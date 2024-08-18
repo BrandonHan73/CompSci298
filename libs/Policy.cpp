@@ -6,7 +6,7 @@
 #include <random>
 #include <vector>
 
-#include "include/Policy.h"
+#include "Policy.h"
 
 Policy::Policy(uint32_t actions) : action_count(actions), distribution(actions) {
 

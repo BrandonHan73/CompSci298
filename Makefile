@@ -2,11 +2,18 @@
 run: a.out
 	./a.out
 
-includes = -I. -I./third-party/eigen-3.4.0
+init:
+	mkdir out
+	mkdir third-party
+	wget -P third-party https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+	tar -xvf third-party/eigen-3.4.0.tar.gz -C third-party
+
+includes = -I./include -I./third-party/eigen-3.4.0
 
 objects = out/Main.o out/Policy.o out/Regression.o
+third_party = third-party/eigen-3.4.0
 
-a.out: $(objects)
+a.out: $(objects) $(third_party)
 	g++ $(includes) -g $(objects)
 
 out/Main.o: include/Policy.h libs/Main.cpp
