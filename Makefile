@@ -1,6 +1,6 @@
 
 run: a.out
-	./a.out
+	@./a.out
 
 init:
 	mkdir out
@@ -14,14 +14,18 @@ objects = out/Main.o out/Policy.o out/Regression.o
 third_party = third-party/eigen-3.4.0
 
 a.out: $(objects) $(third_party)
-	g++ $(includes) -g $(objects)
+	@echo Linking...
+	@g++ $(includes) -g $(objects)
 
-out/Main.o: include/Policy.h libs/Main.cpp
-	g++ $(includes) -o out/Main.o -c -g libs/Main.cpp
+out/Main.o: include/Policy.h include/Regression.h libs/Main.cpp
+	@echo Compiling out/Main.o
+	@g++ $(includes) -o out/Main.o -c -g libs/Main.cpp
 
 out/Policy.o: include/Policy.h libs/Policy.cpp
-	g++ $(includes) -o out/Policy.o -c -g libs/Policy.cpp
+	@echo Compiling out/Policy.o
+	@g++ $(includes) -o out/Policy.o -c -g libs/Policy.cpp
 
 out/Regression.o: include/Regression.h libs/Regression.cpp
-	g++ $(includes) -o out/Regression.o -c -g libs/Regression.cpp
+	@echo Compiling out/Regression.o
+	@g++ $(includes) -o out/Regression.o -c -g libs/Regression.cpp
 
