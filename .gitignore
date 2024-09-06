@@ -1,0 +1,6 @@
+
+.clangd
+out/
+third-party/
+*.out
+

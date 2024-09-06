@@ -1,5 +1,6 @@
 
 run: a.out
+	@echo
 	@./a.out
 
 init:
@@ -14,6 +15,7 @@ objects = out/Main.o out/Policy.o out/Regression.o
 third_party = third-party/eigen-3.4.0
 
 a.out: $(objects) $(third_party)
+	@echo
 	@echo Linking...
 	@g++ $(includes) -g $(objects)
 
