@@ -1,12 +1,27 @@
 
 #include <iostream>
 
+#include "CrashGame.h"
 #include "Policy.h"
 #include "Regression.h"
 
 int main() {
 
-	Policy pol(3);
+	CrashGame game;
+
+	game.print_details(std::cout);
+	std::cout << std::endl;
+
+	game.update(3, 3);
+	std::cout << std::endl;
+
+	game.print_details(std::cout);
+	std::cout << std::endl;
+
+	return 0;
+}
+
+int test_regression() {
 
 	Regression reg(2, 2, 64);
 
@@ -43,5 +58,6 @@ int main() {
 	input << 1, 1;
 	std::cout << reg.feed(input) << std::endl << std::endl;
 
+	return 0;
 }
 
