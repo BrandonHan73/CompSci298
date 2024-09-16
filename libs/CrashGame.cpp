@@ -1,7 +1,6 @@
 
 #include <chrono>
 #include <ctime>
-#include <iostream>
 #include <ostream>
 #include <random>
 #include <utility>
@@ -70,13 +69,9 @@ std::pair<double, double> CrashGame::update(int truck_action, int car_action) {
 
 std::vector<std::vector<double>> CrashGame::get_rewards() const { return rewards; }
 
-double CrashGame::get_rewards(int row, int col) const {
-	return rewards[row][col];
-}
+double CrashGame::get_rewards(int row, int col) const { return rewards[row][col]; }
 
-double CrashGame::get_rewards(std::pair<int, int> loc) const {
-	return get_rewards(loc.first, loc.second);
-}
+double CrashGame::get_rewards(std::pair<int, int> loc) const { return get_rewards(loc.first, loc.second); }
 
 std::pair<int, int> CrashGame::get_truck_loc() const { return truck; }
 
