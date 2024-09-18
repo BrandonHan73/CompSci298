@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "CrashGame.h"
+#include "CrashGamePolicy.h"
 #include "Policy.h"
 #include "Regression.h"
 
@@ -12,11 +13,9 @@ int main() {
 	game.print_details(std::cout);
 	std::cout << std::endl;
 
-	game.update(3, 3);
-	std::cout << std::endl;
+	CrashGamePolicy pol;
 
-	game.print_details(std::cout);
-	std::cout << std::endl;
+	pol.train(game);
 
 	return 0;
 }

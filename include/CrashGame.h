@@ -27,6 +27,8 @@ public:
 	double get_rewards(int row, int col) const;
 	double get_rewards(std::pair<int, int> loc) const;
 
+	int get_size() const;
+
 	std::pair<int, int> get_truck_loc() const;
 	std::pair<int, int> get_car_loc() const;
 

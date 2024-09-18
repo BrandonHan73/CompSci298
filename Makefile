@@ -11,7 +11,7 @@ init:
 
 includes = -I./include -I./third-party/eigen-3.4.0
 
-objects = out/Main.o out/Policy.o out/Regression.o out/CrashGame.o
+objects = out/Main.o out/Policy.o out/Regression.o out/CrashGame.o out/CrashGamePolicy.o
 third_party = third-party/eigen-3.4.0
 
 a.out: $(objects) $(third_party)
@@ -34,4 +34,8 @@ out/Regression.o: include/Regression.h libs/Regression.cpp
 out/CrashGame.o: include/CrashGame.h libs/CrashGame.cpp
 	@echo Compiling out/CrashGame.o
 	@g++ $(includes) -o out/CrashGame.o -c -g libs/CrashGame.cpp
+
+out/CrashGamePolicy.o: include/CrashGamePolicy.h libs/CrashGamePolicy.cpp
+	@echo Compiling out/CrashGamePolicy.o
+	@g++ $(includes) -o out/CrashGamePolicy.o -c -g libs/CrashGamePolicy.cpp
 
