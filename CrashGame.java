@@ -2,7 +2,7 @@ import java.io.PrintStream;
 
 public class CrashGame {
 
-	private final double truck_crash_reward = 2.0;
+	private final double truck_crash_reward = 5.0;
 	private final double car_crash_cost = 10.0;
 
 	public final int rows, cols;

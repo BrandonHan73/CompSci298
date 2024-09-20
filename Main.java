@@ -11,6 +11,7 @@ public class Main {
 
 		pol.train();
 
+		int[][] possibilities;
 		int[] actions;
 		double[] rewards;
 		char escCode = 0x1B;
@@ -18,7 +19,8 @@ public class Main {
 
 			System.out.println();
 
-			actions = pol.evaluate(game.get_state());
+			possibilities = pol.fictitious_play(game.get_state());
+			actions = pol.evaluate(possibilities);
 			rewards = game.update(actions);
 
 			game.print(System.out);
@@ -27,13 +29,20 @@ public class Main {
 			Main.print(System.out, actions);
 
 			System.out.println(String.format("                                                          %c[A", escCode));
+			System.out.print("Truck options: ");
+			Main.print(System.out, possibilities[0]);
+
+			System.out.println(String.format("                                                          %c[A", escCode));
+			System.out.print("Car options: ");
+			Main.print(System.out, possibilities[1]);
+
+			System.out.println(String.format("                                                          %c[A", escCode));
 			System.out.print("Reward pair: ");
 			Main.print(System.out, rewards);
 
-
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 16; i++) {
+			for(int i = 0; i < 18; i++) {
 				System.out.print(String.format("%c[A", escCode));
 			}
 		}

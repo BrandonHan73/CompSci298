@@ -10,15 +10,15 @@ public class CrashGamePolicy {
 
 	private final CrashGame base_game;
 
-	private final int fictitious_play_iterations = 256;
-	private final int Q_iterations = 128;
+	private final int fictitious_play_iterations = 64;
+	private final int Q_iterations = 512;
 	private final double Beta = 0.4;
 
 	public CrashGamePolicy(CrashGame game) {
 		state_count = (int) Math.pow(game.rows, 2) * (int) Math.pow(game.cols, 2);
 		base_game = game;
 
-		Q= new double[state_count][action_count][action_count][2];
+		Q = new double[state_count][action_count][action_count][2];
 
 		for(int state = 0; state < state_count; state++) {
 			for(int truck_action = 0; truck_action < action_count; truck_action++) {
@@ -157,13 +157,15 @@ public class CrashGamePolicy {
 		return eval;
 	}
 
-	int[] evaluate(int state) {
-		int[][] actions = fictitious_play(state);
-
+	int[] evaluate(int[][] actions) {
 		int truck_action = actions[TRUCK][ (int) (Math.random() * actions[TRUCK].length) ];
 		int car_action = actions[CAR][ (int) (Math.random() * actions[CAR].length) ];
 
 		return new int[] { truck_action, car_action };
+	}
+
+	int[] evaluate(int state) {
+		return evaluate(fictitious_play(state));
 	}
 
 	public void train() {
