@@ -10,7 +10,7 @@ public class CrashGamePolicy {
 
 	private final CrashGame base_game;
 
-	private final int fictitious_play_iterations = 512;
+	private final int fictitious_play_iterations = 256;
 	private final int Q_iterations = 128;
 	private final double Beta = 0.4;
 
@@ -175,6 +175,14 @@ public class CrashGamePolicy {
 
 		double[][][][] Q_update = new double[state_count][action_count][action_count][2];
 
+		String title_text = "Training: ";
+		System.out.print(title_text);
+		for(int i = title_text.length(); i < 100; i++) {
+			System.out.print("-");
+		}
+		System.out.println("|");
+		int progress = 0;
+
 		for(int iteration = 0; iteration < Q_iterations; iteration++) {
 			Q_update = new double[state_count][action_count][action_count][2];
 
@@ -199,9 +207,19 @@ public class CrashGamePolicy {
 
 			Q = Q_update;
 
-			System.out.println("Q iteration " + iteration + " completed");
+			while(progress < 100 * (double) iteration / Q_iterations) {
+				System.out.print("*");
+				progress++;
+			}
 
 		}
+
+		while(progress < 100) {
+			System.out.print("*");
+			progress++;
+		}
+		System.out.println("|");
+		System.out.println("Training complete");
 	}
 
 }

@@ -7,15 +7,15 @@ public class Main {
 		CrashGame game = new CrashGame(5, 5);
 		game = new CrashGame(game, 1);
 
-		game.print(System.out);
-
 		CrashGamePolicy pol = new CrashGamePolicy(game);
 
 		pol.train();
 
 		int[] actions;
 		double[] rewards;
+		char escCode = 0x1B;
 		while(true) {
+
 			System.out.println();
 
 			actions = pol.evaluate(game.get_state());
@@ -26,10 +26,16 @@ public class Main {
 			System.out.print("Action pair: ");
 			Main.print(System.out, actions);
 
+			System.out.println(String.format("                                                          %c[A", escCode));
 			System.out.print("Reward pair: ");
 			Main.print(System.out, rewards);
 
+
 			TimeUnit.SECONDS.sleep(1);
+
+			for(int i = 0; i < 16; i++) {
+				System.out.print(String.format("%c[A", escCode));
+			}
 		}
 	}
 

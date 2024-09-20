@@ -139,18 +139,26 @@ public class CrashGame {
 		Main.print(out, car);
 		out.println();
 
+		for(int col = 0; col < cols; col++) {
+			out.print("---");
+		}
+		out.println("-");
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
 				out.print("|");
 				if(truck.row == row && truck.col == col) {
-					out.print("OO");
+					out.print("TT");
 				} else if(car.row == row && car.col == col) {
-					out.print("--");
+					out.print("cc");
 				} else {
 					out.print("  ");
 				}
 			}
 			out.println("|");
+			for(int col = 0; col < cols; col++) {
+				out.print("---");
+			}
+			out.println("-");
 		}
 	}
 
