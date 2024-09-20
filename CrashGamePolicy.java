@@ -10,9 +10,9 @@ public class CrashGamePolicy {
 
 	private final CrashGame base_game;
 
-	private final int fictitious_play_iterations = 64;
-	private final int Q_iterations = 512;
-	private final double Beta = 0.4;
+	private final int fictitious_play_iterations = 256;
+	private final int Q_iterations = 1024;
+	private final double Beta = 0.6;
 
 	public CrashGamePolicy(CrashGame game) {
 		state_count = (int) Math.pow(game.rows, 2) * (int) Math.pow(game.cols, 2);
@@ -174,6 +174,7 @@ public class CrashGamePolicy {
 		double[] rewards;
 		int[][] actions;
 		double[] Q_evaluation;
+		int new_state;
 
 		double[][][][] Q_update = new double[state_count][action_count][action_count][2];
 
@@ -196,8 +197,9 @@ public class CrashGamePolicy {
 						sim = new CrashGame(base_game, state);
 						rewards = sim.update(truck_action, car_action);
 
-						actions = fictitious_play(state);
-						Q_evaluation = distribution_Q(state, actions);
+						new_state = sim.get_state();
+						actions = fictitious_play(new_state);
+						Q_evaluation = distribution_Q(new_state, actions);
 
 						Q_update[state][truck_action][car_action][TRUCK] = rewards[TRUCK] + Beta * Q_evaluation[TRUCK];
 						Q_update[state][truck_action][car_action][CAR] = rewards[CAR] + Beta * Q_evaluation[CAR];
