@@ -1,6 +1,6 @@
 import java.io.PrintStream;
 
-public class CrashGame {
+public class CrashGame extends Game {
 
 	private final double truck_crash_reward = 5.0;
 	private final double car_crash_cost = 10.0;
@@ -55,6 +55,21 @@ public class CrashGame {
 		state /= rows;
 	}
 
+	@Override
+	public int get_state_count() {
+		return (int) Math.pow(rows, 2) * (int) Math.pow(cols, 2);
+	}
+
+	@Override
+	public int get_action_count() {
+		return 4;
+	}
+
+	@Override
+	public Game get_copy(int state) {
+		return new CrashGame(this, state);
+	}
+
 	public void randomize_positions() {
 		truck.randomize(rows, cols);
 		do {
@@ -66,6 +81,7 @@ public class CrashGame {
 		return rewards[pos.row][pos.col];
 	}
 
+	@Override
 	public int get_state() {
 		int state = truck.row;
 		state = state * cols + truck.col;
@@ -78,6 +94,7 @@ public class CrashGame {
 		return update(actions[0], actions[1]);
 	}
 
+	@Override
 	public double[] update(int truck_action, int car_action) {
 		Position truck_old = new Position(truck);
 		Position car_old = new Position(car);

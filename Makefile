@@ -1,5 +1,5 @@
 
-objects = out/Main.class out/Position.class out/CrashGame.class out/CrashGamePolicy.class
+objects = out/Config.class out/CrashGame.class out/Game.class out/Main.class out/Policy.class out/Position.class
 
 all: $(objects)
 	@echo
@@ -7,23 +7,33 @@ all: $(objects)
 	@echo
 	@java -cp out/ Main
 
-out/Main.class: Main.java
+out/Config.class: Config.java
 	@echo
-	@echo Compiling Main.java
-	@javac -d out/ Main.java
-
-out/Position.class: Position.java
-	@echo
-	@echo Compiling Position.java
-	@javac -d out/ Position.java
+	@echo Compiling Config.java
+	@javac -d out/ Config.java
 
 out/CrashGame.class: CrashGame.java
 	@echo
 	@echo Compiling CrashGame.java
 	@javac -d out/ CrashGame.java
 
-out/CrashGamePolicy.class: CrashGamePolicy.java
+out/Game.class: Game.java
 	@echo
-	@echo Compiling CrashGamePolicy.java
-	@javac -d out/ CrashGamePolicy.java
+	@echo Compiling Game.java
+	@javac -d out/ Game.java
+
+out/Main.class: Main.java
+	@echo
+	@echo Compiling Main.java
+	@javac -d out/ Main.java
+
+out/Policy.class: Policy.java
+	@echo
+	@echo Compiling Policy.java
+	@javac -d out/ Policy.java
+
+out/Position.class: Position.java
+	@echo
+	@echo Compiling Position.java
+	@javac -d out/ Position.java
 

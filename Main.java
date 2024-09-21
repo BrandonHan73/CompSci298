@@ -5,9 +5,8 @@ public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
 		CrashGame game = new CrashGame(5, 5);
-		game = new CrashGame(game, 1);
 
-		CrashGamePolicy pol = new CrashGamePolicy(game);
+		Policy pol = new Policy(game);
 
 		pol.train();
 
