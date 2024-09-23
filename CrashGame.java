@@ -149,11 +149,11 @@ public class CrashGame extends Game {
 
 	public void print(PrintStream out) {
 		out.print("Truck position: ");
-		Main.print(out, truck);
+		Utility.print(out, truck);
 		out.println();
 
 		out.print("Car position: ");
-		Main.print(out, car);
+		Utility.print(out, car);
 		out.println();
 
 		for(int col = 0; col < cols; col++) {

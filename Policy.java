@@ -27,8 +27,7 @@ public class Policy {
 		}
 	}
 
-	public int[][] fictitious_play(int state) {
-
+	private ArrayList<Integer>[][] best_response(int state) {
 		ArrayList<Integer>[][] response = new ArrayList[2][action_count];
 		double best_reward, reward;
 
@@ -70,36 +69,10 @@ public class Policy {
 
 		}
 
-		double[][] action_counts = new double[2][action_count];
-		for(int action = 0; action < action_count; action++) {
-			action_counts[P1][action] = 1.0 / action_count;
-			action_counts[P2][action] = 1.0 / action_count;
-		}
+		return response;
+	}
 
-		double[][] reaction = new double[2][];
-
-		for(int moves = 1; moves < Config.fictitious_play_iterations; moves++) {
-
-			reaction[P1] = new double[action_count];
-			for(int p2_action = 0; p2_action < action_count; p2_action++) {
-				for(int p1_action : response[P1][p2_action]) {
-					reaction[P1][p1_action] += action_counts[P2][p2_action] / moves / response[P1][p2_action].size();
-				}
-			}
-
-			reaction[P2] = new double[action_count];
-			for(int p1_action = 0; p1_action < action_count; p1_action++) {
-				for(int p2_action : response[P2][p1_action]) {
-					reaction[P2][p2_action] += action_counts[P1][p1_action] / moves / response[P2][p1_action].size();
-				}
-			}
-
-			for(int action = 0; action < action_count; action++) {
-				action_counts[P1][action] += reaction[P1][action];
-				action_counts[P2][action] += reaction[P2][action];
-			}
-
-		}
+	private int[][] pick_most_common(double[][] action_counts) {
 
 		ArrayList<Integer> choice = new ArrayList<>();
 		int[][] result = new int[2][];
@@ -138,10 +111,49 @@ public class Policy {
 		return result;
 	}
 
+	public int[][] fictitious_play(int state) {
+
+		ArrayList<Integer>[][] response = best_response(state);
+
+		double[][] action_counts = new double[2][action_count];
+		for(int action = 0; action < action_count; action++) {
+			action_counts[P1][action] = 1.0 / action_count;
+			action_counts[P2][action] = 1.0 / action_count;
+		}
+
+		double[][] reaction = new double[2][];
+
+		for(int moves = 1; moves < Config.fictitious_play_iterations; moves++) {
+
+			reaction[P1] = new double[action_count];
+			for(int p2_action = 0; p2_action < action_count; p2_action++) {
+				for(int p1_action : response[P1][p2_action]) {
+					reaction[P1][p1_action] += action_counts[P2][p2_action] / moves / response[P1][p2_action].size();
+				}
+			}
+
+			reaction[P2] = new double[action_count];
+			for(int p1_action = 0; p1_action < action_count; p1_action++) {
+				for(int p2_action : response[P2][p1_action]) {
+					reaction[P2][p2_action] += action_counts[P1][p1_action] / moves / response[P2][p1_action].size();
+				}
+			}
+
+			for(int action = 0; action < action_count; action++) {
+				action_counts[P1][action] += reaction[P1][action];
+				action_counts[P2][action] += reaction[P2][action];
+			}
+
+		}
+
+		return pick_most_common(action_counts);
+
+	}
+
 	double[] Q_expectation(int state, int[][] actions) {
 
 		double[] eval = new double[] { 0, 0 };
-		int possibilities = actions[P1].length + actions[P2].length;
+		int possibilities = actions[P1].length * actions[P2].length;
 
 		for(int truck_action : actions[P1]) {
 			for(int car_action : actions[P2]) {
@@ -163,8 +175,12 @@ public class Policy {
 
 		double[][][][] Q_update = new double[state_count][action_count][action_count][2];
 
+		double max_change;
+
 		for(int iteration = 0; iteration < Config.Q_iterations; iteration++) {
 			Q_update = new double[state_count][action_count][action_count][2];
+
+			max_change = Double.MIN_VALUE;
 
 			for(int state = 0; state < state_count; state++) {
 
@@ -181,12 +197,16 @@ public class Policy {
 						Q_update[state][p1_action][p2_action][P1] = rewards[P1] + Config.Beta * Q_evaluation[P1];
 						Q_update[state][p1_action][p2_action][P2] = rewards[P2] + Config.Beta * Q_evaluation[P2];
 
+						max_change = Math.max(max_change, Math.abs(Q_update[state][p1_action][p2_action][P1] - Q[state][p1_action][p2_action][P1]));
+						max_change = Math.max(max_change, Math.abs(Q_update[state][p2_action][p2_action][P2] - Q[state][p2_action][p2_action][P2]));
+
 					}
 				}
 
 			}
 
 			Q = Q_update;
+			System.out.println("Largest update: " + max_change);
 		}
 
 	}
