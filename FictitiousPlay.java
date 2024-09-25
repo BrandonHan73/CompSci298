@@ -1,7 +1,16 @@
+import java.util.ArrayList;
 
 public class FictitiousPlay {
 
 	private static final int P1 = 0, P2 = 1;
+
+	public static int[][] basic_nash(double[][][] Q, int action_count) {
+
+		int[][][] response = best_responses(Q, action_count);
+
+
+		return null;
+	}
 
 	/**
 	 * Determines the best response for every action in the current state. Returns an array
