@@ -3,13 +3,77 @@ import java.util.ArrayList;
 public class FictitiousPlay {
 
 	private static final int P1 = 0, P2 = 1;
+	
+	public static int[][] evaluate_state(double[][][] Q, int action_count) {
 
+		int[][] all_nash = basic_nash(Q, action_count);
+		int[][] best_nash;
+		int[][] out = null;
+
+		ArrayList<Integer> choices;
+
+		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
+
+			best_nash = pick_nash(Q, all_nash);
+			out = new int[2][];
+
+			choices = new ArrayList<>();
+			for(int[] action_pair : best_nash) {
+				choices.add(action_pair[P1]);
+			}
+			out[P1] = Utility.removeDuplicates(Utility.toArray(choices));
+
+			choices = new ArrayList<>();
+			for(int[] action_pair : best_nash) {
+				choices.add(action_pair[P2]);
+			}
+			out[P2] = Utility.removeDuplicates(Utility.toArray(choices));
+
+		} else {
+			out = fictitious_play(Q, action_count);
+		}
+
+		return out;
+	}
+
+	/**
+	 * Finds all pure Nash equilibriums for the current state. Returns an array of
+	 * action pairs. 
+	 *
+	 * @param Q The Q function for the current state.
+	 * @param action_count The number of possible actions for each player. 
+	 */
 	public static int[][] basic_nash(double[][][] Q, int action_count) {
 
 		int[][][] response = best_responses(Q, action_count);
 
+		ArrayList<int[]> nash = new ArrayList<>();
 
-		return null;
+		for(int p1_action = 0; p1_action < action_count; p1_action++) {
+			for(int p2_action = 0; p2_action < action_count; p2_action++) {
+
+				if(Utility.contains(response[P1][p2_action], p1_action) && Utility.contains(response[P2][p1_action], p2_action)) {
+					nash.add(new int[] {p1_action, p2_action});
+				}
+
+			}
+		}
+
+		return Utility.toMatrix(nash);
+	}
+
+	public static int[][] pick_nash(double[][][] Q, int[][] action_pairs) {
+		int[] choices = Utility.argmax(0, action_pairs.length, i -> {
+			int p1_action = action_pairs[i][P1];
+			int p2_action = action_pairs[i][P2];
+			return Q[p1_action][p2_action][P1] + Q[p1_action][p2_action][P2];
+		});
+
+		int[][] out = new int[choices.length][];
+		for(int i = 0; i < choices.length; i++) {
+			out[i] = action_pairs[choices[i]];
+		}
+		return out;
 	}
 
 	/**
@@ -48,6 +112,13 @@ public class FictitiousPlay {
 		return result;
 	}
 
+	/**
+	 * Takes an array of action choices and makes a uniformly random decision for each
+	 * player. The input array's first dimension represents which player. The result
+	 * of action[ployer] is an array of action choices. 
+	 *
+	 * @param actions The array of possible actions. 
+	 */
 	public static int[] evaluate_options(int[][] actions) {
 		int[] result = new int[actions.length];
 

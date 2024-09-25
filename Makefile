@@ -1,5 +1,10 @@
 
-objects = out/Config.class out/CrashGame.class out/Game.class out/Main.class out/Policy.class out/Position.class out/LogisticRegression.class out/FictitiousPlay.class
+game_objects = out/Game.class out/CrashGame.class out/RockPaperScissors.class
+smart_objects = out/Policy.class out/FictitiousPlay.class out/LogisticRegression.class
+base_objects = out/Config.class out/Main.class out/Position.class out/Utility.class
+
+objects = $(game_objects) $(smart_objects) $(base_objects)
+
 libraries = lib/Jama-1.0.3.jar
 
 class_path = .:lib/Jama-1.0.3.jar
@@ -52,4 +57,14 @@ out/FictitiousPlay.class: FictitiousPlay.java
 	@echo
 	@echo Compiling FictitiousPlay.java
 	@javac -d out/ -cp $(class_path) FictitiousPlay.java
+
+out/Utility.class: Utility.java
+	@echo
+	@echo Compiling Utility.java
+	@javac -d out/ -cp $(class_path) Utility.java
+
+out/RockPaperScissors.class: RockPaperScissors.java
+	@echo
+	@echo Compiling RockPaperScissors.java
+	@javac -d out/ -cp $(class_path) RockPaperScissors.java
 

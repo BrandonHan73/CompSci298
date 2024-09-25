@@ -32,10 +32,14 @@ public class Policy {
 
 		for(int truck_action : actions[P1]) {
 			for(int car_action : actions[P2]) {
-				eval[P1] += Q[state][truck_action][car_action][P1] / possibilities;
-				eval[P2] += Q[state][truck_action][car_action][P2] / possibilities;
+				eval[P1] += Q[state][truck_action][car_action][P1];
+				eval[P2] += Q[state][truck_action][car_action][P2];
+
 			}
 		}
+
+		eval[P1] /= possibilities;
+		eval[P2] /= possibilities;
 
 		return eval;
 	}
@@ -72,8 +76,14 @@ public class Policy {
 						Q_update[state][p1_action][p2_action][P1] = rewards[P1] + Config.Beta * Q_evaluation[P1];
 						Q_update[state][p1_action][p2_action][P2] = rewards[P2] + Config.Beta * Q_evaluation[P2];
 
-						max_change = Math.max(max_change, Math.abs(Q_update[state][p1_action][p2_action][P1] - Q[state][p1_action][p2_action][P1]));
-						max_change = Math.max(max_change, Math.abs(Q_update[state][p2_action][p2_action][P2] - Q[state][p2_action][p2_action][P2]));
+						max_change = Math.max(
+							max_change, 
+							Math.abs(Q_update[state][p1_action][p2_action][P1] - Q[state][p1_action][p2_action][P1])
+						);
+						max_change = Math.max(
+							max_change, 
+							Math.abs(Q_update[state][p1_action][p2_action][P2] - Q[state][p1_action][p2_action][P2])
+						);
 
 					}
 				}
@@ -87,7 +97,7 @@ public class Policy {
 	}
 
 	public int[][] get_action_options(int state) {
-		return FictitiousPlay.fictitious_play(Q[state], action_count);
+		return FictitiousPlay.evaluate_state(Q[state], action_count);
 	}
 
 	public int[] evaluate(int state) {
