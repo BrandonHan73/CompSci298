@@ -5,19 +5,7 @@ import Jama.Matrix;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		LogisticRegression lr = new LogisticRegression(2, 5, 1, 3);
-
-		for(int i = 0; i < 4096; i++) {
-			lr.train(new double[] {0, 0}, new double[] {0, 0, 0});
-			lr.train(new double[] {0, 1}, new double[] {0, 1, 1});
-			lr.train(new double[] {1, 0}, new double[] {0, 1, 1});
-			lr.train(new double[] {1, 1}, new double[] {1, 1, 0});
-		}
-
-		Utility.print(System.out, lr.pass(new double[] {0, 0}));
-		Utility.print(System.out, lr.pass(new double[] {0, 1}));
-		Utility.print(System.out, lr.pass(new double[] {1, 0}));
-		Utility.print(System.out, lr.pass(new double[] {1, 1}));
+		runCrashGame(args);
 	}
 
 	public static void runRockPaperScissors(String[] args) throws InterruptedException {
@@ -38,8 +26,8 @@ public class Main {
 
 			System.out.println("Cycle " + iteration);
 
-			possibilities = pol.fictitious_play(game.get_state());
-			actions = pol.evaluate(possibilities);
+			possibilities = pol.get_action_options(game.get_state());
+			actions = FictitiousPlay.evaluate_options(possibilities);
 			rewards = game.update(actions);
 
 			System.out.print("Action pair: ");
@@ -80,8 +68,8 @@ public class Main {
 
 			System.out.println();
 
-			possibilities = pol.fictitious_play(game.get_state());
-			actions = pol.evaluate(possibilities);
+			possibilities = pol.get_action_options(game.get_state());
+			actions = FictitiousPlay.evaluate_options(possibilities);
 			rewards = game.update(actions);
 
 			game.print(System.out);

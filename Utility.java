@@ -1,5 +1,7 @@
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.function.IntToDoubleFunction;
 
 public class Utility {
 
@@ -37,6 +39,33 @@ public class Utility {
 
 	public static void print(PrintStream out, Position pos) {
 		out.print("(" + pos.row + ", " + pos.col + ")");
+	}
+
+	public static int[] toArray(ArrayList<Integer> arr) {
+		int[] out = new int[arr.size()];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = arr.get(i);
+		}
+		return out;
+	}
+
+	public static int[] argmax(int start, int end, IntToDoubleFunction f) {
+
+		ArrayList<Integer> choice = new ArrayList<>();
+		double best;
+
+		best = Double.MIN_VALUE;
+		for(int i = start; i < end; i++) {
+			if(f.applyAsDouble(i) > best) {
+				choice = new ArrayList<>();
+				choice.add(i);
+				best = f.applyAsDouble(i);
+			} else if(f.applyAsDouble(i) == best) {
+				choice.add(i);
+			}
+		}
+
+		return Utility.toArray(choice);
 	}
 
 }

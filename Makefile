@@ -1,5 +1,5 @@
 
-objects = out/Config.class out/CrashGame.class out/Game.class out/Main.class out/Policy.class out/Position.class out/LogisticRegression.class
+objects = out/Config.class out/CrashGame.class out/Game.class out/Main.class out/Policy.class out/Position.class out/LogisticRegression.class out/FictitiousPlay.class
 libraries = lib/Jama-1.0.3.jar
 
 class_path = .:lib/Jama-1.0.3.jar
@@ -47,4 +47,9 @@ out/LogisticRegression.class: LogisticRegression.java
 	@echo
 	@echo Compiling LogisticRegression.java
 	@javac -d out/ -cp $(class_path) LogisticRegression.java
+
+out/FictitiousPlay.class: FictitiousPlay.java
+	@echo
+	@echo Compiling FictitiousPlay.java
+	@javac -d out/ -cp $(class_path) FictitiousPlay.java
 
