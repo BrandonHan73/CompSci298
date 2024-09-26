@@ -13,6 +13,7 @@ public class FictitiousPlay {
 		ArrayList<Integer> choices;
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
+			System.out.println("Use pure Nash");
 
 			best_nash = pick_nash(Q, all_nash);
 			out = new int[2][];
@@ -30,6 +31,7 @@ public class FictitiousPlay {
 			out[P2] = Utility.removeDuplicates(Utility.toArray(choices));
 
 		} else {
+			System.out.println("Use fictitious play");
 			out = fictitious_play(Q, action_count);
 		}
 

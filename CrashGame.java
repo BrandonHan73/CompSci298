@@ -26,14 +26,18 @@ public class CrashGame extends Game {
 		randomize_positions();
 	}
 
-	public CrashGame(CrashGame o) {
-		rows = o.rows;
-		cols = o.cols;
-		rewards = o.rewards;
+	public CrashGame(double[][] rewards_) {
+		this(rewards_.length, rewards_[0].length);
 
-		truck = new Position();
-		car = new Position();
-		randomize_positions();
+		for(int r = 0; r < rows; r++) {
+			for(int c = 0; c < cols; c++) {
+				rewards[r][c] = rewards_[r][c];
+			}
+		}
+	}
+
+	public CrashGame(CrashGame o) {
+		this(o.rewards);
 	}
 
 	public CrashGame(CrashGame o, int state) {

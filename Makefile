@@ -9,7 +9,7 @@ libraries = lib/Jama-1.0.3.jar
 
 class_path = .:lib/Jama-1.0.3.jar
 
-all: $(objects) $(libraries)
+all: $(libraries) $(objects) 
 	@echo
 	@echo Executing Main
 	@echo

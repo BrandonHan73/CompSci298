@@ -54,7 +54,13 @@ public class Main {
 	}
 
 	public static void runCrashGame(String[] args) throws InterruptedException {
-		CrashGame game = new CrashGame(5, 5);
+		CrashGame game = new CrashGame(new double[][] {
+			{ 0, 0, 1, 0, 1, 0, 0 },
+			{ 0, 1, 2, 1, 2, 1, 0 },
+			{ 0, 2, 4, 3, 2, 2, 1 },
+			{ 0, 1, 2, 1, 2, 1, 0 },
+			{ 0, 0, 1, 0, 1, 0, 0 }
+		});
 
 		Policy pol = new Policy(game);
 
@@ -64,9 +70,13 @@ public class Main {
 		int[] actions;
 		double[] rewards;
 		char escCode = 0x1B;
-		while(true) {
+		for(int iteration = 1; true; iteration++) {
 
 			System.out.println();
+
+			if(iteration % 20 == 0) {
+				game.randomize_positions();
+			}
 
 			possibilities = pol.get_action_options(game.get_state());
 			actions = FictitiousPlay.evaluate_options(possibilities);
