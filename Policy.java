@@ -8,6 +8,12 @@ public class Policy {
 
 	private final int P1 = 0, P2 = 1;
 
+	/**
+	 * Creates a policy for the given game. Future training will
+	 * be done on copies of the passed game. 
+	 *
+	 * @param game The game to train on. 
+	 */
 	public Policy(Game game) {
 		state_count = game.get_state_count();
 		action_count = game.get_action_count();
@@ -18,25 +24,6 @@ public class Policy {
 		for(int state = 0; state < state_count; state++) {
 			Q[state] = new StateQ(action_count);
 		}
-	}
-
-	double[] Q_expectation(int state, int[][] actions) {
-
-		double[] eval = new double[] { 0, 0 };
-		int possibilities = actions[P1].length * actions[P2].length;
-
-		for(int truck_action : actions[P1]) {
-			for(int car_action : actions[P2]) {
-				eval[P1] += Q[state].get(truck_action, car_action, P1);
-				eval[P2] += Q[state].get(truck_action, car_action, P2);
-
-			}
-		}
-
-		eval[P1] /= possibilities;
-		eval[P2] /= possibilities;
-
-		return eval;
 	}
 
 	public void train() {
@@ -71,7 +58,7 @@ public class Policy {
 
 						new_state = sim.get_state();
 						actions = get_action_options(new_state);
-						Q_evaluation = Q_expectation(new_state, actions);
+						Q_evaluation = NashSolver.Q_expectation(Q[new_state], actions);
 
 						Q_update[state].set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
 						Q_update[state].set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
