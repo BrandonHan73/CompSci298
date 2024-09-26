@@ -1,3 +1,4 @@
+
 import java.util.concurrent.TimeUnit;
 
 import Jama.Matrix;
@@ -5,18 +6,22 @@ import Jama.Matrix;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		runCrashGame(args);
+		CrashGameTest.base();
 	}
 
 	public static void runRockPaperScissors(String[] args) throws InterruptedException {
 		RockPaperScissors game = new RockPaperScissors();
 
-		System.out.println("Rock Paper Scissors");
+		Utility.println(System.out, "Rock Paper Scissors");
+
+		Config.debug = false;
 
 		Policy pol = new Policy(game);
 		pol.train();
 
-		System.out.println("-------------------");
+		Config.debug = true;
+
+		Utility.println(System.out, "-------------------");
 
 		int[][] possibilities;
 		int[] actions;
@@ -24,87 +29,34 @@ public class Main {
 		char escCode = 0x1B;
 		for(int iteration = 1; true; iteration++) {
 
-			System.out.println("Cycle " + iteration);
+			Utility.println(System.out, "Cycle " + iteration);
 
 			possibilities = pol.get_action_options(game.get_state());
-			actions = FictitiousPlay.evaluate_options(possibilities);
+			actions = NashSolver.evaluate_options(possibilities);
 			rewards = game.update(actions);
 
-			System.out.print("Action pair: ");
+			Utility.print(System.out, "Action pair: ");
 			Utility.print(System.out, actions);
 
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("P1 options: ");
+			Utility.println(System.out, String.format("                                                          %c[A", escCode));
+			Utility.print(System.out, "P1 options: ");
 			Utility.print(System.out, possibilities[0]);
 
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("P2 options: ");
+			Utility.println(System.out, String.format("                                                          %c[A", escCode));
+			Utility.print(System.out, "P2 options: ");
 			Utility.print(System.out, possibilities[1]);
 
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("Reward pair: ");
+			Utility.println(System.out, String.format("                                                          %c[A", escCode));
+			Utility.print(System.out, "Reward pair: ");
 			Utility.print(System.out, rewards);
 
 			TimeUnit.SECONDS.sleep(1);
 
 			for(int i = 0; i < 5; i++) {
-				System.out.print(String.format("%c[A", escCode));
+				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}
 	}
 
-	public static void runCrashGame(String[] args) throws InterruptedException {
-		CrashGame game = new CrashGame(new double[][] {
-			{ 0, 0, 1, 0, 1, 0, 0 },
-			{ 0, 1, 2, 1, 2, 1, 0 },
-			{ 0, 2, 4, 3, 2, 2, 1 },
-			{ 0, 1, 2, 1, 2, 1, 0 },
-			{ 0, 0, 1, 0, 1, 0, 0 }
-		});
-
-		Policy pol = new Policy(game);
-
-		pol.train();
-
-		int[][] possibilities;
-		int[] actions;
-		double[] rewards;
-		char escCode = 0x1B;
-		for(int iteration = 1; true; iteration++) {
-
-			System.out.println();
-
-			if(iteration % 20 == 0) {
-				game.randomize_positions();
-			}
-
-			possibilities = pol.get_action_options(game.get_state());
-			actions = FictitiousPlay.evaluate_options(possibilities);
-			rewards = game.update(actions);
-
-			game.print(System.out);
-
-			System.out.print("Action pair: ");
-			Utility.print(System.out, actions);
-
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("Truck options: ");
-			Utility.print(System.out, possibilities[0]);
-
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("Car options: ");
-			Utility.print(System.out, possibilities[1]);
-
-			System.out.println(String.format("                                                          %c[A", escCode));
-			System.out.print("Reward pair: ");
-			Utility.print(System.out, rewards);
-
-			TimeUnit.SECONDS.sleep(1);
-
-			for(int i = 0; i < 18; i++) {
-				System.out.print(String.format("%c[A", escCode));
-			}
-		}
-	}
 }
 

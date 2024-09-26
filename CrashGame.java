@@ -152,34 +152,30 @@ public class CrashGame extends Game {
 	}
 
 	public void print(PrintStream out) {
-		out.print("Truck position: ");
-		Utility.print(out, truck);
-		out.println();
-
-		out.print("Car position: ");
-		Utility.print(out, car);
-		out.println();
+		Utility.println(out, "Truck position: ", truck);
+		Utility.println(out, "Car position: ", car);
+		Utility.println(out, "State code: ", get_state());
 
 		for(int col = 0; col < cols; col++) {
-			out.print("---");
+			Utility.print(out, "---");
 		}
-		out.println("-");
+		Utility.println(out, "-");
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
-				out.print("|");
+				Utility.print(out, "|");
 				if(truck.row == row && truck.col == col) {
-					out.print("TT");
+					Utility.print(out, "TT");
 				} else if(car.row == row && car.col == col) {
-					out.print("cc");
+					Utility.print(out, "cc");
 				} else {
-					out.print("  ");
+					Utility.print(out, "  ");
 				}
 			}
-			out.println("|");
+			Utility.println(out, "|");
 			for(int col = 0; col < cols; col++) {
-				out.print("---");
+				Utility.print(out, "---");
 			}
-			out.println("-");
+			Utility.println(out, "-");
 		}
 	}
 

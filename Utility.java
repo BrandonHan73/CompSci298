@@ -7,40 +7,71 @@ import java.util.function.IntToDoubleFunction;
 
 public class Utility {
 
-	public static void print(PrintStream out, int[][] arr) {
+	private static void print_ob(PrintStream out, int[][] arr) {
 		for(int[] row : arr) {
 			for(int i = 0; i < row.length - 1; i++) {
 				out.print(row[i] + ", ");
 			}
-			out.println(row[row.length - 1]);
+			out.print(row[row.length - 1]);
 		}
 	}
 
-	public static void print(PrintStream out, int[] arr) {
+	private static void print_ob(PrintStream out, int[] arr) {
 		for(int i = 0; i < arr.length - 1; i++) {
 			out.print(arr[i] + ", ");
 		}
-		out.println(arr[arr.length - 1]);
+		out.print(arr[arr.length - 1]);
 	}
 
-	public static void print(PrintStream out, double[][] arr) {
+	private static void print_ob(PrintStream out, double[][] arr) {
 		for(double[] row : arr) {
 			for(int i = 0; i < row.length - 1; i++) {
 				out.print(row[i] + ", ");
 			}
-			out.println(row[row.length - 1]);
+			out.print(row[row.length - 1]);
 		}
 	}
 
-	public static void print(PrintStream out, double[] arr) {
+	private static void print_ob(PrintStream out, double[] arr) {
 		for(int i = 0; i < arr.length - 1; i++) {
 			out.print(arr[i] + ", ");
 		}
-		out.println(arr[arr.length - 1]);
+		out.print(arr[arr.length - 1]);
 	}
 
-	public static void print(PrintStream out, Position pos) {
+	private static void print_ob(PrintStream out, Position pos) {
 		out.print("(" + pos.row + ", " + pos.col + ")");
+	}
+
+	private static void print_ob(PrintStream out, Object o) {
+		if(o instanceof int[][]) {
+			print_ob(out, (int[][]) o);
+		} else if(o instanceof int[]) {
+			print_ob(out, (int[]) o);
+		} else if(o instanceof double[][]) {
+			print_ob(out, (double[][]) o);
+		} else if(o instanceof double[]) {
+			print_ob(out, (double[]) o);
+		} else if(o instanceof Position) {
+			print_ob(out, (Position) o);
+		} else {
+			out.print(o);
+		}
+	}
+
+	public static void print(PrintStream out, Object... args) {
+		if(Config.debug) {
+			for(Object o : args) {
+				print_ob(out, o);
+			}
+		}
+	}
+
+	public static void println(PrintStream out, Object... args) {
+		if(Config.debug) {
+			print(out, args);
+			out.println();
+		}
 	}
 
 	public static int[] toArray(ArrayList<Integer> arr) {

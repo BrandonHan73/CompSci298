@@ -1,10 +1,11 @@
+
 import java.util.ArrayList;
 
-public class FictitiousPlay {
+public class NashSolver {
 
 	private static final int P1 = 0, P2 = 1;
 	
-	public static int[][] evaluate_state(double[][][] Q, int action_count) {
+	public static int[][] evaluate_state(StateQ Q, int action_count) {
 
 		int[][] all_nash = basic_nash(Q, action_count);
 		int[][] best_nash;
@@ -13,7 +14,6 @@ public class FictitiousPlay {
 		ArrayList<Integer> choices;
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
-			System.out.println("Use pure Nash");
 
 			best_nash = pick_nash(Q, all_nash);
 			out = new int[2][];
@@ -31,7 +31,6 @@ public class FictitiousPlay {
 			out[P2] = Utility.removeDuplicates(Utility.toArray(choices));
 
 		} else {
-			System.out.println("Use fictitious play");
 			out = fictitious_play(Q, action_count);
 		}
 
@@ -45,7 +44,7 @@ public class FictitiousPlay {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][] basic_nash(double[][][] Q, int action_count) {
+	public static int[][] basic_nash(StateQ Q, int action_count) {
 
 		int[][][] response = best_responses(Q, action_count);
 
@@ -64,11 +63,11 @@ public class FictitiousPlay {
 		return Utility.toMatrix(nash);
 	}
 
-	public static int[][] pick_nash(double[][][] Q, int[][] action_pairs) {
+	public static int[][] pick_nash(StateQ Q, int[][] action_pairs) {
 		int[] choices = Utility.argmax(0, action_pairs.length, i -> {
 			int p1_action = action_pairs[i][P1];
 			int p2_action = action_pairs[i][P2];
-			return Q[p1_action][p2_action][P1] + Q[p1_action][p2_action][P2];
+			return Q.get(p1_action, p2_action, P1) + Q.get(p1_action, p2_action, P2);
 		});
 
 		int[][] out = new int[choices.length][];
@@ -87,17 +86,17 @@ public class FictitiousPlay {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][][] best_responses(double[][][] Q, int action_count) {
+	public static int[][][] best_responses(StateQ Q, int action_count) {
 		int[][][] out = new int[2][action_count][];
 
 		for(int p2_action = 0; p2_action < action_count; p2_action++) {
 			final int _p2_action = p2_action;
-			out[P1][p2_action] = Utility.argmax(0, action_count, i -> Q[i][_p2_action][P1]);
+			out[P1][p2_action] = Utility.argmax(0, action_count, i -> Q.get(i, _p2_action, P1));
 		}
 
 		for(int p1_action = 0; p1_action < action_count; p1_action++) {
 			final int _p1_action = p1_action;
-			out[P2][p1_action] = Utility.argmax(0, action_count, i -> Q[_p1_action][i][P2]);
+			out[P2][p1_action] = Utility.argmax(0, action_count, i -> Q.get(_p1_action, i, P2));
 		}
 
 		return out;
@@ -131,7 +130,7 @@ public class FictitiousPlay {
 		return result;
 	}
 
-	public static int[][] fictitious_play(double[][][] Q, int action_count) {
+	public static int[][] fictitious_play(StateQ Q, int action_count) {
 
 		int[][][] response = best_responses(Q, action_count);
 

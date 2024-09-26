@@ -9,5 +9,7 @@ public class Config {
 	public static double alpha = 0.4;
 	public static double Beta = 0.4;
 
+	public static boolean debug = true;
+
 }
 

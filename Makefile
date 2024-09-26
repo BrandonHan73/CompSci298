@@ -1,9 +1,10 @@
 
 game_objects = out/Game.class out/CrashGame.class out/RockPaperScissors.class
-smart_objects = out/Policy.class out/FictitiousPlay.class out/LogisticRegression.class
+smart_objects = out/Policy.class out/NashSolver.class out/LogisticRegression.class
 base_objects = out/Config.class out/Main.class out/Position.class out/Utility.class
+test_objects = out/CrashGameTest.class
 
-objects = $(game_objects) $(smart_objects) $(base_objects)
+objects = $(game_objects) $(smart_objects) $(base_objects) $(test_objects)
 
 libraries = lib/Jama-1.0.3.jar
 
@@ -53,10 +54,10 @@ out/LogisticRegression.class: LogisticRegression.java
 	@echo Compiling LogisticRegression.java
 	@javac -d out/ -cp $(class_path) LogisticRegression.java
 
-out/FictitiousPlay.class: FictitiousPlay.java
+out/FNashSolver.class: NashSolver.java
 	@echo
-	@echo Compiling FictitiousPlay.java
-	@javac -d out/ -cp $(class_path) FictitiousPlay.java
+	@echo Compiling NashSolver.java
+	@javac -d out/ -cp $(class_path) NashSolver.java
 
 out/Utility.class: Utility.java
 	@echo
@@ -67,4 +68,9 @@ out/RockPaperScissors.class: RockPaperScissors.java
 	@echo
 	@echo Compiling RockPaperScissors.java
 	@javac -d out/ -cp $(class_path) RockPaperScissors.java
+
+out/CrashGameTest.class: CrashGameTest.java
+	@echo
+	@echo Compiling CrashGameTest.java
+	@javac -d out/ -cp $(class_path) CrashGameTest.java
 
