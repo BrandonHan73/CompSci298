@@ -11,5 +11,7 @@ public class Config {
 
 	public static boolean debug = true;
 
+	public static boolean fictitious_play_start_even = true;
+
 }
 

@@ -196,9 +196,14 @@ public class NashSolver {
 		int[][][] response = best_responses(Q, action_count);
 
 		double[][] action_counts = new double[2][action_count];
-		for(int action = 0; action < action_count; action++) {
-			action_counts[P1][action] = 1.0 / action_count;
-			action_counts[P2][action] = 1.0 / action_count;
+		if(Config.fictitious_play_start_even) {
+			for(int action = 0; action < action_count; action++) {
+				action_counts[P1][action] = 1.0 / action_count;
+				action_counts[P2][action] = 1.0 / action_count;
+			}
+		} else {
+			action_counts[P1][0] = 1;
+			action_counts[P2][0] = 1;
 		}
 
 		double[][] reaction = new double[2][];
@@ -223,6 +228,9 @@ public class NashSolver {
 				action_counts[P1][action] += reaction[P1][action];
 				action_counts[P2][action] += reaction[P2][action];
 			}
+
+			Utility.println(System.out, "Truck counts: ", action_counts[P1]);
+			Utility.println(System.out, "Car counts: ", action_counts[P2]);
 
 		}
 

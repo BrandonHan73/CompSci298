@@ -12,7 +12,9 @@ public class CrashGameTest {
 	};
 
 	public static void base() throws InterruptedException {
-		CrashGame game = new CrashGame(5, 7);
+		// CrashGame game = new CrashGame(5, 7);
+		CrashGame game = new CrashGame(reward1);
+		game = (CrashGame) game.get_copy(613);
 		Policy pol = new Policy(game);
 
 		Config.debug = false;
@@ -43,7 +45,9 @@ public class CrashGameTest {
 		for(int iteration = 0; iteration < 16; iteration++) {
 			Utility.println(System.out);
 
+			Config.debug = false;
 			choices = pol.get_action_options(game.get_state());
+			Config.debug = true;
 
 			Utility.print(System.out, "Truck: ");
 			print_action_list(choices[0]);
@@ -76,6 +80,7 @@ public class CrashGameTest {
 
 			game.print(System.out);
 
+			Utility.println(System.out, String.format("                                                          %c[A", escCode));
 			Utility.print(System.out, "Action pair: ");
 			print_action_list(actions);
 			Utility.println(System.out);
