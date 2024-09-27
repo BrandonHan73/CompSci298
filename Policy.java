@@ -34,7 +34,7 @@ public class Policy {
 
 		Game sim;
 		double[] rewards;
-		int[][] actions;
+		double[][] actions;
 		double[] Q_evaluation;
 		int new_state;
 
@@ -83,7 +83,7 @@ public class Policy {
 
 	}
 
-	public int[][] get_action_options(int state) {
+	public double[][] get_action_options(int state) {
 		return NashSolver.evaluate_state(Q[state], action_count);
 	}
 

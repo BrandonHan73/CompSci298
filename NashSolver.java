@@ -20,30 +20,23 @@ public class NashSolver {
 	 * @param Q The Q function for the given state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][] evaluate_state(StateQ Q, int action_count) {
+	public static double[][] evaluate_state(StateQ Q, int action_count) {
 
 		int[][] all_nash = basic_nash(Q, action_count);
 		int[][] best_nash;
-		int[][] out = null;
-
-		ArrayList<Integer> choices;
+		double[][] out = null;
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
 
 			best_nash = pick_nash(Q, all_nash);
-			out = new int[2][];
+			out = new double[2][action_count];
 
-			choices = new ArrayList<>();
 			for(int[] action_pair : best_nash) {
-				choices.add(action_pair[P1]);
+				out[P1][action_pair[P1]]++;
+				out[P2][action_pair[P2]]++;
 			}
-			out[P1] = Utility.removeDuplicates(Utility.toArray(choices));
-
-			choices = new ArrayList<>();
-			for(int[] action_pair : best_nash) {
-				choices.add(action_pair[P2]);
-			}
-			out[P2] = Utility.removeDuplicates(Utility.toArray(choices));
+			out[P1] = Utility.toDistribution(out[P1]);
+			out[P2] = Utility.toDistribution(out[P2]);
 
 		} else {
 			out = fictitious_play(Q, action_count);
@@ -54,28 +47,25 @@ public class NashSolver {
 
 	/***
 	 * Takes the Q function for the current state and the current action
-	 * choices for both players. Assumes a uniform random choice between the
-	 * action choices and finds the expected Q value. The first dimension
-	 * of the action parameter represents the player. 
+	 * choices for both players. The first dimension of the action parameter 
+	 * represents the player. 
 	 *
 	 * @param Q The Q function for the given state.
-	 * @param actions The action choices for both players. 
+	 * @param actions The action choice distributions for both players. 
 	 */
-	public static double[] Q_expectation(StateQ Q, int[][] actions) {
+	public static double[] Q_expectation(StateQ Q, double[][] actions) {
 
 		double[] eval = new double[] { 0, 0 };
-		int possibilities = actions[P1].length * actions[P2].length;
 
-		for(int truck_action : actions[P1]) {
-			for(int car_action : actions[P2]) {
-				eval[P1] += Q.get(truck_action, car_action, P1);
-				eval[P2] += Q.get(truck_action, car_action, P2);
+		double prob;
+		for(int p1_action = 0; p1_action < actions[P1].length; p1_action++) {
+			for(int p2_action = 0; p2_action < actions[P2].length; p2_action++) {
+				prob = actions[P1][p1_action] * actions[P2][p2_action];
+				eval[P1] += prob * Q.get(p1_action, p2_action, P1);
+				eval[P2] += prob * Q.get(p1_action, p2_action, P2);
 
 			}
 		}
-
-		eval[P1] /= possibilities;
-		eval[P2] /= possibilities;
 
 		return eval;
 	}
@@ -169,17 +159,17 @@ public class NashSolver {
 	}
 
 	/**
-	 * Takes an array of action choices and makes a uniformly random decision for each
+	 * Takes an array of action choices and makes a random decision for each
 	 * player. The input array's first dimension represents which player. The result
-	 * of action[ployer] is an array of action choices. 
+	 * of action[ployer] is an array of action distributions. 
 	 *
-	 * @param actions The array of possible actions. 
+	 * @param actions The array of action distributions. 
 	 */
-	public static int[] evaluate_options(int[][] actions) {
+	public static int[] evaluate_options(double[][] actions) {
 		int[] result = new int[actions.length];
 
 		for(int i = 0; i < result.length; i++) {
-			result[i] = actions[i][ (int) (Math.random() * actions[i].length) ];
+			result[i] = Utility.pickFrom(actions[i]);
 		}
 
 		return result;
@@ -191,7 +181,7 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][] fictitious_play(StateQ Q, int action_count) {
+	public static double[][] fictitious_play(StateQ Q, int action_count) {
 
 		int[][][] response = best_responses(Q, action_count);
 
@@ -229,12 +219,12 @@ public class NashSolver {
 				action_counts[P2][action] += reaction[P2][action];
 			}
 
-			Utility.println(System.out, "Truck counts: ", action_counts[P1]);
-			Utility.println(System.out, "Car counts: ", action_counts[P2]);
-
 		}
 
-		return pick_most_common(action_counts);
+		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
+		action_counts[P2] = Utility.toDistribution(action_counts[P2]);
+
+		return action_counts;
 
 	}
 

@@ -132,5 +132,39 @@ public class Utility {
 		return false;
 	}
 
+	public static int pickFrom(double[] distribution) {
+		double choice = Math.random();
+
+		for(int i = 0; i < distribution.length; i++) {
+			choice -= distribution[i];
+			if(choice < 0) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	public static double[] toDistribution(int[] arr) {
+		double[] out = new double[arr.length];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = arr[i];
+		}
+		return toDistribution(out);
+	}
+
+	public static double[] toDistribution(double[] arr) {
+		double sum = 0;
+		for(double d : arr) {
+			sum += d;
+		}
+
+		double[] out = new double[arr.length];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = arr[i] / sum;
+		}
+		return out;
+	}
+
 }
 

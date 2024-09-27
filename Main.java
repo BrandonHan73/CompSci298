@@ -24,7 +24,7 @@ public class Main {
 
 		Utility.println(System.out, "-------------------");
 
-		int[][] possibilities;
+		double[][] possibilities;
 		int[] actions;
 		double[] rewards;
 		char escCode = 0x1B;

@@ -41,7 +41,7 @@ public class CrashGameTest {
 
 		game.print(System.out);
 
-		int[][] choices;
+		double[][] choices;
 		for(int iteration = 0; iteration < 16; iteration++) {
 			Utility.println(System.out);
 
@@ -49,12 +49,10 @@ public class CrashGameTest {
 			choices = pol.get_action_options(game.get_state());
 			Config.debug = true;
 
-			Utility.print(System.out, "Truck: ");
-			print_action_list(choices[0]);
+			Utility.print(System.out, "Truck: ", choices[0]);
 			Utility.println(System.out);
 
-			Utility.print(System.out, "  Car: ");
-			print_action_list(choices[1]);
+			Utility.print(System.out, "  Car: ", choices[1]);
 			Utility.println(System.out);
 
 			Config.debug = false;
@@ -65,7 +63,7 @@ public class CrashGameTest {
 	}
 
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
-		int[][] possibilities;
+		double[][] possibilities;
 		int[] actions;
 		double[] rewards;
 		char escCode = 0x1B;
@@ -74,9 +72,11 @@ public class CrashGameTest {
 			Utility.println(System.out);
 			Utility.println(System.out, "Iteration ", iteration);
 
+			// Config.debug = false;
 			possibilities = pol.get_action_options(game.get_state());
 			actions = NashSolver.evaluate_options(possibilities);
 			rewards = game.update(actions);
+			Config.debug = true;
 
 			game.print(System.out);
 
@@ -86,14 +86,10 @@ public class CrashGameTest {
 			Utility.println(System.out);
 
 			Utility.println(System.out, String.format("                                                          %c[A", escCode));
-			Utility.print(System.out, "Truck options: ");
-			print_action_list(possibilities[0]);
-			Utility.println(System.out);
+			Utility.println(System.out, "Truck options: ", possibilities[0]);
 
 			Utility.println(System.out, String.format("                                                          %c[A", escCode));
-			Utility.print(System.out, "Car options: ");
-			print_action_list(possibilities[1]);
-			Utility.println(System.out);
+			Utility.println(System.out, "Car options: ", possibilities[1]);
 
 			Utility.println(System.out, String.format("                                                          %c[A", escCode));
 			Utility.println(System.out, "Reward pair: ", rewards);
