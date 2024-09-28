@@ -219,11 +219,11 @@ public class NashSolver {
 				action_counts[P2][action] += reaction[P2][action];
 			}
 
-			Utility.println(System.out);
-			Utility.println(System.out, "Truck counts: ", action_counts[P1]);
-			Utility.println(System.out, "Car counts: ", action_counts[P2]);
-
 		}
+
+		Utility.debugln(System.out);
+		Utility.debugln(System.out, "Truck counts: ", action_counts[P1]);
+		Utility.debugln(System.out, "Car counts: ", action_counts[P2]);
 
 		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
 		action_counts[P2] = Utility.toDistribution(action_counts[P2]);

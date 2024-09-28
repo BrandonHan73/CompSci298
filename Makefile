@@ -1,7 +1,7 @@
 
 game_objects = out/Game.class out/CrashGame.class out/RockPaperScissors.class
 smart_objects = out/Policy.class out/NashSolver.class out/LogisticRegression.class
-base_objects = out/Config.class out/Main.class out/Position.class out/Utility.class
+base_objects = out/Config.class  out/Position.class out/Utility.class
 test_objects = out/CrashGameTest.class
 
 objects = $(game_objects) $(smart_objects) $(base_objects) $(test_objects)
@@ -12,6 +12,8 @@ class_path = .:lib/Jama-1.0.3.jar
 
 all: $(libraries) $(objects) 
 	@echo
+	@echo Compiling Main.java
+	@javac -d out/ -cp $(class_path) Main.java
 	@echo Executing Main
 	@echo
 	@java -cp out:lib/Jama-1.0.3.jar Main
@@ -33,11 +35,6 @@ out/Game.class: Game.java
 	@echo
 	@echo Compiling Game.java
 	@javac -d out/ -cp $(class_path) Game.java
-
-out/Main.class: Main.java
-	@echo
-	@echo Compiling Main.java
-	@javac -d out/ -cp $(class_path) Main.java
 
 out/Policy.class: Policy.java
 	@echo

@@ -78,7 +78,7 @@ public class Policy {
 			}
 
 			Q = Q_update;
-			Utility.println(System.out, "Largest update: " + max_change);
+			Utility.debugln(System.out, "Largest update: ", max_change);
 		}
 
 	}

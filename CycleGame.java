@@ -1,24 +1,9 @@
 
 public class CycleGame extends Game {
 
-	private int cat_loc, rat_loc;
-
-	public final static int cat_catch_reward = 1;
-	public final static int rat_avoid_reward = 1;
+	public final static double confront = 1, steal = 1, avoid = 0.5, predict = 0.5;
 
 	public CycleGame() {
-		cat_loc = (int) (2 * Math.random());
-		rat_loc = (int) (2 * Math.random());
-	}
-
-	public CycleGame(int state) {
-		cat_loc = state / 2;
-		rat_loc = state % 2;
-	}
-
-	public CycleGame(CycleGame game) {
-		cat_loc = game.cat_loc;
-		rat_loc = game.rat_loc;
 	}
 
 	@Override
@@ -33,17 +18,29 @@ public class CycleGame extends Game {
 
 	@Override
 	public Game get_copy(int state) {
-		return new CycleGame(get_state());
+		return new CycleGame();
 	}
 
 	@Override
 	public double[] update(int p1_action, int p2_action) {
-		return null;
+		double[] reward = null;
+
+		if(p1_action == 0 && p2_action == 0) {
+			reward = new double[] { -steal, steal }; 
+		} else if(p1_action == 0 && p2_action == 1) {
+			reward = new double[] { predict, -predict };
+		} else if(p1_action == 1 && p2_action == 0) {
+			reward = new double[] { confront, -confront };
+		} else if(p1_action == 1 && p2_action == 1) {
+			reward = new double[] { -avoid, avoid };
+		}
+
+		return reward;
 	}
 
 	@Override
 	public int get_state() {
-		return 2 * cat_loc + rat_loc;
+		return 0;
 	}
 
 }

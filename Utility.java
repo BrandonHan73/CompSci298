@@ -23,20 +23,16 @@ public class Utility {
 		out.print(arr[arr.length - 1]);
 	}
 
-	private static void print_ob(PrintStream out, double[][] arr) {
-		for(double[] row : arr) {
-			for(int i = 0; i < row.length - 1; i++) {
-				out.print(row[i] + ", ");
-			}
-			out.print(row[row.length - 1]);
-		}
-	}
-
 	private static void print_ob(PrintStream out, double[] arr) {
 		for(int i = 0; i < arr.length - 1; i++) {
-			out.print(arr[i] + ", ");
+			print_ob(out, arr[i]);
+			out.print(", ");
 		}
-		out.print(arr[arr.length - 1]);
+		print_ob(out, arr[arr.length - 1]);
+	}
+
+	private static void print_ob(PrintStream out, double d) {
+		out.print(String.format("%.4f", d));
 	}
 
 	private static void print_ob(PrintStream out, Position pos) {
@@ -48,8 +44,8 @@ public class Utility {
 			print_ob(out, (int[][]) o);
 		} else if(o instanceof int[]) {
 			print_ob(out, (int[]) o);
-		} else if(o instanceof double[][]) {
-			print_ob(out, (double[][]) o);
+		} else if(o instanceof Double) {
+			print_ob(out, (double) o);
 		} else if(o instanceof double[]) {
 			print_ob(out, (double[]) o);
 		} else if(o instanceof Position) {
@@ -60,18 +56,30 @@ public class Utility {
 	}
 
 	public static void print(PrintStream out, Object... args) {
-		if(Config.debug) {
-			for(Object o : args) {
-				print_ob(out, o);
-			}
+		for(Object o : args) {
+			print_ob(out, o);
 		}
 	}
 
 	public static void println(PrintStream out, Object... args) {
+		print(out, args);
+		out.println();
+	}
+
+	public static void debug(PrintStream out, Object... args) {
 		if(Config.debug) {
 			print(out, args);
-			out.println();
 		}
+	}
+
+	public static void debugln(PrintStream out, Object... args) {
+		if(Config.debug) {
+			println(out, args);
+		}
+	}
+
+	public static void clearln(PrintStream out) {
+		Utility.println(System.out, String.format("                                                                             %c[A", 0x1B));
 	}
 
 	public static int[] toArray(ArrayList<Integer> arr) {

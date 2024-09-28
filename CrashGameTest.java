@@ -12,9 +12,8 @@ public class CrashGameTest {
 	};
 
 	public static void base() throws InterruptedException {
-		// CrashGame game = new CrashGame(5, 7);
-		CrashGame game = new CrashGame(reward1);
-		game = (CrashGame) game.get_copy(613);
+		CrashGame game = new CrashGame(5, 7);
+		// CrashGame game = new CrashGame(reward1);
 		Policy pol = new Policy(game);
 
 		Config.debug = false;
@@ -81,6 +80,63 @@ public class CrashGameTest {
 
 	}
 
+	public static void evaluate() {
+
+		Config.debug = false;
+
+		CrashGame game = new CrashGame(reward1);
+		Policy pol;
+
+		int games = 256, cycles = 512;
+
+		double[] reward, gain;
+
+		Config.use_pure_nash_optimization = true;
+
+		Utility.println(System.out, "Using pure Nash optimization");
+		pol = new Policy(game);
+		pol.train();
+
+		reward = new double[] { 0, 0 };
+
+		for(int g = 0; g < games; g++) {
+			game.randomize_positions();
+
+			for(int c = 0; c < cycles; c++) {
+				gain = game.update(pol.evaluate(game.get_state()));
+				reward[0] += gain[0];
+				reward[1] += gain[1];
+			}
+		}
+		reward[0] /= games;
+		reward[1] /= games;
+
+		Utility.println(System.out, reward);
+
+		Config.use_pure_nash_optimization = false;
+
+		Utility.println(System.out, "Using only fictitious play");
+		pol = new Policy(game);
+		pol.train();
+
+		reward = new double[] { 0, 0 };
+
+		for(int g = 0; g < games; g++) {
+			game.randomize_positions();
+
+			for(int c = 0; c < cycles; c++) {
+				gain = game.update(pol.evaluate(game.get_state()));
+				reward[0] += gain[0];
+				reward[1] += gain[1];
+			}
+		}
+		reward[0] /= games;
+		reward[1] /= games;
+
+		Utility.println(System.out, reward);
+
+	}
+
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
 		double[][] possibilities;
 		int[] actions;
@@ -99,23 +155,23 @@ public class CrashGameTest {
 
 			game.print(System.out);
 
-			Utility.println(System.out, String.format("                                                          %c[A", escCode));
+			Utility.clearln(System.out);
 			Utility.print(System.out, "Action pair: ");
 			print_action_list(actions);
 			Utility.println(System.out);
 
-			Utility.println(System.out, String.format("                                                          %c[A", escCode));
+			Utility.clearln(System.out);
 			Utility.println(System.out, "Truck options: ", possibilities[0]);
 
-			Utility.println(System.out, String.format("                                                          %c[A", escCode));
-			Utility.println(System.out, "Car options: ", possibilities[1]);
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Car options: ", possibilities[1]);
 
-			Utility.println(System.out, String.format("                                                          %c[A", escCode));
-			Utility.println(System.out, "Reward pair: ", rewards);
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Reward pair: ", rewards);
 
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 20; i++) {
+			for(int i = 0; i < 23; i++) {
 				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}
