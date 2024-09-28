@@ -12,15 +12,13 @@ public class CrashGameTest {
 	};
 
 	public static void base() throws InterruptedException {
-		CrashGame game = new CrashGame(5, 7);
-		// CrashGame game = new CrashGame(reward1);
+		// CrashGame game = new CrashGame(5, 7);
+		CrashGame game = new CrashGame(reward1);
 		Policy pol = new Policy(game);
 
 		Config.debug = false;
 
 		pol.train();
-
-		Config.debug = true;
 
 		idle(game, pol);
 	}
@@ -80,63 +78,6 @@ public class CrashGameTest {
 
 	}
 
-	public static void evaluate() {
-
-		Config.debug = false;
-
-		CrashGame game = new CrashGame(reward1);
-		Policy pol;
-
-		int games = 256, cycles = 512;
-
-		double[] reward, gain;
-
-		Config.use_pure_nash_optimization = true;
-
-		Utility.println(System.out, "Using pure Nash optimization");
-		pol = new Policy(game);
-		pol.train();
-
-		reward = new double[] { 0, 0 };
-
-		for(int g = 0; g < games; g++) {
-			game.randomize_positions();
-
-			for(int c = 0; c < cycles; c++) {
-				gain = game.update(pol.evaluate(game.get_state()));
-				reward[0] += gain[0];
-				reward[1] += gain[1];
-			}
-		}
-		reward[0] /= games;
-		reward[1] /= games;
-
-		Utility.println(System.out, reward);
-
-		Config.use_pure_nash_optimization = false;
-
-		Utility.println(System.out, "Using only fictitious play");
-		pol = new Policy(game);
-		pol.train();
-
-		reward = new double[] { 0, 0 };
-
-		for(int g = 0; g < games; g++) {
-			game.randomize_positions();
-
-			for(int c = 0; c < cycles; c++) {
-				gain = game.update(pol.evaluate(game.get_state()));
-				reward[0] += gain[0];
-				reward[1] += gain[1];
-			}
-		}
-		reward[0] /= games;
-		reward[1] /= games;
-
-		Utility.println(System.out, reward);
-
-	}
-
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
 		double[][] possibilities;
 		int[] actions;
@@ -151,7 +92,6 @@ public class CrashGameTest {
 			possibilities = pol.get_action_options(game.get_state());
 			actions = NashSolver.evaluate_options(possibilities);
 			rewards = game.update(actions);
-			Config.debug = true;
 
 			game.print(System.out);
 
@@ -171,7 +111,7 @@ public class CrashGameTest {
 
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 23; i++) {
+			for(int i = 0; i < 20; i++) {
 				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}

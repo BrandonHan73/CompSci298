@@ -42,10 +42,47 @@ public class NashSolver {
 			out = fictitious_play(Q, action_count);
 		}
 
+		return fix_action_distribution(out);
+	}
+
+	/**
+	 * Fixes action distribution based off of configuration. Either takes the
+	 * argmax or leaves the distribution alone. 
+	 *
+	 * @param actions The base action distributions to fix
+	 */
+	public static double[][] fix_action_distribution(double[][] actions) {
+		double[][] out = new double[actions.length][];
+
+		int[] argmax;
+		if(Config.use_action_distribution) {
+			// No action required, return a copy of action distribution
+
+			for(int i = 0; i < actions.length; i++) {
+				out[i] = new double[actions[i].length];
+				for(int j = 0; j < out[i].length; j++) {
+					out[i][j] = actions[i][j];
+				}
+			}
+
+		} else {
+
+			for(int i = 0; i < actions.length; i++) {
+				final double[] dist = actions[i];
+				argmax = Utility.argmax(0, dist.length, j -> dist[j]);
+
+				out[i] = new double[dist.length];
+				for(int action : argmax) {
+					out[i][action] = 1.0 / dist.length;
+				}
+			}
+
+		}
+
 		return out;
 	}
 
-	/***
+	/**
 	 * Takes the Q function for the current state and the current action
 	 * choices for both players. The first dimension of the action parameter 
 	 * represents the player. 

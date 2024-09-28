@@ -5,6 +5,9 @@ public class CrashGame extends Game {
 	private final double truck_crash_reward = 5.0;
 	private final double car_crash_cost = 10.0;
 
+	private final double car_cutoff_reward = 8.0;
+	private final double truck_cutoff_cost = 7.0;
+
 	public final int rows, cols;
 	private final double[][] rewards;
 
@@ -23,7 +26,7 @@ public class CrashGame extends Game {
 
 		truck = new Position();
 		car = new Position();
-		randomize_positions();
+		randomize();
 	}
 
 	public CrashGame(double[][] rewards_) {
@@ -74,7 +77,7 @@ public class CrashGame extends Game {
 		return new CrashGame(this, state);
 	}
 
-	public void randomize_positions() {
+	public void randomize() {
 		truck.randomize(rows, cols);
 		do {
 			car.randomize(rows, cols);
@@ -137,15 +140,16 @@ public class CrashGame extends Game {
 
 		double[] rewards = { get_reward(truck), get_reward(car) };
 
-		boolean crash = truck.equals(car);
 		if(truck_old.equals(car) && car_old.equals(truck)) {
-			crash = true;
 			truck = truck_old;
-		}
-		if(crash) {
 			car = car_old;
 			rewards[0] += truck_crash_reward;
 			rewards[1] -= car_crash_cost;
+		}
+		if(truck.equals(car)) {
+			truck = truck_old;
+			rewards[0] -= truck_cutoff_cost;
+			rewards[1] += car_cutoff_reward;
 		}
 
 		return rewards;
