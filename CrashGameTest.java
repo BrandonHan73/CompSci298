@@ -60,6 +60,25 @@ public class CrashGameTest {
 
 	}
 
+	public static void test_fictitious_play() throws InterruptedException {
+		CrashGame game = new CrashGame(reward1);
+		game = (CrashGame) game.get_copy(613);
+
+		// CrashGame game = new CrashGame(5, 7);
+		Policy pol = new Policy(game);
+
+		Config.debug = false;
+
+		pol.train();
+
+		Config.debug = true;
+
+		int[][] choices = pol.get_action_options(game.get_state());
+
+		game.print(System.out);
+
+	}
+
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
 		int[][] possibilities;
 		int[] actions;

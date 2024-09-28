@@ -224,6 +224,10 @@ public class NashSolver {
 				action_counts[P2][action] += reaction[P2][action];
 			}
 
+			Utility.println(System.out);
+			Utility.println(System.out, "Truck counts: ", action_counts[P1]);
+			Utility.println(System.out, "Car counts: ", action_counts[P2]);
+
 		}
 
 		return pick_most_common(action_counts);

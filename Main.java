@@ -1,12 +1,12 @@
 
 import java.util.concurrent.TimeUnit;
 
-import Jama.Matrix;
-
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		CrashGameTest.base();
+		// CrashGameTest.base();
+		// CrashGameTest.test_train_cycle();
+		CrashGameTest.test_fictitious_play();
 	}
 
 	public static void runRockPaperScissors(String[] args) throws InterruptedException {
