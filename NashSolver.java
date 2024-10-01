@@ -9,6 +9,10 @@ import java.util.ArrayList;
 public class NashSolver {
 
 	private static final int P1 = 0, P2 = 1;
+
+	public static double[][] evaluate_state(StateQ Q, int action_count) {
+		return evaluate_state(Q, action_count, false);
+	}
 	
 	/**
 	 * Takes the Q function for a given state and determines a set of actions
@@ -20,7 +24,7 @@ public class NashSolver {
 	 * @param Q The Q function for the given state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static double[][] evaluate_state(StateQ Q, int action_count) {
+	public static double[][] evaluate_state(StateQ Q, int action_count, boolean fast) {
 
 		int[][] all_nash = basic_nash(Q, action_count);
 		int[][] best_nash;
@@ -39,7 +43,11 @@ public class NashSolver {
 			out[P2] = Utility.toDistribution(out[P2]);
 
 		} else {
-			out = fictitious_play(Q, action_count);
+			if(fast) {
+				out = fast_fictitious_play(Q, action_count);
+			} else {
+				out = fictitious_play(Q, action_count);
+			}
 		}
 
 		return fix_action_distribution(out);
@@ -212,13 +220,21 @@ public class NashSolver {
 		return result;
 	}
 
+	public static double[][] fictitious_play(StateQ Q, int action_count) {
+		return fictitious_play(Q, action_count, Config.fictitious_play_iterations);
+	}
+
+	public static double[][] fast_fictitious_play(StateQ Q, int action_count) {
+		return fictitious_play(Q, action_count, Config.fast_fictitious_play_iterations);
+	}
+
 	/**
 	 * Runs the fictitious play algorithm for the current state. 
 	 *
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static double[][] fictitious_play(StateQ Q, int action_count) {
+	public static double[][] fictitious_play(StateQ Q, int action_count, int iterations) {
 
 		int[][][] response = best_responses(Q, action_count);
 
@@ -235,7 +251,7 @@ public class NashSolver {
 
 		double[][] reaction = new double[2][];
 
-		for(int moves = 1; moves < Config.fictitious_play_iterations; moves++) {
+		for(int moves = 1; moves < iterations; moves++) {
 
 			reaction[P1] = new double[action_count];
 			for(int p2_action = 0; p2_action < action_count; p2_action++) {
@@ -257,10 +273,6 @@ public class NashSolver {
 			}
 
 		}
-
-		Utility.debugln(System.out);
-		Utility.debugln(System.out, "Truck counts: ", action_counts[P1]);
-		Utility.debugln(System.out, "Car counts: ", action_counts[P2]);
 
 		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
 		action_counts[P2] = Utility.toDistribution(action_counts[P2]);

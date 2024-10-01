@@ -2,6 +2,7 @@
 public class Config {
 
 	public static int fictitious_play_iterations = 512;
+	public static int fast_fictitious_play_iterations = 128;
 	public static int Q_iterations = 128;
 
 	public static boolean use_pure_nash_optimization = true;

@@ -67,47 +67,8 @@ public class Main {
 
 		Main.test(game, new RandomPolicy(game), games, cycles);
 
-		Config.Q_iterations = 64;
-		Config.fictitious_play_iterations = 2048;
-
-		Config.use_action_distribution = false;
-
-		Config.use_pure_nash_optimization = false;
-
 		Utility.println(System.out);
-		Utility.println(System.out, "Using only fictitious play");
-
-		Main.test(game, new Policy(game), games, cycles);
-
-		Config.use_pure_nash_optimization = true;
-
-		Utility.println(System.out);
-		Utility.println(System.out, "Using pure Nash optimization");
-
-		Main.test(game, new Policy(game), games, cycles);
-
-		Config.fictitious_play_iterations = 4096 * 2;
-
-		Utility.println(System.out);
-		Utility.println(System.out, "Using pure Nash optimization with extra fictitious play cycles");
-
-		Main.test(game, new Policy(game), games, cycles);
-
-		Config.fictitious_play_iterations = 2048;
-
-		Config.use_action_distribution = true;
-
-		Config.use_pure_nash_optimization = false;
-
-		Utility.println(System.out);
-		Utility.println(System.out, "Using only fictitious play and action distributions");
-
-		Main.test(game, new Policy(game), games, cycles);
-
-		Config.use_pure_nash_optimization = true;
-
-		Utility.println(System.out);
-		Utility.println(System.out, "Using pure Nash optimization and action distributions");
+		Utility.println(System.out, "Using trained policy");
 
 		Main.test(game, new Policy(game), games, cycles);
 

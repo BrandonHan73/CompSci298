@@ -38,6 +38,8 @@ public class Policy {
 		double[] Q_evaluation;
 		int new_state;
 
+		double[][] Q_eval_lookup;
+
 		StateQ[] Q_update;
 
 		double max_change;
@@ -45,7 +47,9 @@ public class Policy {
 		for(int iteration = 0; iteration < iterations; iteration++) {
 			Q_update = new StateQ[state_count];
 
-			max_change = Double.MIN_VALUE;
+			max_change = 0;
+
+			Q_eval_lookup = new double[state_count][];
 
 			for(int state = 0; state < state_count; state++) {
 				Q_update[state] = new StateQ(action_count);
@@ -57,8 +61,13 @@ public class Policy {
 						rewards = sim.update(p1_action, p2_action);
 
 						new_state = sim.get_state();
-						actions = get_action_options(new_state);
-						Q_evaluation = NashSolver.Q_expectation(Q[new_state], actions);
+						if(Q_eval_lookup[new_state] == null) {
+							actions = NashSolver.evaluate_state(Q[new_state], action_count, true);
+							Q_evaluation = NashSolver.Q_expectation(Q[new_state], actions);
+							Q_eval_lookup[new_state] = Q_evaluation;
+						} else {
+							Q_evaluation = Q_eval_lookup[new_state];
+						}
 
 						Q_update[state].set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
 						Q_update[state].set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
