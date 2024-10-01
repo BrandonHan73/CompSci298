@@ -63,23 +63,23 @@ public class Policy {
 						rewards = sim.update(p1_action, p2_action);
 
 						new_state = sim.get_state();
-						if(Q_eval_lookup.containsKey(state)) {
+						if(Q_eval_lookup.containsKey(new_state)) {
 							Q_evaluation = Q_eval_lookup.get(new_state);
 						} else {
 							Q_evaluation = NashSolver.Q_expectation(Q.get(new_state), true);
 							Q_eval_lookup.put(new_state, Q_evaluation);
 						}
 
-						Q_update.get(state).set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
-						Q_update.get(state).set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
+						state_update.set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
+						state_update.set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
 
 						max_change = Math.max(
 							max_change, 
-							Math.abs(Q_update.get(state).get(p1_action, p2_action, P1) - Q.get(state).get(p1_action, p2_action, P1))
+							Math.abs(state_update.get(p1_action, p2_action, P1) - Q.get(state).get(p1_action, p2_action, P1))
 						);
 						max_change = Math.max(
 							max_change, 
-							Math.abs(Q_update.get(state).get(p1_action, p2_action, P2) - Q.get(state).get(p1_action, p2_action, P2))
+							Math.abs(state_update.get(p1_action, p2_action, P2) - Q.get(state).get(p1_action, p2_action, P2))
 						);
 
 					}
@@ -89,7 +89,7 @@ public class Policy {
 			}
 
 			Q = Q_update;
-			Utility.debugln(System.out, "Largest update: ", max_change);
+			// Utility.debugln(System.out, "Largest update: ", max_change);
 		}
 
 	}

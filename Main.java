@@ -58,8 +58,6 @@ public class Main {
 
 	public static void evaluate(Game game) {
 
-		Config.debug = false;
-
 		int games = 256, cycles = 512;
 
 		Utility.println(System.out);

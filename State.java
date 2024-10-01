@@ -46,5 +46,10 @@ public class State {
 		return ((State) o).value == value;
 	}
 
+	@Override
+	public int hashCode() {
+		return value;
+	}
+
 }
 

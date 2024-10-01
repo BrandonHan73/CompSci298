@@ -39,6 +39,15 @@ public class CrashGame extends Game {
 				return false;
 			}
 		}
+
+		@Override
+		public int hashCode() {
+			int state = truck.row;
+			state = state * cols + truck.col;
+			state = state * rows + car.row;
+			state = state * cols + car.col;
+			return state;
+		}
 	}
 
 	public CrashGame(int rows_, int cols_) {
@@ -62,7 +71,7 @@ public class CrashGame extends Game {
 			for(int tc = 0; tc < cols; tc++) {
 				for(int cr = 0; cr < rows; cr++) {
 					for(int cc = 0; cc < cols; cc++) {
-						if(tr != cr && tc != cc) {
+						if(!(tr == cr && tc == cc)) {
 							possible_states[state_++] = new CrashGameState(
 								new Position(tr, tc), 
 								new Position(cr, cc)
