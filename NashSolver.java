@@ -91,12 +91,12 @@ public class NashSolver {
 		return out;
 	}
 
-	public static double[] Q_expectation(StateQ Q, boolean fast) {
-		return Q_expectation(Q, evaluate_state(Q, fast));
+	public static double[] value_of(StateQ Q, boolean fast) {
+		return value_of(Q, evaluate_state(Q, fast));
 	}
 
-	public static double[] Q_expectation(StateQ Q) {
-		return Q_expectation(Q, false);
+	public static double[] value_of(StateQ Q) {
+		return value_of(Q, false);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class NashSolver {
 	 * @param Q The Q function for the given state.
 	 * @param actions The action choice distributions for both players. 
 	 */
-	public static double[] Q_expectation(StateQ Q, double[][] actions) {
+	public static double[] value_of(StateQ Q, double[][] actions) {
 
 		double[] eval = new double[] { 0, 0 };
 

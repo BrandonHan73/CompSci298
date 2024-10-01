@@ -14,7 +14,7 @@ public class CrashGameTest {
 	public static void base() throws InterruptedException {
 		// CrashGame game = new CrashGame(5, 7);
 		CrashGame game = new CrashGame(reward1);
-		Policy pol = new Policy(game);
+		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
 
 		Config.debug = false;
 
@@ -27,7 +27,7 @@ public class CrashGameTest {
 		CrashGame game = new CrashGame(reward1);
 
 		// CrashGame game = new CrashGame(5, 7);
-		Policy pol = new Policy(game);
+		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
 
 		Config.debug = false;
 
@@ -62,7 +62,7 @@ public class CrashGameTest {
 		CrashGame game = new CrashGame(reward1);
 
 		// CrashGame game = new CrashGame(5, 7);
-		Policy pol = new Policy(game);
+		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
 
 		Config.debug = false;
 
@@ -109,7 +109,7 @@ public class CrashGameTest {
 
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 20; i++) {
+			for(int i = 0; i < 19; i++) {
 				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}

@@ -13,7 +13,7 @@ public class CrashGame extends Game {
 
 	private Position truck, car;
 
-	private final CrashGameState[] possible_states;
+	private static CrashGameState[] possible_states;
 
 	private class CrashGameState extends State {
 		Position truck, car;
@@ -46,7 +46,7 @@ public class CrashGame extends Game {
 			state = state * cols + truck.col;
 			state = state * rows + car.row;
 			state = state * cols + car.col;
-			return state;
+			return Integer.hashCode(state);
 		}
 	}
 
@@ -65,17 +65,19 @@ public class CrashGame extends Game {
 		car = new Position();
 		randomize();
 
-		possible_states = new CrashGameState[rows * cols * (rows * cols - 1)];
-		int state_ = 0;
-		for(int tr = 0; tr < rows; tr++) {
-			for(int tc = 0; tc < cols; tc++) {
-				for(int cr = 0; cr < rows; cr++) {
-					for(int cc = 0; cc < cols; cc++) {
-						if(!(tr == cr && tc == cc)) {
-							possible_states[state_++] = new CrashGameState(
-								new Position(tr, tc), 
-								new Position(cr, cc)
-							);
+		if(possible_states == null) {
+			possible_states = new CrashGameState[rows * cols * (rows * cols - 1)];
+			int state_ = 0;
+			for(int tr = 0; tr < rows; tr++) {
+				for(int tc = 0; tc < cols; tc++) {
+					for(int cr = 0; cr < rows; cr++) {
+						for(int cc = 0; cc < cols; cc++) {
+							if(!(tr == cr && tc == cc)) {
+								possible_states[state_++] = new CrashGameState(
+									new Position(tr, tc), 
+									new Position(cr, cc)
+								);
+							}
 						}
 					}
 				}
@@ -191,7 +193,6 @@ public class CrashGame extends Game {
 	public void print(PrintStream out) {
 		Utility.println(out, "Truck position: ", truck);
 		Utility.println(out, "Car position: ", car);
-		Utility.println(out, "State code: ", get_state());
 
 		for(int col = 0; col < cols; col++) {
 			Utility.print(out, "---");

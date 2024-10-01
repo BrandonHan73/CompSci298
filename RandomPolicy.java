@@ -1,4 +1,3 @@
-import java.util.Random;
 
 public class RandomPolicy extends Policy {
 
@@ -7,16 +6,20 @@ public class RandomPolicy extends Policy {
 	}
 
 	@Override
-	public int[] evaluate(State state) {
+	public double[][] get_action_options(State state) {
 		int action_count = state.action_count();
-		return new int[] {
-			(int) (action_count * Math.random()),
-			(int) (action_count * Math.random())
-		};
+
+		double[][] out = new double[2][action_count];
+		for(int i = 0; i < action_count; i++) {
+			out[0][i] = 1.0 / action_count;
+			out[1][i] = 1.0 / action_count;
+		}
+
+		return out;
 	}
 
 	@Override
-	public void train() {}
+	public void train(int iterations) {}
 
 }
 
