@@ -1,5 +1,8 @@
+package policy;
 
 import Jama.Matrix;
+
+import base.Config;
 
 public class LogisticRegression {
 

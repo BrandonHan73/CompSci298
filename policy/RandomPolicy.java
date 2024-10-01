@@ -1,3 +1,7 @@
+package policy;
+
+import game.Game;
+import base.State;
 
 public class RandomPolicy extends Policy {
 

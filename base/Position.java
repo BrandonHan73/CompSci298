@@ -1,41 +1,42 @@
+package base;
 
 public class Position {
 
 	public int row, col;
 
-	Position() {
+	public Position() {
 		row = 0;
 		col = 0;
 	}
 
-	Position(int row_, int col_) {
+	public Position(int row_, int col_) {
 		row = row_;
 		col = col_;
 	}
 
-	Position(Position o) {
+	public Position(Position o) {
 		row = o.row;
 		col = o.col;
 	}
 
-	void randomize(int row_bound, int col_bound) {
+	public void randomize(int row_bound, int col_bound) {
 		row = (int) (Math.random() * row_bound);
 		col = (int) (Math.random() * col_bound);
 	}
 
-	void down(int row_bound) {
+	public void down(int row_bound) {
 		row = (row + row_bound + 1) % row_bound;
 	}
 
-	void up(int row_bound) {
+	public void up(int row_bound) {
 		row = (row + row_bound - 1) % row_bound;
 	}
 
-	void right(int col_bound) {
+	public void right(int col_bound) {
 		col = (col + col_bound + 1) % col_bound;
 	}
 
-	void left(int col_bound) {
+	public void left(int col_bound) {
 		col = (col + col_bound - 1) % col_bound;
 	}
 

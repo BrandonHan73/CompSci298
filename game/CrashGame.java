@@ -1,4 +1,10 @@
+package game;
+
 import java.io.PrintStream;
+
+import base.Utility;
+import base.Position;
+import base.State;
 
 public class CrashGame extends Game {
 

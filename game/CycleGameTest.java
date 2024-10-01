@@ -1,3 +1,8 @@
+package game;
+
+import base.Config;
+import policy.Policy;
+import policy.DiscreteGamePolicy;
 
 public class CycleGameTest {
 

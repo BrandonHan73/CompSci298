@@ -1,3 +1,6 @@
+package game;
+
+import base.State;
 
 public abstract class Game {
 

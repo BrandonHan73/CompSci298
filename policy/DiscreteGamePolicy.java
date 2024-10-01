@@ -1,5 +1,12 @@
+package policy;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import base.Utility;
+import base.Config;
+import base.State;
+import game.Game;
 
 public class DiscreteGamePolicy extends Policy {
 
