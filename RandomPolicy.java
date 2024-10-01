@@ -7,7 +7,8 @@ public class RandomPolicy extends Policy {
 	}
 
 	@Override
-	public int[] evaluate(int state) {
+	public int[] evaluate(State state) {
+		int action_count = state.action_count();
 		return new int[] {
 			(int) (action_count * Math.random()),
 			(int) (action_count * Math.random())

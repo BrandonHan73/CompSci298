@@ -13,6 +13,34 @@ public class CrashGame extends Game {
 
 	private Position truck, car;
 
+	private final CrashGameState[] possible_states;
+
+	private class CrashGameState extends State {
+		Position truck, car;
+
+		CrashGameState(Position t, Position c) {
+			super(new int[][] {
+				new int[] { 0, 1, 2, 3 },
+				new int[] { 0, 1, 2, 3 }
+			});
+
+			truck = new Position(t);
+			car = new Position(c);
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			CrashGameState s;
+			if(o instanceof CrashGameState) {
+				s = (CrashGameState) o;
+
+				return truck.equals(s.truck) && car.equals(s.car);
+			} else {
+				return false;
+			}
+		}
+	}
+
 	public CrashGame(int rows_, int cols_) {
 		rows = rows_;
 		cols = cols_;
@@ -27,6 +55,28 @@ public class CrashGame extends Game {
 		truck = new Position();
 		car = new Position();
 		randomize();
+
+		possible_states = new CrashGameState[rows * cols * (rows * cols - 1)];
+		int state_ = 0;
+		for(int tr = 0; tr < rows; tr++) {
+			for(int tc = 0; tc < cols; tc++) {
+				for(int cr = 0; cr < rows; cr++) {
+					for(int cc = 0; cc < cols; cc++) {
+						if(tr != cr && tc != cc) {
+							possible_states[state_++] = new CrashGameState(
+								new Position(tr, tc), 
+								new Position(cr, cc)
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public State[] get_possible_states() {
+		return possible_states;
 	}
 
 	public CrashGame(double[][] rewards_) {
@@ -43,38 +93,16 @@ public class CrashGame extends Game {
 		this(o.rewards);
 	}
 
-	public CrashGame(CrashGame o, int state) {
+	public CrashGame(CrashGame o, CrashGameState state) {
 		this(o);
 
-		truck = new Position();
-		car = new Position();
-
-		car.col = state % cols;
-		state /= cols;
-
-		car.row = state % rows;
-		state /= rows;
-
-		truck.col = state % cols;
-		state /= cols;
-
-		truck.row = state % rows;
-		state /= rows;
+		truck = new Position(state.truck);
+		car = new Position(state.car);
 	}
 
 	@Override
-	public int get_state_count() {
-		return (int) Math.pow(rows, 2) * (int) Math.pow(cols, 2);
-	}
-
-	@Override
-	public int get_action_count() {
-		return 4;
-	}
-
-	@Override
-	public Game get_copy(int state) {
-		return new CrashGame(this, state);
+	public Game get_copy(State state) {
+		return new CrashGame(this, (CrashGameState) state);
 	}
 
 	public void randomize() {
@@ -89,12 +117,8 @@ public class CrashGame extends Game {
 	}
 
 	@Override
-	public int get_state() {
-		int state = truck.row;
-		state = state * cols + truck.col;
-		state = state * rows + car.row;
-		state = state * cols + car.col;
-		return state;
+	public State get_state() {
+		return new CrashGameState(truck, car);
 	}
 
 	public double[] update(int[] actions) {

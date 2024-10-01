@@ -10,8 +10,8 @@ public class NashSolver {
 
 	private static final int P1 = 0, P2 = 1;
 
-	public static double[][] evaluate_state(StateQ Q, int action_count) {
-		return evaluate_state(Q, action_count, false);
+	public static double[][] evaluate_state(StateQ Q) {
+		return evaluate_state(Q, false);
 	}
 	
 	/**
@@ -24,8 +24,9 @@ public class NashSolver {
 	 * @param Q The Q function for the given state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static double[][] evaluate_state(StateQ Q, int action_count, boolean fast) {
+	public static double[][] evaluate_state(StateQ Q, boolean fast) {
 
+		int action_count = Q.action_count;
 		int[][] all_nash = basic_nash(Q, action_count);
 		int[][] best_nash;
 		double[][] out = null;
@@ -88,6 +89,14 @@ public class NashSolver {
 		}
 
 		return out;
+	}
+
+	public static double[] Q_expectation(StateQ Q, boolean fast) {
+		return Q_expectation(Q, evaluate_state(Q, fast));
+	}
+
+	public static double[] Q_expectation(StateQ Q) {
+		return Q_expectation(Q, false);
 	}
 
 	/**

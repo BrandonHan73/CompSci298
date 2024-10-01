@@ -1,10 +1,21 @@
 
 public class RockPaperScissors extends Game {
 
-	public int get_state_count() { return 1; }
-	public int get_action_count() { return 3; }
+	private State state;
 
-	public Game get_copy(int state) { return new RockPaperScissors(); }
+	public RockPaperScissors() {
+		state = new State(new int[][] {
+			new int[] { 0, 1, 2 },
+			new int[] { 0, 1, 2 }
+		});
+	}
+
+	@Override
+	public State[] get_possible_states() {
+		return new State[] { state };
+	}
+
+	public Game get_copy(State state) { return new RockPaperScissors(); }
 
 	public double[] update(int p1_action, int p2_action) {
 
@@ -30,7 +41,7 @@ public class RockPaperScissors extends Game {
 		return update(actions[0], actions[1]);
 	}
 
-	public int get_state() { return 0; }
+	public State get_state() { return state; }
 
 }
 

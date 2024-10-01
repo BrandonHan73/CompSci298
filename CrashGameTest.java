@@ -25,7 +25,6 @@ public class CrashGameTest {
 
 	public static void test_train_cycle() throws InterruptedException {
 		CrashGame game = new CrashGame(reward1);
-		game = (CrashGame) game.get_copy(613);
 
 		// CrashGame game = new CrashGame(5, 7);
 		Policy pol = new Policy(game);
@@ -61,7 +60,6 @@ public class CrashGameTest {
 
 	public static void test_fictitious_play() throws InterruptedException {
 		CrashGame game = new CrashGame(reward1);
-		game = (CrashGame) game.get_copy(613);
 
 		// CrashGame game = new CrashGame(5, 7);
 		Policy pol = new Policy(game);
