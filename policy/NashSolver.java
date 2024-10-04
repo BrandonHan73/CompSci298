@@ -285,6 +285,13 @@ public class NashSolver {
 				action_counts[P2][action] += reaction[P2][action];
 			}
 
+			if(moves == 1 && Config.fictitious_play_start_even) {
+				for(int action = 0; action < action_count; action++) {
+					action_counts[P1][action] -= 1.0 / action_count;
+					action_counts[P2][action] -= 1.0 / action_count;
+				}
+			}
+
 		}
 
 		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
