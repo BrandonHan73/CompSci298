@@ -19,7 +19,7 @@ public class CrashGame extends Game {
 
 	private Position truck, car;
 
-	private static CrashGameState[] possible_states;
+	private CrashGameState[] possible_states;
 
 	private class CrashGameState extends State {
 		Position truck, car;
@@ -107,7 +107,14 @@ public class CrashGame extends Game {
 	}
 
 	public CrashGame(CrashGame o) {
-		this(o.rewards);
+		rows = o.rows;
+		cols = o.cols;
+		rewards = o.rewards;
+
+		truck = new Position(o.truck);
+		car = new Position(o.car);
+
+		possible_states = o.possible_states;
 	}
 
 	public CrashGame(CrashGame o, CrashGameState state) {
