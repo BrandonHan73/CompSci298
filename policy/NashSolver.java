@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import base.Config;
 import base.Utility;
+import game.ActionSet;
 
 /**
  * Various library functions for Q learning. 
@@ -14,7 +15,7 @@ public class NashSolver {
 
 	private static final int P1 = 0, P2 = 1;
 
-	public static double[][] evaluate_state(StateQ Q) {
+	public static ActionDistribution[] evaluate_state(StateQ Q) {
 		return evaluate_state(Q, false);
 	}
 	
@@ -27,24 +28,29 @@ public class NashSolver {
 	 *
 	 * @param Q The Q function for the given state.
 	 */
-	public static double[][] evaluate_state(StateQ Q, boolean fast) {
+	public static ActionDistribution[] evaluate_state(StateQ Q, boolean fast) {
 
-		int action_count = Q.action_count;
-		int[][] all_nash = basic_nash(Q, action_count);
-		int[][] best_nash;
-		double[][] out = null;
+		int[][] action_choices = Q.action_choices;
+		int player_count = action_choices.length;
+
+		ActionSet[] all_nash = basic_nash(Q, action_choices);
+		ActionSet[] best_nash;
+		
+		ActionDistribution[] out = null;
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
 
 			best_nash = pick_nash(Q, all_nash);
-			out = new double[2][action_count];
-
-			for(int[] action_pair : best_nash) {
-				out[P1][action_pair[P1]]++;
-				out[P2][action_pair[P2]]++;
+			out = new ActionDistribution[player_count];
+			for(int i = 0; i < player_count; i++) {
+				out[i] = new ActionDistribution();
 			}
-			out[P1] = Utility.toDistribution(out[P1]);
-			out[P2] = Utility.toDistribution(out[P2]);
+
+			for(ActionSet as : best_nash) {
+				for(int i = 0; i < player_count; i++) {
+					out[i].add(as.get(i));
+				}
+			}
 
 		} else {
 			if(fast) {
@@ -57,7 +63,6 @@ public class NashSolver {
 		return out;
 	}
 
-
 	/**
 	 * Finds all pure Nash equilibriums for the current state. Returns an array of
 	 * action pairs. 
@@ -65,7 +70,7 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][] basic_nash(StateQ Q, int action_count) {
+	public static ActionSet[] basic_nash(StateQ Q) {
 
 		int[][][] response = best_responses(Q, action_count);
 

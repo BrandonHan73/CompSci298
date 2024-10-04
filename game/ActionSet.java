@@ -2,12 +2,18 @@ package game;
 
 public class ActionSet {
 
+	public final int player_count;
 	private int[] actions;
 	private int[][] choices;
 
 	public ActionSet(int[] player_actions, int[][] player_choices) {
+		player_count = player_actions.length;
 		actions = player_actions;
 		choices = player_choices;
+	}
+
+	public int get(int player) {
+		return actions[player];
 	}
 
 	@Override

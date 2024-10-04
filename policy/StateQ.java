@@ -31,27 +31,21 @@ public class StateQ {
 		Q.get(actions)[player] = val;
 	}
 
-	/**
-	 * Takes the Q function for the current state and the current action
-	 * choices for both players. The first dimension of the action parameter 
-	 * represents the player. 
-	 *
-	 * @param Q The Q function for the given state.
-	 * @param actions The action choice distributions for both players. 
-	 */
-	public double[] value(double[][] actions) {
+	public double[] value(ActionDistribution[] distributions) {
 
-		double[] eval = new double[] { 0, 0 };
+		double[] eval = new double[action_choices.length];
 
-		double prob;
-		for(int p1_action = 0; p1_action < actions[P1].length; p1_action++) {
-			for(int p2_action = 0; p2_action < actions[P2].length; p2_action++) {
-				prob = actions[P1][p1_action] * actions[P2][p2_action];
-				eval[P1] += prob * get(p1_action, p2_action, P1);
-				eval[P2] += prob * get(p1_action, p2_action, P2);
-
+		Utility.forEachChoice(action_choices, pick -> {
+			double prob = 1;
+			for(int player = 0; player < pick.length; player++) {
+				prob *= distributions[player].get(pick[player]);
 			}
-		}
+
+			ActionSet as = new ActionSet(pick, action_choices);
+			for(int player = 0; player < pick.length; player++) {
+				eval[player] += prob * get(as, player);
+			}
+		});
 
 		return eval;
 	}
