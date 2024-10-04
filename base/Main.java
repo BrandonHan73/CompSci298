@@ -1,7 +1,3 @@
-package base;
-
-import game.*;
-import policy.*;
 
 public class Main {
 

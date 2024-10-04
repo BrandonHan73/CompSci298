@@ -3,5 +3,7 @@
 out/
 lib/
 third-party/
+
 *.out
+*.class
 

@@ -26,7 +26,6 @@ public class NashSolver {
 	 * will be applied instead. 
 	 *
 	 * @param Q The Q function for the given state.
-	 * @param action_count The number of possible actions for each player. 
 	 */
 	public static double[][] evaluate_state(StateQ Q, boolean fast) {
 
@@ -55,78 +54,9 @@ public class NashSolver {
 			}
 		}
 
-		return fix_action_distribution(out);
-	}
-
-	/**
-	 * Fixes action distribution based off of configuration. Either takes the
-	 * argmax or leaves the distribution alone. 
-	 *
-	 * @param actions The base action distributions to fix
-	 */
-	public static double[][] fix_action_distribution(double[][] actions) {
-		double[][] out = new double[actions.length][];
-
-		int[] argmax;
-		if(Config.use_action_distribution) {
-			// No action required, return a copy of action distribution
-
-			for(int i = 0; i < actions.length; i++) {
-				out[i] = new double[actions[i].length];
-				for(int j = 0; j < out[i].length; j++) {
-					out[i][j] = actions[i][j];
-				}
-			}
-
-		} else {
-
-			for(int i = 0; i < actions.length; i++) {
-				final double[] dist = actions[i];
-				argmax = Utility.argmax(0, dist.length, j -> dist[j]);
-
-				out[i] = new double[dist.length];
-				for(int action : argmax) {
-					out[i][action] = 1.0 / dist.length;
-				}
-			}
-
-		}
-
 		return out;
 	}
 
-	public static double[] value_of(StateQ Q, boolean fast) {
-		return value_of(Q, evaluate_state(Q, fast));
-	}
-
-	public static double[] value_of(StateQ Q) {
-		return value_of(Q, false);
-	}
-
-	/**
-	 * Takes the Q function for the current state and the current action
-	 * choices for both players. The first dimension of the action parameter 
-	 * represents the player. 
-	 *
-	 * @param Q The Q function for the given state.
-	 * @param actions The action choice distributions for both players. 
-	 */
-	public static double[] value_of(StateQ Q, double[][] actions) {
-
-		double[] eval = new double[] { 0, 0 };
-
-		double prob;
-		for(int p1_action = 0; p1_action < actions[P1].length; p1_action++) {
-			for(int p2_action = 0; p2_action < actions[P2].length; p2_action++) {
-				prob = actions[P1][p1_action] * actions[P2][p2_action];
-				eval[P1] += prob * Q.get(p1_action, p2_action, P1);
-				eval[P2] += prob * Q.get(p1_action, p2_action, P2);
-
-			}
-		}
-
-		return eval;
-	}
 
 	/**
 	 * Finds all pure Nash equilibriums for the current state. Returns an array of

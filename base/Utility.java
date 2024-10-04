@@ -175,5 +175,52 @@ public class Utility {
 		return out;
 	}
 
+	public static interface IntArrToVoid {
+		public void run(int[] arr);
+	}
+
+	public static void forEachChoice(int[][] choices, IntArrToVoid action) {
+		int count = choices.length;
+		int choice_count, index;
+
+		int[] indices = new int[count];
+
+		int[] pick = new int[count];
+		while(true) {
+
+			for(int i = 0; i < count; i++) {
+				pick[i] = choices[i][indices[i]];
+			}
+
+			action.run(pick);
+
+			index = 0;
+			do {
+				choice_count = choices[index].length;
+				indices[index]++;
+
+				if(indices[index] < choice_count) {
+					break;
+				} else {
+					indices[index] = 0;
+					index++;
+					if(index < count) {
+						continue;
+					} else {
+						return;
+					}
+				}
+			} while(true);
+		}
+	}
+
+	public static double[] createDoubleArray(int n, double val) {
+		double[] out = new double[n];
+		for(int i = 0; i < n; i++) {
+			out[i] = val;
+		}
+		return out;
+	}
+
 }
 

@@ -68,7 +68,7 @@ public class DiscreteGamePolicy extends Policy {
 						if(value_table.containsKey(new_state)) {
 							Q_evaluation = value_table.get(new_state);
 						} else {
-							Q_evaluation = NashSolver.value_of(Q.get(new_state), true);
+							Q_evaluation = Q.get(new_state).value(true);
 							value_table.put(new_state, Q_evaluation);
 						}
 
