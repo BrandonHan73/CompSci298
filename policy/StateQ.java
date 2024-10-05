@@ -11,11 +11,13 @@ public class StateQ {
 	private Map<ActionSet, double[]> Q;
 
 	public final int[][] action_choices;
+	public final int player_count;
 
 	private final int P1 = 0, P2 = 1;
 
 	public StateQ(State s) {
 		action_choices = s.choices();
+		player_count = action_choices.length;
 
 		Q = new HashMap<>();
 		Utility.forEachChoice(action_choices, pick -> {

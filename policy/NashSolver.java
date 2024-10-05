@@ -1,6 +1,8 @@
 package policy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import base.Config;
 import base.Utility;
@@ -74,7 +76,16 @@ public class NashSolver {
 
 		int[][][] response = best_responses(Q, action_count);
 
-		ArrayList<int[]> nash = new ArrayList<>();
+		ArrayList<ActionSet> nash = new ArrayList<>();
+
+		Utility.forEachChoice(Q.action_choices, pick -> {
+			ActionSet as = new ActionSet(pick, Q.action_choices);
+
+			ActionSet alt;
+			for(int player = 0; player < as.player_count; player++) {
+
+			}
+		});
 
 		for(int p1_action = 0; p1_action < action_count; p1_action++) {
 			for(int p2_action = 0; p2_action < action_count; p2_action++) {
@@ -118,8 +129,19 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][][] best_responses(StateQ Q, int action_count) {
+	public static Map<ActionSet, ActionDistribution[]> best_responses(StateQ Q, int action_count) {
 		int[][][] out = new int[2][action_count][];
+
+		Map<ActionSet, ActionDistribution[]> out = new HashMap<>();
+
+		Utility.forEachChoice(Q.action_choices, pick -> {
+			ActionSet as = new ActionSet(pick, Q.action_choices);
+			ActionDistribution[] dist = new ActionDistribution[Q.player_count];
+
+			for(int pl = 0; pl < Q.player_count; pl++) {
+				dist[pl] = new ActionDistribution();
+			}
+		});
 
 		for(int p2_action = 0; p2_action < action_count; p2_action++) {
 			final int _p2_action = p2_action;
