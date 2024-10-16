@@ -25,6 +25,10 @@ public class StateQ {
 		});
 	}
 
+	public double get(ActionSet actions) {
+		return Q.get(actions);
+	}
+
 	public double get(ActionSet actions, int player) {
 		return Q.get(actions)[player];
 	}

@@ -74,28 +74,30 @@ public class NashSolver {
 	 */
 	public static ActionSet[] basic_nash(StateQ Q) {
 
-		int[][][] response = best_responses(Q, action_count);
-
 		ArrayList<ActionSet> nash = new ArrayList<>();
 
 		Utility.forEachChoice(Q.action_choices, pick -> {
 			ActionSet as = new ActionSet(pick, Q.action_choices);
 
 			ActionSet alt;
+			int[] choices;
+			double[] Q_eval = Q.get(pick);
 			for(int player = 0; player < as.player_count; player++) {
+				choices = Q.action_choices[player];
 
-			}
-		});
-
-		for(int p1_action = 0; p1_action < action_count; p1_action++) {
-			for(int p2_action = 0; p2_action < action_count; p2_action++) {
-				if(Utility.contains(response[P1][p2_action], p1_action) && Utility.contains(response[P2][p1_action], p2_action)) {
-					nash.add(new int[] {p1_action, p2_action});
+				for(int action : choices) {
+					alt = new ActionSet(as);
+					alt.set(player, action);
+					if(Q.get(alt, player) > Q_eval[player]) {
+						return;
+					}
 				}
 			}
-		}
 
-		return Utility.toMatrix(nash);
+			nash.add(as);
+		});
+
+		return Utility.toArray(nash);
 	}
 
 	/**

@@ -28,7 +28,7 @@ public class ActionDistribution {
 
 	public double get(int action) {
 		if(count == 0) {
-
+			return 0;
 		}
 		return (double) distribution.get(action) / count;
 	}

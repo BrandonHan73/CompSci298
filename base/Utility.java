@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.IntToDoubleFunction;
 
+import game.ActionSet;
+
 public class Utility {
 
 	private static void print_ob(PrintStream out, int[][] arr) {
@@ -95,6 +97,30 @@ public class Utility {
 		int[][] out = new int[arr.size()][];
 		for(int i = 0; i < out.length; i++) {
 			out[i] = arr.get(i);
+		}
+		return out;
+	}
+
+	public static ActionSet[] toArray(ArrayList<ActionSet> arr) {
+		ActionSet[] out = new ActionSet[arr.size()];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = arr.get(i);
+		}
+		return out;
+	}
+
+	public static int[] copy(int[] arr) {
+		int[] out = new int[arr.length];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = arr[i];
+		}
+		return out;
+	}
+
+	public static int[][] copy(int[][] arr) {
+		int[][] out = new int[arr.length][];
+		for(int i = 0; i < out.length; i++) {
+			out[i] = copy(arr[i]);
 		}
 		return out;
 	}

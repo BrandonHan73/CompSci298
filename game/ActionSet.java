@@ -1,5 +1,7 @@
 package game;
 
+import base.Utility;
+
 public class ActionSet {
 
 	public final int player_count;
@@ -8,12 +10,20 @@ public class ActionSet {
 
 	public ActionSet(int[] player_actions, int[][] player_choices) {
 		player_count = player_actions.length;
-		actions = player_actions;
-		choices = player_choices;
+		actions = Utility.copy(player_actions);
+		choices = Utility.copy(player_choices);
+	}
+
+	public ActionSet(ActionSet o) {
+		this(o.actions, o.choices);
 	}
 
 	public int get(int player) {
 		return actions[player];
+	}
+
+	public void set(int player, int action) {
+		actions[player] = action;
 	}
 
 	@Override
