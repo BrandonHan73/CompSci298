@@ -54,6 +54,11 @@ public class CrashGame extends Game {
 			state = state * cols + car.col;
 			return Integer.hashCode(state);
 		}
+
+		@Override
+		public String toString() {
+			return truck.toString() + " vs. " + car.toString();
+		}
 	}
 
 	public CrashGame(int rows_, int cols_) {

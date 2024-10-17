@@ -50,5 +50,10 @@ public class Position {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "(" + row + "," + col + ")";
+	}
+
 }
 

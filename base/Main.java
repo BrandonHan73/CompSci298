@@ -12,11 +12,11 @@ public class Main {
 
 	public static void test_games(String[] args) {
 
-		Utility.println(System.out);
-		Utility.println(System.out, "----------------------------------");
-		Utility.println(System.out, "| Rock Paper Scissors            |");
-		Utility.println(System.out, "----------------------------------");
-		evaluate(new RockPaperScissors());
+		// Utility.println(System.out);
+		// Utility.println(System.out, "----------------------------------");
+		// Utility.println(System.out, "| Rock Paper Scissors            |");
+		// Utility.println(System.out, "----------------------------------");
+		// evaluate(new RockPaperScissors());
 
 		Utility.println(System.out);
 		Utility.println(System.out, "----------------------------------");

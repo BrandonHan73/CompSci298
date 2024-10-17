@@ -9,12 +9,16 @@ public class Config {
 	public static boolean use_pure_nash_optimization = true;
 	public static boolean use_action_distribution = true;
 
+	// Base learning rate for gradient descent
 	public static double alpha = 0.4;
+
+	// Discount for Q learning
 	public static double Beta = 0.4;
 
-	public static boolean debug = true;
+	// Fictitious play base ratio
+	public static double gamma = 0.5;
 
-	public static boolean fictitious_play_start_even = true;
+	public static boolean debug = true;
 
 }
 

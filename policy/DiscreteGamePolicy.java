@@ -6,6 +6,7 @@ import java.util.Map;
 import base.Utility;
 import base.Config;
 import base.State;
+import game.CrashGame;
 import game.Game;
 
 public class DiscreteGamePolicy extends Policy {
@@ -43,6 +44,9 @@ public class DiscreteGamePolicy extends Policy {
 		Map<State, StateQ> Q_update;
 
 		double max_change;
+		double change;
+		State change_state = null;
+		int change_truck = -1, change_car = -1;
 
 		StateQ state_update;
 		int[] action_counts;
@@ -75,14 +79,16 @@ public class DiscreteGamePolicy extends Policy {
 						state_update.set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
 						state_update.set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
 
-						max_change = Math.max(
-							max_change, 
+						change = Math.max(
+							Math.abs(state_update.get(p1_action, p2_action, P2) - Q.get(state).get(p1_action, p2_action, P2)),
 							Math.abs(state_update.get(p1_action, p2_action, P1) - Q.get(state).get(p1_action, p2_action, P1))
 						);
-						max_change = Math.max(
-							max_change, 
-							Math.abs(state_update.get(p1_action, p2_action, P2) - Q.get(state).get(p1_action, p2_action, P2))
-						);
+						if(change > max_change) {
+							max_change = change;
+							change_state = state;
+							change_truck = p1_action;
+							change_car = p2_action;
+						}
 
 					}
 				}
@@ -91,7 +97,16 @@ public class DiscreteGamePolicy extends Policy {
 			}
 
 			Q = Q_update;
-			Utility.debugln(System.out, "Largest update: ", max_change);
+			if(max_change > 0) {
+				Utility.debugln(System.out, 
+					"Largest update: ", max_change, 
+					" at ", change_state, 
+					" doing ", change_truck, " and ", change_car
+				);
+			} else {
+				Utility.println(System.out, "No change");
+				break;
+			}
 		}
 
 	}

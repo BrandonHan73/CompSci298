@@ -252,19 +252,19 @@ public class NashSolver {
 		int[][][] response = best_responses(Q, action_count);
 
 		double[][] action_counts = new double[2][action_count];
-		if(Config.fictitious_play_start_even) {
-			for(int action = 0; action < action_count; action++) {
-				action_counts[P1][action] = 1.0 / action_count;
-				action_counts[P2][action] = 1.0 / action_count;
-			}
-		} else {
-			action_counts[P1][0] = 1;
-			action_counts[P2][0] = 1;
+		for(int action = 0; action < action_count; action++) {
+			action_counts[P1][action] = 1.0 / action_count;
+			action_counts[P2][action] = 1.0 / action_count;
 		}
 
 		double[][] reaction = new double[2][];
+		double max_change = 0;
+
+		boolean updated = false;
 
 		for(int moves = 1; moves < iterations; moves++) {
+
+			max_change = 0;
 
 			reaction[P1] = new double[action_count];
 			for(int p2_action = 0; p2_action < action_count; p2_action++) {
@@ -281,18 +281,44 @@ public class NashSolver {
 			}
 
 			for(int action = 0; action < action_count; action++) {
-				action_counts[P1][action] += reaction[P1][action];
-				action_counts[P2][action] += reaction[P2][action];
+				
+				max_change = Math.max(max_change, Math.abs(action_counts[P1][action] / moves - reaction[P1][action]));
+				max_change = Math.max(max_change, Math.abs(action_counts[P2][action] / moves - reaction[P2][action]));
+
+				// action_counts[P1][action] += reaction[P1][action];
+				// action_counts[P2][action] += reaction[P2][action];
+
+				action_counts[P1][action] = Config.gamma * action_counts[P1][action] + (1 - Config.gamma) * reaction[P1][action];
+				action_counts[P2][action] = Config.gamma * action_counts[P2][action] + (1 - Config.gamma) * reaction[P2][action];
+
 			}
 
-			if(moves == 1 && Config.fictitious_play_start_even) {
+			if(!updated) {
 				for(int action = 0; action < action_count; action++) {
-					action_counts[P1][action] -= 1.0 / action_count;
-					action_counts[P2][action] -= 1.0 / action_count;
+					action_counts[P1][action] -= Config.gamma / action_count;
+					action_counts[P2][action] -= Config.gamma / action_count;
 				}
+				moves--;
+				updated = true;
+			} 
+			action_counts[P1] = Utility.toDistribution(action_counts[P1]);
+			action_counts[P2] = Utility.toDistribution(action_counts[P2]);
+
+			if(max_change == 0) {
+				Utility.println(System.out, "Fictitious play converged");
+				break;
+			} else {
+				Utility.println(System.out,
+					"Truck: ", Utility.toDistribution(action_counts[P1])
+				);
+				Utility.println(System.out,
+					"Car: ", Utility.toDistribution(action_counts[P2])
+				);
 			}
 
 		}
+
+		Utility.println(System.out, "Last max change for fictitious play: ", max_change);
 
 		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
 		action_counts[P2] = Utility.toDistribution(action_counts[P2]);
