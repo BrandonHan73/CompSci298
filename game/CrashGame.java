@@ -129,6 +129,13 @@ public class CrashGame extends Game {
 		car = new Position(state.car);
 	}
 
+	public CrashGame(CrashGame o, Position t, Position c) {
+		this(o);
+
+		truck = new Position(t);
+		car = new Position(c);
+	}
+
 	@Override
 	public Game get_copy(State state) {
 		return new CrashGame(this, (CrashGameState) state);

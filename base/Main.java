@@ -6,7 +6,7 @@ import policy.*;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		// CrashGameTest.base();
+		CrashGameTest.test_train_cycle();
 		test_games(args);
 	}
 

@@ -3,6 +3,7 @@ package game;
 import java.util.concurrent.TimeUnit;
 
 import base.Config;
+import base.Position;
 import base.Utility;
 import policy.DiscreteGamePolicy;
 import policy.Policy;
@@ -32,6 +33,10 @@ public class CrashGameTest {
 
 	public static void test_train_cycle() throws InterruptedException {
 		CrashGame game = new CrashGame(reward1);
+		game = new CrashGame(game, 
+			new Position(0, 1), 
+			new Position(1, 2)
+		);
 
 		// CrashGame game = new CrashGame(5, 7);
 		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
@@ -48,19 +53,35 @@ public class CrashGameTest {
 		for(int iteration = 0; iteration < 16; iteration++) {
 			Utility.println(System.out);
 
-			Config.debug = false;
-			choices = pol.get_action_options(game.get_state());
-			Config.debug = true;
+			game = new CrashGame(game, 
+				new Position(0, 1), 
+				new Position(1, 2)
+			);
 
+			choices = pol.get_action_options(game.get_state());
+
+			Utility.println(System.out, "For ", game.get_state());
 			Utility.print(System.out, "Truck: ", choices[0]);
 			Utility.println(System.out);
 
 			Utility.print(System.out, "  Car: ", choices[1]);
 			Utility.println(System.out);
 
-			Config.debug = false;
+			game = new CrashGame(game, 
+				new Position(0, 1), 
+				new Position(1, 2)
+			);
+
+			choices = pol.get_action_options(game.get_state());
+
+			Utility.println(System.out, "For ", game.get_state());
+			Utility.print(System.out, "Truck: ", choices[0]);
+			Utility.println(System.out);
+
+			Utility.print(System.out, "  Car: ", choices[1]);
+			Utility.println(System.out);
+
 			pol.train(1);
-			Config.debug = true;
 		}
 
 	}

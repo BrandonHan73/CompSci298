@@ -305,20 +305,9 @@ public class NashSolver {
 			action_counts[P2] = Utility.toDistribution(action_counts[P2]);
 
 			if(max_change == 0) {
-				Utility.println(System.out, "Fictitious play converged");
 				break;
-			} else {
-				Utility.println(System.out,
-					"Truck: ", Utility.toDistribution(action_counts[P1])
-				);
-				Utility.println(System.out,
-					"Car: ", Utility.toDistribution(action_counts[P2])
-				);
 			}
-
 		}
-
-		Utility.println(System.out, "Last max change for fictitious play: ", max_change);
 
 		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
 		action_counts[P2] = Utility.toDistribution(action_counts[P2]);
