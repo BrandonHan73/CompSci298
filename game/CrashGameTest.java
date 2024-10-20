@@ -68,8 +68,8 @@ public class CrashGameTest {
 			Utility.println(System.out);
 
 			game = new CrashGame(game, 
-				new Position(0, 1), 
-				new Position(1, 2)
+				new Position(0, 2), 
+				new Position(1, 1)
 			);
 
 			choices = pol.get_action_options(game.get_state());

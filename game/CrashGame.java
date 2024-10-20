@@ -52,7 +52,7 @@ public class CrashGame extends Game {
 			state = state * cols + truck.col;
 			state = state * rows + car.row;
 			state = state * cols + car.col;
-			return Integer.hashCode(state);
+			return state;
 		}
 
 		@Override

@@ -33,7 +33,7 @@ public class Utility {
 	}
 
 	private static void print_ob(PrintStream out, double d) {
-		out.print(String.format("%.4f", d));
+		out.print(String.format("%.8f", d));
 	}
 
 	private static void print_ob(PrintStream out, Position pos) {
