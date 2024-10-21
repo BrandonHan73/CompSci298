@@ -2,11 +2,14 @@ package policy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import base.Config;
 import base.Utility;
 import game.ActionSet;
+import policy.ActionDistribution;
 
 /**
  * Various library functions for Q learning. 
@@ -35,7 +38,7 @@ public class NashSolver {
 		int[][] action_choices = Q.action_choices;
 		int player_count = action_choices.length;
 
-		ActionSet[] all_nash = basic_nash(Q, action_choices);
+		ActionSet[] all_nash = basic_nash(Q);
 		ActionSet[] best_nash;
 		
 		ActionDistribution[] out = null;
@@ -55,11 +58,7 @@ public class NashSolver {
 			}
 
 		} else {
-			if(fast) {
-				out = fast_fictitious_play(Q, action_count);
-			} else {
-				out = fictitious_play(Q, action_count);
-			}
+			out = fast ? fast_fictitious_play(Q) : fictitious_play(Q);
 		}
 
 		return out;
@@ -76,26 +75,14 @@ public class NashSolver {
 
 		ArrayList<ActionSet> nash = new ArrayList<>();
 
-		Utility.forEachChoice(Q.action_choices, pick -> {
-			ActionSet as = new ActionSet(pick, Q.action_choices);
+		Set<ActionSet>[] choices = new Set<ActionSet>[Q.player_count];
+		for(int player = 0; player < Q.player_count; player++) {
+			choices[player] = new HashSet<>();
+		}
 
-			ActionSet alt;
-			int[] choices;
-			double[] Q_eval = Q.get(pick);
-			for(int player = 0; player < as.player_count; player++) {
-				choices = Q.action_choices[player];
+		for(int player = 0; player < Q.player_count; player++) {
 
-				for(int action : choices) {
-					alt = new ActionSet(as);
-					alt.set(player, action);
-					if(Q.get(alt, player) > Q_eval[player]) {
-						return;
-					}
-				}
-			}
-
-			nash.add(as);
-		});
+		}
 
 		return Utility.toArray(nash);
 	}
@@ -131,48 +118,39 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static Map<ActionSet, ActionDistribution[]> best_responses(StateQ Q, int action_count) {
-		int[][][] out = new int[2][action_count][];
-
+	public static Map<ActionSet, ActionDistribution[]> best_responses(StateQ Q) {
 		Map<ActionSet, ActionDistribution[]> out = new HashMap<>();
 
-		Utility.forEachChoice(Q.action_choices, pick -> {
-			ActionSet as = new ActionSet(pick, Q.action_choices);
-			ActionDistribution[] dist = new ActionDistribution[Q.player_count];
+		int[][] action_options = Utility.copy(Q.action_choices);
+		int[] current_player_options, temp_substitute = new int[] {-1};
+		ActionDistribution build;
 
-			for(int pl = 0; pl < Q.player_count; pl++) {
-				dist[pl] = new ActionDistribution();
-			}
-		});
+		for(int pl = 0; pl < Q.player_count; pl++) {
+			current_player_options = action_options[pl];
+			action_options[pl] = temp_substitute;
 
-		for(int p2_action = 0; p2_action < action_count; p2_action++) {
-			final int _p2_action = p2_action;
-			out[P1][p2_action] = Utility.argmax(0, action_count, i -> Q.get(i, _p2_action, P1));
+			Utility.forEachChoice(action_options, choices -> {
+				ActionSet action_set = new ActionSet(choices, Q.action_choices);
+
+				int[] select = Utility.argmax(
+					0, current_player_options.length, 
+					i -> {
+						action_set.set(pl, current_player_options[i]);
+						return Q.get(action_set, pl);
+					}
+				);
+
+				build = new ActionDistribution();
+				for(int sel : select) {
+					build.add(sel);
+				}
+
+				action_set.set(pl, -1);
+				out.get(action_set)[pl] = build;
+			});
+
+			action_options[pl] = current_player_options;
 		}
-
-		for(int p1_action = 0; p1_action < action_count; p1_action++) {
-			final int _p1_action = p1_action;
-			out[P2][p1_action] = Utility.argmax(0, action_count, i -> Q.get(_p1_action, i, P2));
-		}
-
-		return out;
-	}
-
-	/**
-	 * Takes an array of action frequencies and determines which appeared most often. The
-	 * first dimension of the given array represents which player. 
-	 *
-	 * @param action_counts The frequencies of each action for every player. 
-	 */
-	public static int[][] pick_most_common(double[][] action_counts) {
-		int[][] result = new int[action_counts.length][];
-
-		for(int i = 0; i < action_counts.length; i++) {
-			final int _i = i;
-			result[i] = Utility.argmax(0, action_counts[i].length, j -> action_counts[_i][j]);
-		}
-
-		return result;
 	}
 
 	/**

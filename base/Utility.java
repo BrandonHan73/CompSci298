@@ -140,7 +140,6 @@ public class Utility {
 	}
 
 	public static int[] argmax(int start, int end, IntToDoubleFunction f) {
-
 		ArrayList<Integer> choice = new ArrayList<>();
 		double best;
 

@@ -3,6 +3,7 @@ package policy;
 import java.util.HashMap;
 import java.util.Map;
 
+import base.State;
 import base.Utility;
 import game.ActionSet;
 
@@ -12,8 +13,6 @@ public class StateQ {
 
 	public final int[][] action_choices;
 	public final int player_count;
-
-	private final int P1 = 0, P2 = 1;
 
 	public StateQ(State s) {
 		action_choices = s.choices();
@@ -25,7 +24,7 @@ public class StateQ {
 		});
 	}
 
-	public double get(ActionSet actions) {
+	public double[] get(ActionSet actions) {
 		return Q.get(actions);
 	}
 
