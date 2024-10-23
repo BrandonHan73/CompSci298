@@ -3,6 +3,8 @@ package policy;
 import java.util.HashMap;
 import java.util.Map;
 
+import base.Utility;
+
 public class ActionDistribution {
 
 	private Map<Integer, Double> distribution;
@@ -27,10 +29,33 @@ public class ActionDistribution {
 	}
 
 	public double get(int action) {
-		if(count == 0) {
+		if(count == 0 || !distribution.containsKey(action)) {
 			return 0;
 		}
-		return (double) distribution.get(action) / count;
+		return distribution.get(action) / count;
+	}
+
+	public int[] choices() {
+		int[] out = new int[distribution.size()];
+		int i = 0;
+		for(int action : distribution.keySet()) {
+			out[i++] = action;
+		}
+		return out;
+	}
+
+	public int poll() {
+		double choice = count * Math.random();
+
+		for(int action : distribution.keySet()) {
+			choice -= distribution.get(action);
+
+			if(choice < 0) {
+				return action;
+			}
+		}
+
+		return -1;
 	}
 
 }

@@ -1,3 +1,13 @@
+package base;
+
+import environment.RockPaperScissors;
+import environment.CrashGame;
+import environment.CrashGameTest;
+import environment.Game;
+
+import policy.Policy;
+import policy.RandomPolicy;
+import policy.DiscreteGamePolicy;
 
 public class Main {
 

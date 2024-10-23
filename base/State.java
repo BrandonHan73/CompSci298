@@ -31,6 +31,10 @@ public class State {
 		return actions;
 	}
 
+	public int player_count() {
+		return actions.length;
+	}
+
 	public int[] action_counts() {
 		int[] count = new int[actions.length];
 		for(int i = 0; i < count.length; i++) {

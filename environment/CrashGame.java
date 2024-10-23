@@ -1,4 +1,4 @@
-package game;
+package environment;
 
 import java.io.PrintStream;
 
@@ -145,11 +145,11 @@ public class CrashGame extends Game {
 		return new CrashGameState(truck, car);
 	}
 
-	public double[] update(int[] actions) {
-		return update(actions[0], actions[1]);
+	@Override
+	public double[] update(ActionSet as) {
+		return update(as.get(0), as.get(1));
 	}
 
-	@Override
 	public double[] update(int truck_action, int car_action) {
 		Position truck_old = new Position(truck);
 		Position car_old = new Position(car);

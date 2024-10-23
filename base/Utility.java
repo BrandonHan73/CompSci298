@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.IntToDoubleFunction;
 
-import game.ActionSet;
+import environment.ActionSet;
 
 public class Utility {
 
@@ -101,10 +101,11 @@ public class Utility {
 		return out;
 	}
 
-	public static ActionSet[] toArray(ArrayList<ActionSet> arr) {
-		ActionSet[] out = new ActionSet[arr.size()];
-		for(int i = 0; i < out.length; i++) {
-			out[i] = arr.get(i);
+	public static ActionSet[] toArray(Set<ActionSet> set) {
+		ActionSet[] out = new ActionSet[set.size()];
+		int i = 0;
+		for(ActionSet as : set) {
+			out[i++] = as;
 		}
 		return out;
 	}

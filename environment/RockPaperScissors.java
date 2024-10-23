@@ -1,4 +1,4 @@
-package game;
+package environment;
 
 import base.State;
 
@@ -40,8 +40,9 @@ public class RockPaperScissors extends Game {
 
 	}
 
-	public double[] update(int[] actions) {
-		return update(actions[0], actions[1]);
+	@Override
+	public double[] update(ActionSet as) {
+		return update(as.get(0), as.get(1));
 	}
 
 	public State get_state() { return state; }

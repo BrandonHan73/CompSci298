@@ -1,9 +1,9 @@
 
 base_objects = out/base/Config.class out/base/Position.class out/base/State.class out/base/Utility.class
-game_objects = out/game/CrashGame.class out/game/CrashGameTest.class out/game/CycleGame.class out/game/CycleGameTest.class out/game/Game.class out/game/RockPaperScissors.class
+environment_objects = out/environment/CrashGame.class out/environment/CrashGameTest.class out/environment/CycleGame.class out/environment/CycleGameTest.class out/environment/Game.class out/environment/RockPaperScissors.class
 policy_objects = out/policy/DiscreteGamePolicy.class out/policy/LogisticRegression.class out/policy/NashSolver.class out/policy/Policy.class out/policy/RandomPolicy.class out/policy/StateQ.class
 
-objects = $(game_objects) $(policy_objects) $(base_objects) 
+objects = $(environment_objects) $(policy_objects) $(base_objects) 
 
 libraries = lib/Jama-1.0.3.jar
 
@@ -36,29 +36,29 @@ out/base/Utility.class: base/Utility.java
 	@echo Compiling base/Utility.class  
 	@javac -d out/ -cp $(class_path) base/Utility.java
 
-out/game/CrashGame.class: game/CrashGame.java
-	@echo Compiling game/CrashGame.class
-	@javac -d out/ -cp $(class_path) game/CrashGame.java
+out/environment/CrashGame.class: environment/CrashGame.java
+	@echo Compiling environment/CrashGame.class
+	@javac -d out/ -cp $(class_path) environment/CrashGame.java
 
-out/game/CrashGameTest.class: game/CrashGameTest.java
-	@echo Compiling game/CrashGameTest.class
-	@javac -d out/ -cp $(class_path) game/CrashGameTest.java
+out/environment/CrashGameTest.class: environment/CrashGameTest.java
+	@echo Compiling environment/CrashGameTest.class
+	@javac -d out/ -cp $(class_path) environment/CrashGameTest.java
 
-out/game/CycleGame.class: game/CycleGame.java
-	@echo Compiling game/CycleGame.class
-	@javac -d out/ -cp $(class_path) game/CycleGame.java
+out/environment/CycleGame.class: environment/CycleGame.java
+	@echo Compiling environment/CycleGame.class
+	@javac -d out/ -cp $(class_path) environment/CycleGame.java
 
-out/game/CycleGameTest.class: game/CycleGameTest.java
-	@echo Compiling game/CycleGameTest.class
-	@javac -d out/ -cp $(class_path) game/CycleGameTest.java
+out/environment/CycleGameTest.class: environment/CycleGameTest.java
+	@echo Compiling environment/CycleGameTest.class
+	@javac -d out/ -cp $(class_path) environment/CycleGameTest.java
 
-out/game/Game.class: game/Game.java
-	@echo Compiling game/Game.class
-	@javac -d out/ -cp $(class_path) game/Game.java
+out/environment/Game.class: environment/Game.java
+	@echo Compiling environment/Game.class
+	@javac -d out/ -cp $(class_path) environment/Game.java
 
-out/game/RockPaperScissors.class: game/RockPaperScissors.java
-	@echo Compiling game/RockPaperScissors.class
-	@javac -d out/ -cp $(class_path) game/RockPaperScissors.java
+out/environment/RockPaperScissors.class: environment/RockPaperScissors.java
+	@echo Compiling environment/RockPaperScissors.class
+	@javac -d out/ -cp $(class_path) environment/RockPaperScissors.java
 
 out/policy/DiscreteGamePolicy.class: policy/DiscreteGamePolicy.java
 	@echo Compiling policy/DiscreteGamePolicy.class

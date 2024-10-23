@@ -1,4 +1,4 @@
-package game;
+package environment;
 
 import base.Utility;
 
