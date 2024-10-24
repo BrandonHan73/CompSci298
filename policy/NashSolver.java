@@ -265,20 +265,6 @@ public class NashSolver {
 				}
 			});
 
-			if(!updated) {
-				for(int action = 0; action < action_count; action++) {
-					action_counts[P1][action] -= Config.gamma / action_count;
-					action_counts[P2][action] -= Config.gamma / action_count;
-				}
-				moves--;
-				updated = true;
-			} 
-			action_counts[P1] = Utility.toDistribution(action_counts[P1]);
-			action_counts[P2] = Utility.toDistribution(action_counts[P2]);
-
-			if(max_change == 0) {
-				break;
-			}
 		}
 
 		return action_counts;
