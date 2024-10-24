@@ -1,13 +1,19 @@
 package base;
 
-import game.*;
-import policy.*;
+import environment.RockPaperScissors;
+import environment.CrashGame;
+import environment.CrashGameTest;
+import environment.Game;
+
+import policy.Policy;
+import policy.RandomPolicy;
+import policy.DiscreteGamePolicy;
 
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		CrashGameTest.test_train_cycle();
-		test_games(args);
+		CrashGameTest.base();
+		//test_games(args);
 	}
 
 	public static void test_games(String[] args) {

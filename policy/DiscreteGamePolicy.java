@@ -6,8 +6,8 @@ import java.util.Map;
 import base.Utility;
 import base.Config;
 import base.State;
-import game.CrashGame;
-import game.Game;
+import environment.Game;
+import environment.ActionSet;
 
 public class DiscreteGamePolicy extends Policy {
 
@@ -27,17 +27,12 @@ public class DiscreteGamePolicy extends Policy {
 		Q = new HashMap<>();
 
 		for(State s : game.get_possible_states()) {
-			Q.put(s, new StateQ(s.action_count()));
+			Q.put(s, new StateQ(s));
 		}
 	}
 
 	@Override
 	public void train(int iterations) {
-
-		Game sim;
-		double[] rewards;
-		double[] Q_evaluation;
-		State new_state;
 
 		Map<State, double[]> value_table;
 
@@ -48,7 +43,6 @@ public class DiscreteGamePolicy extends Policy {
 		State change_state = null;
 		int change_truck = -1, change_car = -1;
 
-		StateQ state_update;
 		int[] action_counts;
 
 		for(int iteration = 0; iteration < iterations; iteration++) {
@@ -60,35 +54,32 @@ public class DiscreteGamePolicy extends Policy {
 
 			for(State state : get_possible_states()) {
 				action_counts = state.action_counts();
-				state_update = new StateQ(state.action_count());
+
+				StateQ state_update = new StateQ(state);
+				final Map<State, double[]> value_table_ = value_table;
+				Utility.forEachChoice(state.choices(), action -> {
+					ActionSet as = new ActionSet(action, state.choices());
+
+					Game sim = get_base_copy(state);
+					double[] rewards = sim.update(as);
+
+					State new_state = sim.get_state();
+					double[] Q_evaluation;
+						if(value_table_.containsKey(new_state)) {
+							Q_evaluation = value_table_.get(new_state);
+						} else {
+							Q_evaluation = Q.get(new_state).value(true);
+							value_table_.put(new_state, Q_evaluation);
+						}
+
+					for(int player = 0; player < state.player_count(); player++) {
+						state_update.set(rewards[player] + Config.Beta * Q_evaluation[player], as, player);
+					}
+
+				});
 
 				for(int p1_action = 0; p1_action < action_counts[0]; p1_action++) {
 					for(int p2_action = 0; p2_action < action_counts[1]; p2_action++) {
-
-						sim = get_base_copy(state);
-						rewards = sim.update(p1_action, p2_action);
-
-						new_state = sim.get_state();
-						if(value_table.containsKey(new_state)) {
-							Q_evaluation = value_table.get(new_state);
-						} else {
-							Q_evaluation = NashSolver.value_of(Q.get(new_state), true);
-							value_table.put(new_state, Q_evaluation);
-						}
-
-						state_update.set(rewards[P1] + Config.Beta * Q_evaluation[P1], p1_action, p2_action, P1);
-						state_update.set(rewards[P2] + Config.Beta * Q_evaluation[P2], p1_action, p2_action, P2);
-
-						change = Math.max(
-							Math.abs(state_update.get(p1_action, p2_action, P2) - Q.get(state).get(p1_action, p2_action, P2)),
-							Math.abs(state_update.get(p1_action, p2_action, P1) - Q.get(state).get(p1_action, p2_action, P1))
-						);
-						if(change > max_change) {
-							max_change = change;
-							change_state = state;
-							change_truck = p1_action;
-							change_car = p2_action;
-						}
 
 					}
 				}
@@ -97,22 +88,13 @@ public class DiscreteGamePolicy extends Policy {
 			}
 
 			Q = Q_update;
-			if(max_change > 0) {
-				Utility.debugln(System.out, 
-					"Largest update: ", max_change, 
-					" at ", change_state, 
-					" doing ", change_truck, " and ", change_car
-				);
-			} else {
-				Utility.println(System.out, "No change");
-				break;
-			}
+			// Utility.debugln(System.out, "Largest update: ", max_change);
 		}
 
 	}
 
 	@Override
-	public double[][] get_action_options(State state) {
+	public ActionDistribution[] get_action_options(State state) {
 		return NashSolver.evaluate_state(Q.get(state));
 	}
 

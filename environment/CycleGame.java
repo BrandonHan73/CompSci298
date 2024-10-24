@@ -1,4 +1,4 @@
-package game;
+package environment;
 
 import base.State;
 
@@ -26,9 +26,9 @@ public class CycleGame extends Game {
 	}
 
 	@Override
-	public double[] update(int[] actions) {
-		int p1_action = actions[0];
-		int p2_action = actions[1];
+	public double[] update(ActionSet as) {
+		int p1_action = as.get(0);
+		int p2_action = as.get(1);
 
 		double[] reward = null;
 

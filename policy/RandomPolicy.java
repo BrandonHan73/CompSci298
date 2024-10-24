@@ -1,7 +1,8 @@
 package policy;
 
-import game.Game;
+import environment.Game;
 import base.State;
+import base.Utility;
 
 public class RandomPolicy extends Policy {
 
@@ -10,13 +11,14 @@ public class RandomPolicy extends Policy {
 	}
 
 	@Override
-	public double[][] get_action_options(State state) {
-		int action_count = state.action_count();
+	public ActionDistribution[] get_action_options(State state) {
+		ActionDistribution[] out = new ActionDistribution[state.player_count()];
 
-		double[][] out = new double[2][action_count];
-		for(int i = 0; i < action_count; i++) {
-			out[0][i] = 1.0 / action_count;
-			out[1][i] = 1.0 / action_count;
+		for(int player = 0; player < state.player_count(); player++) {
+			out[player] = new ActionDistribution();
+			for(int action : state.choices_for(player)) {
+				out[player].add(action);
+			}
 		}
 
 		return out;

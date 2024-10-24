@@ -27,6 +27,14 @@ public class State {
 		return actions[player];
 	}
 
+	public int[][] choices() {
+		return actions;
+	}
+
+	public int player_count() {
+		return actions.length;
+	}
+
 	public int[] action_counts() {
 		int[] count = new int[actions.length];
 		for(int i = 0; i < count.length; i++) {
@@ -34,10 +42,6 @@ public class State {
 		}
 
 		return count;
-	}
-
-	public int action_count() {
-		return action_counts()[0];
 	}
 
 	@Override
@@ -49,7 +53,7 @@ public class State {
 
 	@Override
 	public int hashCode() {
-		return value;
+		return Integer.hashCode(value);
 	}
 
 }

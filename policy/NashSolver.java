@@ -1,9 +1,15 @@
 package policy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import base.Config;
 import base.Utility;
+import environment.ActionSet;
+import policy.ActionDistribution;
 
 /**
  * Various library functions for Q learning. 
@@ -14,7 +20,7 @@ public class NashSolver {
 
 	private static final int P1 = 0, P2 = 1;
 
-	public static double[][] evaluate_state(StateQ Q) {
+	public static ActionDistribution[] evaluate_state(StateQ Q) {
 		return evaluate_state(Q, false);
 	}
 	
@@ -26,106 +32,35 @@ public class NashSolver {
 	 * will be applied instead. 
 	 *
 	 * @param Q The Q function for the given state.
-	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static double[][] evaluate_state(StateQ Q, boolean fast) {
+	public static ActionDistribution[] evaluate_state(StateQ Q, boolean fast) {
+		int[][] action_choices = Q.action_choices;
+		int player_count = action_choices.length;
 
-		int action_count = Q.action_count;
-		int[][] all_nash = basic_nash(Q, action_count);
-		int[][] best_nash;
-		double[][] out = null;
+		ActionSet[] all_nash = basic_nash(Q);
+		ActionSet[] best_nash;
+		
+		ActionDistribution[] out = null;
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
 
 			best_nash = pick_nash(Q, all_nash);
-			out = new double[2][action_count];
-
-			for(int[] action_pair : best_nash) {
-				out[P1][action_pair[P1]]++;
-				out[P2][action_pair[P2]]++;
+			out = new ActionDistribution[player_count];
+			for(int i = 0; i < player_count; i++) {
+				out[i] = new ActionDistribution();
 			}
-			out[P1] = Utility.toDistribution(out[P1]);
-			out[P2] = Utility.toDistribution(out[P2]);
 
-		} else {
-			if(fast) {
-				out = fast_fictitious_play(Q, action_count);
-			} else {
-				out = fictitious_play(Q, action_count);
-			}
-		}
-
-		return fix_action_distribution(out);
-	}
-
-	/**
-	 * Fixes action distribution based off of configuration. Either takes the
-	 * argmax or leaves the distribution alone. 
-	 *
-	 * @param actions The base action distributions to fix
-	 */
-	public static double[][] fix_action_distribution(double[][] actions) {
-		double[][] out = new double[actions.length][];
-
-		int[] argmax;
-		if(Config.use_action_distribution) {
-			// No action required, return a copy of action distribution
-
-			for(int i = 0; i < actions.length; i++) {
-				out[i] = new double[actions[i].length];
-				for(int j = 0; j < out[i].length; j++) {
-					out[i][j] = actions[i][j];
+			for(ActionSet as : best_nash) {
+				for(int i = 0; i < player_count; i++) {
+					out[i].add(as.get(i));
 				}
 			}
 
 		} else {
-
-			for(int i = 0; i < actions.length; i++) {
-				final double[] dist = actions[i];
-				argmax = Utility.argmax(0, dist.length, j -> dist[j]);
-
-				out[i] = new double[dist.length];
-				for(int action : argmax) {
-					out[i][action] = 1.0 / dist.length;
-				}
-			}
-
+			out = fast ? fast_fictitious_play(Q) : fictitious_play(Q);
 		}
 
 		return out;
-	}
-
-	public static double[] value_of(StateQ Q, boolean fast) {
-		return value_of(Q, evaluate_state(Q, fast));
-	}
-
-	public static double[] value_of(StateQ Q) {
-		return value_of(Q, false);
-	}
-
-	/**
-	 * Takes the Q function for the current state and the current action
-	 * choices for both players. The first dimension of the action parameter 
-	 * represents the player. 
-	 *
-	 * @param Q The Q function for the given state.
-	 * @param actions The action choice distributions for both players. 
-	 */
-	public static double[] value_of(StateQ Q, double[][] actions) {
-
-		double[] eval = new double[] { 0, 0 };
-
-		double prob;
-		for(int p1_action = 0; p1_action < actions[P1].length; p1_action++) {
-			for(int p2_action = 0; p2_action < actions[P2].length; p2_action++) {
-				prob = actions[P1][p1_action] * actions[P2][p2_action];
-				eval[P1] += prob * Q.get(p1_action, p2_action, P1);
-				eval[P2] += prob * Q.get(p1_action, p2_action, P2);
-
-			}
-		}
-
-		return eval;
 	}
 
 	/**
@@ -135,21 +70,42 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][] basic_nash(StateQ Q, int action_count) {
+	public static ActionSet[] basic_nash(StateQ Q) {
+		Set<ActionSet> nash = new HashSet<>();
 
-		int[][][] response = best_responses(Q, action_count);
+		Map<ActionSet, ActionDistribution>[] best_responses = best_responses(Q);
 
-		ArrayList<int[]> nash = new ArrayList<>();
+		Set<ActionSet>[] choices = new Set[Q.player_count];
+		ActionSet as;
+		ActionDistribution ad;
+		for(int player = 0; player < Q.player_count; player++) {
+			choices[player] = new HashSet<>();
 
-		for(int p1_action = 0; p1_action < action_count; p1_action++) {
-			for(int p2_action = 0; p2_action < action_count; p2_action++) {
-				if(Utility.contains(response[P1][p2_action], p1_action) && Utility.contains(response[P2][p1_action], p2_action)) {
-					nash.add(new int[] {p1_action, p2_action});
+			for(ActionSet actions : choices[player]) {
+				ad = best_responses[player].get(actions);
+				for(int a : Q.action_choices[player]) {
+					if(ad.get(a) > 0) {
+						as = new ActionSet(actions);
+						as.set(player, a);
+
+						choices[player].add(as);
+					}
 				}
 			}
 		}
 
-		return Utility.toMatrix(nash);
+		nash.addAll(choices[0]);
+		Set<ActionSet> keep = new HashSet<>();
+		for(int player = 1; player < Q.player_count; player++) {
+			for(ActionSet action : nash) {
+				if(choices[player].contains(action)) {
+					keep.add(action);
+				}
+			}
+			nash = keep;
+		}
+
+		return Utility.toArray(nash);
 	}
 
 	/**
@@ -160,16 +116,19 @@ public class NashSolver {
 	 * @param Q The Q function for the current state. 
 	 * @param action_pairs The action pairs that correspond to Nash equilibrium.
 	 */
-	public static int[][] pick_nash(StateQ Q, int[][] action_pairs) {
-		int[] choices = Utility.argmax(0, action_pairs.length, i -> {
-			int p1_action = action_pairs[i][P1];
-			int p2_action = action_pairs[i][P2];
-			return Q.get(p1_action, p2_action, P1) + Q.get(p1_action, p2_action, P2);
+	public static ActionSet[] pick_nash(StateQ Q, ActionSet[] nash) {
+		int[] choices = Utility.argmax(0, nash.length, i -> {
+			double[] eval = Q.get(nash[i]);
+			double sum = 0;
+			for(double d : eval) {
+				sum += d;
+			}
+			return sum;
 		});
 
-		int[][] out = new int[choices.length][];
+		ActionSet[] out = new ActionSet[choices.length];
 		for(int i = 0; i < choices.length; i++) {
-			out[i] = action_pairs[choices[i]];
+			out[i] = nash[choices[i]];
 		}
 		return out;
 	}
@@ -183,37 +142,42 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static int[][][] best_responses(StateQ Q, int action_count) {
-		int[][][] out = new int[2][action_count][];
+	public static Map<ActionSet, ActionDistribution>[] best_responses(StateQ Q) {
+		Map<ActionSet, ActionDistribution>[] out = new Map[Q.player_count];
 
-		for(int p2_action = 0; p2_action < action_count; p2_action++) {
-			final int _p2_action = p2_action;
-			out[P1][p2_action] = Utility.argmax(0, action_count, i -> Q.get(i, _p2_action, P1));
-		}
+		int[][] action_options = Utility.copy(Q.action_choices);
+		int[] temp_substitute = new int[] {-1};
+		for(int pl = 0; pl < Q.player_count; pl++) {
+			int[] current_player_options = action_options[pl];
+			action_options[pl] = temp_substitute;
 
-		for(int p1_action = 0; p1_action < action_count; p1_action++) {
-			final int _p1_action = p1_action;
-			out[P2][p1_action] = Utility.argmax(0, action_count, i -> Q.get(_p1_action, i, P2));
+			out[pl] = new HashMap<>();
+
+			final int pl_ = pl;
+			Utility.forEachChoice(action_options, choices -> {
+				ActionSet action_set = new ActionSet(choices, Q.action_choices);
+
+				int[] select = Utility.argmax(
+					0, current_player_options.length, 
+					i -> {
+						action_set.set(pl_, current_player_options[i]);
+						return Q.get(action_set, pl_);
+					}
+				);
+
+				ActionDistribution build = new ActionDistribution();
+				for(int sel : select) {
+					build.add(sel);
+				}
+
+				action_set.set(pl_, -1);
+				out[pl_].put(action_set, build);
+			});
+
+			action_options[pl] = current_player_options;
 		}
 
 		return out;
-	}
-
-	/**
-	 * Takes an array of action frequencies and determines which appeared most often. The
-	 * first dimension of the given array represents which player. 
-	 *
-	 * @param action_counts The frequencies of each action for every player. 
-	 */
-	public static int[][] pick_most_common(double[][] action_counts) {
-		int[][] result = new int[action_counts.length][];
-
-		for(int i = 0; i < action_counts.length; i++) {
-			final int _i = i;
-			result[i] = Utility.argmax(0, action_counts[i].length, j -> action_counts[_i][j]);
-		}
-
-		return result;
 	}
 
 	/**
@@ -223,22 +187,22 @@ public class NashSolver {
 	 *
 	 * @param actions The array of action distributions. 
 	 */
-	public static int[] evaluate_options(double[][] actions) {
-		int[] result = new int[actions.length];
+	public static ActionSet evaluate_options(ActionDistribution[] options) {
+		int[] result = new int[options.length];
 
 		for(int i = 0; i < result.length; i++) {
-			result[i] = Utility.pickFrom(actions[i]);
+			result[i] = options[i].poll();
 		}
 
-		return result;
+		return new ActionSet(result, null);
 	}
 
-	public static double[][] fictitious_play(StateQ Q, int action_count) {
-		return fictitious_play(Q, action_count, Config.fictitious_play_iterations);
+	public static ActionDistribution[] fictitious_play(StateQ Q) {
+		return fictitious_play(Q, Config.fictitious_play_iterations);
 	}
 
-	public static double[][] fast_fictitious_play(StateQ Q, int action_count) {
-		return fictitious_play(Q, action_count, Config.fast_fictitious_play_iterations);
+	public static ActionDistribution[] fast_fictitious_play(StateQ Q) {
+		return fictitious_play(Q, Config.fast_fictitious_play_iterations);
 	}
 
 	/**
@@ -247,51 +211,59 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param action_count The number of possible actions for each player. 
 	 */
-	public static double[][] fictitious_play(StateQ Q, int action_count, int iterations) {
+	public static ActionDistribution[] fictitious_play(StateQ Q, int iterations) {
 
-		int[][][] response = best_responses(Q, action_count);
+		Map<ActionSet, ActionDistribution>[] response = best_responses(Q);
 
-		double[][] action_counts = new double[2][action_count];
-		for(int action = 0; action < action_count; action++) {
-			action_counts[P1][action] = 1.0 / action_count;
-			action_counts[P2][action] = 1.0 / action_count;
+		ActionDistribution[] action_counts = new ActionDistribution[Q.player_count];
+		
+		for(int player = 0; player < Q.player_count; player++) {
+			action_counts[player] = new ActionDistribution();
+			for(int action : Q.action_choices[player]) {
+				action_counts[player].add(action, 1.0 / Q.action_choices.length);
+			}
 		}
 
-		double[][] reaction = new double[2][];
-		double max_change = 0;
+		ActionDistribution[] reaction = new ActionDistribution[Q.player_count];
 
-		boolean updated = false;
+		int[][] action_options = Utility.copy(Q.action_choices);
+		int[] temp_action_set = new int[] {-1}, current_player_choices;
 
 		for(int moves = 1; moves < iterations; moves++) {
 
-			max_change = 0;
+			for(int player = 0; player < Q.player_count; player++) {
+				reaction[player] = new ActionDistribution();
 
-			reaction[P1] = new double[action_count];
-			for(int p2_action = 0; p2_action < action_count; p2_action++) {
-				for(int p1_action : response[P1][p2_action]) {
-					reaction[P1][p1_action] += action_counts[P2][p2_action] / moves / response[P1][p2_action].length;
+				current_player_choices = action_options[player];
+				action_options[player] = temp_action_set;
+
+				final int player_ = player;
+				final int[] current_player_choices_ = current_player_choices;
+				Utility.forEachChoice(action_options, action -> {
+					ActionSet as = new ActionSet(action, Q.action_choices);
+					double probability = 1;
+
+					for(int opponent = 0; opponent < Q.player_count; opponent++) {
+						if(player_ == opponent) continue;
+
+						probability *= action_counts[opponent].get(as.get(opponent));
+					}
+
+					for(int curr : current_player_choices_) {
+						reaction[player_].add(curr, 
+							response[player_].get(as).get(curr) * probability
+						);
+					}
+				});
+
+				action_options[player] = current_player_choices;
+			}
+
+			Utility.forEachChoice(Q.action_choices, action -> {
+				for(int player = 0; player < Q.player_count; player++) {
+					action_counts[player].add(action[player], reaction[player].get(action[player]));
 				}
-			}
-
-			reaction[P2] = new double[action_count];
-			for(int p1_action = 0; p1_action < action_count; p1_action++) {
-				for(int p2_action : response[P2][p1_action]) {
-					reaction[P2][p2_action] += action_counts[P1][p1_action] / moves / response[P2][p1_action].length;
-				}
-			}
-
-			for(int action = 0; action < action_count; action++) {
-				
-				max_change = Math.max(max_change, Math.abs(action_counts[P1][action] / moves - reaction[P1][action]));
-				max_change = Math.max(max_change, Math.abs(action_counts[P2][action] / moves - reaction[P2][action]));
-
-				// action_counts[P1][action] += reaction[P1][action];
-				// action_counts[P2][action] += reaction[P2][action];
-
-				action_counts[P1][action] = Config.gamma * action_counts[P1][action] + (1 - Config.gamma) * reaction[P1][action];
-				action_counts[P2][action] = Config.gamma * action_counts[P2][action] + (1 - Config.gamma) * reaction[P2][action];
-
-			}
+			});
 
 			if(!updated) {
 				for(int action = 0; action < action_count; action++) {
@@ -308,9 +280,6 @@ public class NashSolver {
 				break;
 			}
 		}
-
-		action_counts[P1] = Utility.toDistribution(action_counts[P1]);
-		action_counts[P2] = Utility.toDistribution(action_counts[P2]);
 
 		return action_counts;
 

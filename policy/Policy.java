@@ -1,6 +1,7 @@
 package policy;
 
-import game.Game;
+import environment.Game;
+import environment.ActionSet;
 import base.Config;
 import base.State;
 import policy.NashSolver;
@@ -26,9 +27,9 @@ public abstract class Policy {
 	}
 
 	public abstract void train(int iterations);
-	public abstract double[][] get_action_options(State state);
+	public abstract ActionDistribution[] get_action_options(State state);
 
-	public int[] evaluate(State state) {
+	public ActionSet evaluate(State state) {
 		return NashSolver.evaluate_options(get_action_options(state));
 	}
 

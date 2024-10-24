@@ -1,10 +1,11 @@
-package game;
+package environment;
 
 import java.util.concurrent.TimeUnit;
 
 import base.Config;
 import base.Position;
 import base.Utility;
+import policy.ActionDistribution;
 import policy.DiscreteGamePolicy;
 import policy.Policy;
 import policy.NashSolver;
@@ -49,7 +50,7 @@ public class CrashGameTest {
 
 		game.print(System.out);
 
-		double[][] choices;
+		ActionDistribution[] choices;
 		for(int iteration = 0; iteration < 16; iteration++) {
 			Utility.println(System.out);
 
@@ -98,15 +99,15 @@ public class CrashGameTest {
 
 		Config.debug = true;
 
-		double[][] choices = pol.get_action_options(game.get_state());
+		ActionDistribution[] choices = pol.get_action_options(game.get_state());
 
 		game.print(System.out);
 
 	}
 
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
-		double[][] possibilities;
-		int[] actions;
+		ActionDistribution[] possibilities;
+		ActionSet actions;
 		double[] rewards;
 		char escCode = 0x1B;
 		for(int iteration = 1; true; iteration++) {
@@ -137,17 +138,18 @@ public class CrashGameTest {
 
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 19; i++) {
+			for(int i = 0; i < 20; i++) {
 				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}
 	}
 
-	public static void print_action_list(int[] actions) {
-		for(int i = 0; i < actions.length - 1; i++) {
-			Utility.print(System.out, action_string(actions[i]), ", ");
-		}
-		Utility.print(System.out, action_string(actions[actions.length - 1]));
+	public static void print_action_list(ActionSet as) {
+		Utility.println(System.out,
+			action_string(as.get(0)),
+			", ", 
+			action_string(as.get(1))
+		);
 	}
 
 	public static String action_string(int action) {

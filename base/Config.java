@@ -7,7 +7,6 @@ public class Config {
 	public static int Q_iterations = 128;
 
 	public static boolean use_pure_nash_optimization = true;
-	public static boolean use_action_distribution = true;
 
 	// Base learning rate for gradient descent
 	public static double alpha = 0.4;
