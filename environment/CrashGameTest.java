@@ -117,7 +117,7 @@ public class CrashGameTest {
 
 			TimeUnit.SECONDS.sleep(1);
 
-			for(int i = 0; i < 19; i++) {
+			for(int i = 0; i < 20; i++) {
 				Utility.print(System.out, String.format("%c[A", escCode));
 			}
 		}

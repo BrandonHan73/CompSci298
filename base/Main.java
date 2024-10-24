@@ -12,8 +12,8 @@ import policy.DiscreteGamePolicy;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		// CrashGameTest.base();
-		test_games(args);
+		CrashGameTest.base();
+		//test_games(args);
 	}
 
 	public static void test_games(String[] args) {

@@ -86,7 +86,7 @@ public class DiscreteGamePolicy extends Policy {
 			}
 
 			Q = Q_update;
-			Utility.debugln(System.out, "Largest update: ", max_change);
+			// Utility.debugln(System.out, "Largest update: ", max_change);
 		}
 
 	}

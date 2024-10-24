@@ -111,6 +111,7 @@ public class Utility {
 	}
 
 	public static int[] copy(int[] arr) {
+		if(arr == null) return null;
 		int[] out = new int[arr.length];
 		for(int i = 0; i < out.length; i++) {
 			out[i] = arr[i];
@@ -119,6 +120,7 @@ public class Utility {
 	}
 
 	public static int[][] copy(int[][] arr) {
+		if(arr == null) return null;
 		int[][] out = new int[arr.length][];
 		for(int i = 0; i < out.length; i++) {
 			out[i] = copy(arr[i]);

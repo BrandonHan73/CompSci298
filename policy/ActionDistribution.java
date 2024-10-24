@@ -58,5 +58,19 @@ public class ActionDistribution {
 		return -1;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for(int action : distribution.keySet()) {
+			sb.append(action);
+			sb.append(":");
+			sb.append(get(action));
+			sb.append(" ");
+		}
+
+		return sb.toString();
+	}
+
 }
 
