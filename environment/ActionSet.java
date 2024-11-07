@@ -1,21 +1,22 @@
 package environment;
 
 import base.Utility;
+import base.State;
 
 public class ActionSet {
 
 	public final int player_count;
 	private int[] actions;
-	private int[][] choices;
+	private final State state;
 
-	public ActionSet(int[] player_actions, int[][] player_choices) {
+	public ActionSet(int[] player_actions, State st) {
 		player_count = player_actions.length;
 		actions = Utility.copy(player_actions);
-		choices = Utility.copy(player_choices);
+		state = st;
 	}
 
 	public ActionSet(ActionSet o) {
-		this(o.actions, o.choices);
+		this(o.actions, o.state);
 	}
 
 	public int get(int player) {
@@ -50,11 +51,22 @@ public class ActionSet {
 		int res = actions[0];
 
 		for(int i = 1; i < actions.length; ++i) {
-			res *= choices[i - 1].length;
+			res *= state.choices_for(i).size();
 			res += actions[i];
 		}
 
-		return Integer.hashCode(res);
+		return res;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("(");
+		for(int pl = 0; pl < player_count - 1; pl++) {
+			sb.append(actions[pl]).append(", ");
+		}
+		sb.append(actions[player_count - 1]).append(")");
+
+		return sb.toString();
 	}
 
 }

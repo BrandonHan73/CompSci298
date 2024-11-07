@@ -11,16 +11,20 @@ public class StateQ {
 
 	private Map<ActionSet, double[]> Q;
 
-	public final int[][] action_choices;
-	public final int player_count;
+	public final State state;
+
+	private double value[];
+	private boolean fast_value;
 
 	public StateQ(State s) {
-		action_choices = s.choices();
-		player_count = action_choices.length;
+		s.ensure_action_choices_provided();
+		value = null;
+		fast_value = true;
+		state = s;
 
 		Q = new HashMap<>();
-		Utility.forEachChoice(action_choices, pick -> {
-			Q.put(new ActionSet(pick, action_choices), Utility.createDoubleArray(action_choices.length, 1));
+		Utility.forEachChoice(state.choices(), pick -> {
+			Q.put(new ActionSet(pick, state), Utility.createDoubleArray(state.choices().length, 1));
 		});
 	}
 
@@ -29,24 +33,49 @@ public class StateQ {
 	}
 
 	public double get(ActionSet actions, int player) {
-		return Q.get(actions)[player];
+		if(Q.keySet().contains(actions)) {
+			return Q.get(actions)[player];
+		} else {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Provided action set ");
+			sb.append(actions);
+			sb.append(" with code ");
+			sb.append(actions.hashCode());
+			sb.append(" is not one of ");
+			sb.append(Q.keySet().size());
+			sb.append(" valid options");
+
+			sb.append("\n");
+			for(ActionSet as : Q.keySet()) {
+				sb.append(as).append(" ").append(as.hashCode());
+				sb.append("\n");
+			}
+
+			throw new RuntimeException(sb.toString());
+		}
 	}
 
 	public void set(double val, ActionSet actions, int player) {
-		Q.get(actions)[player] = val;
+		double[] vector = Q.get(actions);
+		if(vector[player] != val) {
+			vector[player] = val;
+			fast_value = true;
+			value = null;
+		}
 	}
 
 	public double[] value(ActionDistribution[] distributions) {
 
-		double[] eval = new double[action_choices.length];
+		double[] eval = new double[state.choices().length];
 
-		Utility.forEachChoice(action_choices, pick -> {
+		Utility.forEachChoice(state.choices(), pick -> {
 			double prob = 1;
 			for(int player = 0; player < pick.length; player++) {
 				prob *= distributions[player].get(pick[player]);
 			}
 
-			ActionSet as = new ActionSet(pick, action_choices);
+			ActionSet as = new ActionSet(pick, state);
 			for(int player = 0; player < pick.length; player++) {
 				eval[player] += prob * get(as, player);
 			}
@@ -56,7 +85,12 @@ public class StateQ {
 	}
 
 	public double[] value(boolean fast) {
-		return value(NashSolver.evaluate_state(this, fast));
+		if(value == null || (fast_value && !fast)) {
+			fast_value = fast;
+			return value(NashSolver.evaluate_state(this, fast));
+		}
+
+		return value;
 	}
 
 	public double[] value() {

@@ -1,59 +1,73 @@
 package base;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class State {
 
-	private final int value;
+	private final int state_code;
 
-	private final int[][] actions;
+	private final Set<Integer>[] action_choices;
 
 	public State() {
 		this(0);
 	}
 
-	public State(int val) {
-		this(val, new int[0][0]);
+	public State(int code) {
+		this(code, null);
 	}
 
 	public State(int[][] p_actions) {
+		this(0, new Set[p_actions.length]);
+
+		for(int player = 0; player < p_actions.length; player++) {
+			action_choices[player] = new HashSet<>();
+			for(int action : p_actions[player]) {
+				action_choices[player].add(action);
+			}
+		}
+	}
+
+	public State(Set<Integer>[] p_actions) {
 		this(0, p_actions);
 	}
 
-	public State(int val, int[][] p_actions) {
-		value = val;
-		actions = p_actions;
+	public State(int code, Set<Integer>[] p_actions) {
+		state_code = code;
+		action_choices = p_actions;
 	}
 
-	public int[] choices_for(int player) {
-		return actions[player];
+	public Set<Integer> choices_for(int player) {
+		ensure_action_choices_provided();
+		return action_choices[player];
 	}
 
-	public int[][] choices() {
-		return actions;
+	public Set<Integer>[] choices() {
+		ensure_action_choices_provided();
+		return action_choices;
 	}
 
 	public int player_count() {
-		return actions.length;
+		ensure_action_choices_provided();
+		return action_choices.length;
 	}
 
-	public int[] action_counts() {
-		int[] count = new int[actions.length];
-		for(int i = 0; i < count.length; i++) {
-			count[i] = actions[i].length;
+	public void ensure_action_choices_provided() {
+		if(action_choices == null) {
+			throw new RuntimeException("Player action choices not specified. ");
 		}
-
-		return count;
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof State)) return false;
 
-		return ((State) o).value == value;
+		return ((State) o).state_code == state_code;
 	}
 
 	@Override
 	public int hashCode() {
-		return Integer.hashCode(value);
+		return Integer.hashCode(state_code);
 	}
 
 }

@@ -34,61 +34,61 @@ public class DiscreteGamePolicy extends Policy {
 	@Override
 	public void train(int iterations) {
 
-		Map<State, double[]> value_table;
-
 		Map<State, StateQ> Q_update;
 
-		double max_change;
-		double change;
-		State change_state = null;
-		int change_truck = -1, change_car = -1;
-
-		int[] action_counts;
+		Utility.MaxRecord max_change;
 
 		for(int iteration = 0; iteration < iterations; iteration++) {
 			Q_update = new HashMap<>();
 
-			max_change = 0;
-
-			value_table = new HashMap<>();
+			max_change = new Utility.MaxRecord();
 
 			for(State state : get_possible_states()) {
-				action_counts = state.action_counts();
 
 				StateQ state_update = new StateQ(state);
-				final Map<State, double[]> value_table_ = value_table;
+				Utility.MaxRecord record_change = new Utility.MaxRecord();
 				Utility.forEachChoice(state.choices(), action -> {
-					ActionSet as = new ActionSet(action, state.choices());
+					ActionSet as = new ActionSet(action, state);
 
 					Game sim = get_base_copy(state);
 					double[] rewards = sim.update(as);
 
 					State new_state = sim.get_state();
-					double[] Q_evaluation;
-						if(value_table_.containsKey(new_state)) {
-							Q_evaluation = value_table_.get(new_state);
-						} else {
-							Q_evaluation = Q.get(new_state).value(true);
-							value_table_.put(new_state, Q_evaluation);
-						}
+					double[] state_value = Q.get(new_state).value(true);
 
 					for(int player = 0; player < state.player_count(); player++) {
-						state_update.set(rewards[player] + Config.Beta * Q_evaluation[player], as, player);
+						double old_Q_value = Q.get(state).get(as, player);
+						double new_Q_value = rewards[player] + Config.Beta * state_value[player];
+
+						record_change.record(
+							Math.abs(old_Q_value - new_Q_value), 
+							() -> {
+								ActionDistribution[] test_fictitious_play = NashSolver.evaluate_state(Q.get(new_state), true);
+
+								return "\n" + 
+								String.format("Change from %.4f to %.4f, ", old_Q_value, new_Q_value) + '\n' + 
+								as.toString() +	" at " + state.toString() + '\n' +
+								"Truck: " + test_fictitious_play[0] + '\n' +
+								"Car: " + test_fictitious_play[1] + '\n';
+							}
+						);
+
+						state_update.set(new_Q_value, as, player);
 					}
 
 				});
 
-				for(int p1_action = 0; p1_action < action_counts[0]; p1_action++) {
-					for(int p2_action = 0; p2_action < action_counts[1]; p2_action++) {
-
-					}
-				}
+				max_change.record(record_change);
 
 				Q_update.put(state, state_update);
 			}
 
+			Utility.println(System.out, "Q update ", max_change);
+			if(max_change.get() == 0) {
+				break;
+			}
+
 			Q = Q_update;
-			// Utility.debugln(System.out, "Largest update: ", max_change);
 		}
 
 	}

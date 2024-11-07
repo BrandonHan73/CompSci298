@@ -20,12 +20,20 @@ public class CrashGameTest {
 			{ 0, 0, 1, 0, 1, 0, 0 }
 	};
 
+	public static void zero_sum_base() throws InterruptedException {
+		// CrashGame game = new CrashGame(5, 7);
+		ZeroSumCrashGame game = new ZeroSumCrashGame(reward1);
+		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
+
+		pol.train();
+
+		idle(game, pol);
+	}
+
 	public static void base() throws InterruptedException {
 		// CrashGame game = new CrashGame(5, 7);
 		CrashGame game = new CrashGame(reward1);
 		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
-
-		Config.debug = false;
 
 		pol.train();
 
@@ -42,11 +50,7 @@ public class CrashGameTest {
 		// CrashGame game = new CrashGame(5, 7);
 		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
 
-		Config.debug = false;
-
 		pol.train();
-
-		Config.debug = true;
 
 		game.print(System.out);
 
@@ -93,11 +97,7 @@ public class CrashGameTest {
 		// CrashGame game = new CrashGame(5, 7);
 		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
 
-		Config.debug = false;
-
 		pol.train();
-
-		Config.debug = true;
 
 		ActionDistribution[] choices = pol.get_action_options(game.get_state());
 
@@ -106,6 +106,45 @@ public class CrashGameTest {
 	}
 
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {
+		ActionDistribution[] possibilities;
+		ActionSet actions;
+		double[] rewards;
+		char escCode = 0x1B;
+		for(int iteration = 1; true; iteration++) {
+
+			Utility.println(System.out);
+			Utility.println(System.out, "Iteration ", iteration);
+
+			// Config.debug = false;
+			possibilities = pol.get_action_options(game.get_state());
+			actions = NashSolver.evaluate_options(possibilities);
+			rewards = game.update(actions);
+
+			game.print(System.out);
+
+			Utility.clearln(System.out);
+			Utility.print(System.out, "Action pair: ");
+			print_action_list(actions);
+			Utility.println(System.out);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "Truck options: ", possibilities[0]);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Car options: ", possibilities[1]);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Reward pair: ", rewards);
+
+			TimeUnit.SECONDS.sleep(1);
+
+			for(int i = 0; i < 20; i++) {
+				Utility.print(System.out, String.format("%c[A", escCode));
+			}
+		}
+	}
+
+	public static void idle(ZeroSumCrashGame game, Policy pol) throws InterruptedException {
 		ActionDistribution[] possibilities;
 		ActionSet actions;
 		double[] rewards;

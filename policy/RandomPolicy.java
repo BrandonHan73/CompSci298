@@ -15,10 +15,7 @@ public class RandomPolicy extends Policy {
 		ActionDistribution[] out = new ActionDistribution[state.player_count()];
 
 		for(int player = 0; player < state.player_count(); player++) {
-			out[player] = new ActionDistribution();
-			for(int action : state.choices_for(player)) {
-				out[player].add(action);
-			}
+			out[player] = new ActionDistribution(state.choices_for(player));
 		}
 
 		return out;

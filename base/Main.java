@@ -2,6 +2,7 @@ package base;
 
 import environment.RockPaperScissors;
 import environment.CrashGame;
+import environment.ZeroSumCrashGame;
 import environment.CrashGameTest;
 import environment.Game;
 
@@ -12,7 +13,7 @@ import policy.DiscreteGamePolicy;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		CrashGameTest.base();
+		CrashGameTest.zero_sum_base();
 		//test_games(args);
 	}
 
@@ -36,6 +37,11 @@ public class Main {
 		Utility.println(System.out, "----------------------------------");
 		evaluate(new CrashGame(CrashGameTest.reward1));
 
+		Utility.println(System.out);
+		Utility.println(System.out, "----------------------------------");
+		Utility.println(System.out, "| Zero Sum Crash Game            |");
+		Utility.println(System.out, "----------------------------------");
+		evaluate(new ZeroSumCrashGame(CrashGameTest.reward1));
 	}
 
 	public static void test(Game game, Policy pol, int games, int cycles) {

@@ -2,6 +2,8 @@ package base;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.IntToDoubleFunction;
@@ -142,19 +144,67 @@ public class Utility {
 		return toArray(out);
 	}
 
+	public static Set<Integer> argmax(Set<Integer> options, IntToDoubleFunction f) {
+		Set<Integer> choice = new HashSet<>();
+		double best;
+
+		Map<Integer, Double> eval = new HashMap<>();
+		for(int i : options) {
+			eval.put(i, f.applyAsDouble(i));
+		}
+
+		best = -Double.MAX_VALUE;
+		double result;
+		for(int i : options) {
+			result = eval.get(i);
+			if(result > best) {
+				choice = new HashSet<>();
+				choice.add(i);
+				best = result;
+			} else if(result == best) {
+				choice.add(i);
+			}
+		}
+
+		if(options.size() > 0 && choice.size() == 0) {
+			throw new RuntimeException("Argmax produced no results");
+		}
+
+		return choice;
+	}
+
 	public static int[] argmax(int start, int end, IntToDoubleFunction f) {
+		if(start == end) {
+			return new int[] {};
+		}
+
+		int temp = start;
+		start = Math.min(temp, end);
+		end = Math.max(temp, end);
+
 		ArrayList<Integer> choice = new ArrayList<>();
 		double best;
 
-		best = Double.MIN_VALUE;
+		double[] eval = new double[end - start];
 		for(int i = start; i < end; i++) {
-			if(f.applyAsDouble(i) > best) {
+			eval[i - start] = f.applyAsDouble(i);
+		}
+
+		best = eval[0];
+		choice.add(0);
+
+		for(int i = start + 1; i < end; i++) {
+			if(eval[i - start] > best) {
 				choice = new ArrayList<>();
 				choice.add(i);
-				best = f.applyAsDouble(i);
-			} else if(f.applyAsDouble(i) == best) {
+				best = eval[i - start];
+			} else if(eval[i - start] == best) {
 				choice.add(i);
 			}
+		}
+
+		if(choice.size() == 0) {
+			throw new RuntimeException("Argmax produced no results");
 		}
 
 		return Utility.toArray(choice);
@@ -167,19 +217,6 @@ public class Utility {
 			}
 		}
 		return false;
-	}
-
-	public static int pickFrom(double[] distribution) {
-		double choice = Math.random();
-
-		for(int i = 0; i < distribution.length; i++) {
-			choice -= distribution[i];
-			if(choice < 0) {
-				return i;
-			}
-		}
-
-		return -1;
 	}
 
 	public static double[] toDistribution(int[] arr) {
@@ -205,6 +242,39 @@ public class Utility {
 
 	public static interface IntArrToVoid {
 		public void run(int[] arr);
+	}
+
+	public static void forEachChoice(Set<Integer>[] choices, IntArrToVoid action, int... skip) {
+		int[] current = new int[choices.length];
+		Set<Integer> skip_set = new HashSet<>();
+
+		for(int i : skip) {
+			skip_set.add(i);
+		}
+
+		forEachChoice(choices, action, 0, current, skip_set);
+	}
+
+	private static void forEachChoice(Set<Integer>[] choices, IntArrToVoid action, int start_index, int[] current, Set<Integer> skip) {
+		if(start_index > choices.length) {
+			throw new RuntimeException("Something went wrong with forEachChoice...");
+		}
+
+		if(skip.contains(start_index)) {
+			current[start_index] = Config.placeholder_action;
+			forEachChoice(choices, action, start_index + 1, current, skip);
+			return;
+		}
+
+		if(start_index == choices.length) {
+			action.run(current);
+			return;
+		}
+
+		for(int i : choices[start_index]) {
+			current[start_index] = i;
+			forEachChoice(choices, action, start_index + 1, current, skip);
+		}
 	}
 
 	public static void forEachChoice(int[][] choices, IntArrToVoid action) {
@@ -248,6 +318,44 @@ public class Utility {
 			out[i] = val;
 		}
 		return out;
+	}
+
+	public static interface VoidString {
+		String run();
+	}
+
+	public static class MaxRecord {
+		private double value;
+		private VoidString log;
+		public MaxRecord() {
+			value = 0;
+			log = null;
+		}
+		public void record(double v, VoidString vs) {
+			if(v > value) {
+				value = v;
+				log = vs;
+			}
+		}
+		public void record(double v, String debug) {
+			record(v, () -> debug);
+		}
+		public void record(double v) {
+			record(v, "");
+		}
+		public void record(MaxRecord o) {
+			record(o.value, o.log);
+		}
+		public String log() {
+			return log.run();
+		}
+		public double get() {
+			return value;
+		}
+		@Override
+		public String toString() {
+			return value + " (" + log() + ")";
+		}
 	}
 
 }
