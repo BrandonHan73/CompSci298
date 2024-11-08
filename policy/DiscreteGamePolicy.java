@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import base.Utility;
+import base.Log.SuccessLogger;
 import base.Config;
+import base.Log;
 import base.State;
 import environment.Game;
 import environment.ActionSet;
@@ -83,15 +85,18 @@ public class DiscreteGamePolicy extends Policy {
 				Q_update.put(state, state_update);
 			}
 
-			Utility.println(System.out, "Q update ", max_change);
+			Log.log(discrete_Q_train_name, "Q update " + max_change.toString());
 			if(max_change.get() == 0) {
-				break;
+				discrete_Q_train_convergence.success();
+				return;
 			}
 
 			Q = Q_update;
 		}
-
+		discrete_Q_train_convergence.fail();
 	}
+	private static final String discrete_Q_train_name = "Q_training";
+	private static SuccessLogger discrete_Q_train_convergence = new SuccessLogger(discrete_Q_train_name, "Convergence rate");
 
 	@Override
 	public ActionDistribution[] get_action_options(State state) {

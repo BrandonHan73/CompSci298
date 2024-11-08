@@ -1,5 +1,5 @@
 
-base_objects = out/base/Config.class out/base/Position.class out/base/State.class out/base/Utility.class
+base_objects = out/base/Config.class out/base/Position.class out/base/State.class out/base/Log.class out/base/Utility.class
 environment_objects = out/environment/CrashGame.class out/environment/CrashGameTest.class out/environment/CycleGame.class out/environment/CycleGameTest.class out/environment/Game.class out/environment/RockPaperScissors.class
 policy_objects = out/policy/DiscreteGamePolicy.class out/policy/LogisticRegression.class out/policy/NashSolver.class out/policy/Policy.class out/policy/RandomPolicy.class out/policy/StateQ.class
 
@@ -31,6 +31,10 @@ out/base/Position.class: base/Position.java
 out/base/State.class: base/State.java
 	@echo Compiling base/State.class  
 	@javac -d out/ -cp $(class_path) base/State.java
+
+out/base/Log.class: base/Log.java
+	@echo Compiling base/Log.class  
+	@javac -d out/ -cp $(class_path) base/Log.java
 
 out/base/Utility.class: base/Utility.java
 	@echo Compiling base/Utility.class  

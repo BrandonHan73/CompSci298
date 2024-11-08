@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import base.Config;
+import base.Log;
 import base.Utility;
+import base.Log.SuccessLogger;
 import environment.ActionSet;
 import policy.ActionDistribution;
 
@@ -41,21 +43,25 @@ public class NashSolver {
 
 		if(all_nash.length > 0 && Config.use_pure_nash_optimization) {
 			best_nash = pick_nash(Q, all_nash);
-			out = new ActionDistribution[player_count];
-			for(int i = 0; i < player_count; i++) {
-				out[i] = new ActionDistribution();
-			}
-
-			for(ActionSet as : best_nash) {
-				for(int i = 0; i < player_count; i++) {
-					out[i].add(as.get(i));
-				}
-			}
-
+			out = distribution_from_nash(player_count, best_nash);
 		} else {
 			out = fast ? fast_fictitious_play(Q) : fictitious_play(Q);
 		}
 
+		return out;
+	}
+
+	public static ActionDistribution[] distribution_from_nash(int player_count, ActionSet[] nash) {
+		ActionDistribution[] out = new ActionDistribution[player_count];
+		for(int i = 0; i < player_count; i++) {
+			out[i] = new ActionDistribution();
+		}
+
+		for(ActionSet as : nash) {
+			for(int i = 0; i < player_count; i++) {
+				out[i].add(as.get(i));
+			}
+		}
 		return out;
 	}
 
@@ -121,35 +127,39 @@ public class NashSolver {
 	 * @param action_pairs The action pairs that correspond to Nash equilibrium.
 	 */
 	public static ActionSet[] pick_nash(StateQ Q, ActionSet[] nash) {
-		int[] choices = Utility.argmax(0, nash.length, i -> {
-			double[] eval = Q.get(nash[i]);
-			double sum = 0;
-			for(double d : eval) {
-				sum += d;
-			}
-			return sum;
-		});
+		if(Config.nash_take_highest_sum_of_Q) {
+			int[] choices = Utility.argmax(0, nash.length, i -> {
+				double[] eval = Q.get(nash[i]);
+				double sum = 0;
+				for(double d : eval) {
+					sum += d;
+				}
+				return sum;
+			});
 
-		ActionSet[] out = null;
-		int[] argmax;
-		if(Config.pick_one_pure_nash) {
-			argmax = Utility.argmax(0, choices.length, i -> nash[choices[i]].hashCode());
-			out = new ActionSet[] { nash[choices[argmax[0]]] };
-		} else {
-			out = new ActionSet[choices.length];
-			for(int i = 0; i < choices.length; i++) {
-				out[i] = nash[choices[i]];
+			ActionSet[] out = null;
+			int[] argmax;
+			if(Config.pick_one_pure_nash) {
+				argmax = Utility.argmax(0, choices.length, i -> nash[choices[i]].hashCode());
+				out = new ActionSet[] { nash[choices[argmax[0]]] };
+			} else {
+				out = new ActionSet[choices.length];
+				for(int i = 0; i < choices.length; i++) {
+					out[i] = nash[choices[i]];
+				}
 			}
-		}
 
-		// int index;
-		// if(Config.pick_one_pure_nash) {
+			// int index;
+			// if(Config.pick_one_pure_nash) {
 			// final ActionSet[] out_ = out;
 			// choices = Utility.argmax(0, out.length, i -> out_[i].hashCode());
 			// out = new ActionSet[] { out[choices[0]] };
-		// }
+			// }
 
-		return out;
+			return out;
+		} else {
+			return nash;
+		}
 	}
 
 	/**
@@ -303,6 +313,8 @@ public class NashSolver {
 			}
 
 			if(max_change.get() == 0) {
+				fictitious_play_convergence.success();
+				compare_with_pure_nash(Q, action_counts, true);
 				return action_counts;
 			}
 		}
@@ -323,13 +335,61 @@ public class NashSolver {
 				}
 
 				if(max_change.get() == 0) {
+					fictitious_play_convergence.success();
+					fictitious_play_panic_convergence.success();
+					compare_with_pure_nash(Q, action_counts, true);
 					return action_counts;
 				}
 			}
+			fictitious_play_panic_convergence.fail();
 		}
 
+		fictitious_play_convergence.fail();
+		compare_with_pure_nash(Q, action_counts, false);
 		return action_counts;
 	}
+
+	private static void compare_with_pure_nash(StateQ Q, ActionDistribution[] fictitious_play, boolean converged) {
+		ActionSet[] all_nash = basic_nash(Q);
+		ActionSet[] best_nash;
+		int player_count = Q.state.player_count();
+		
+		ActionDistribution[] out = null;
+		boolean print = false;
+
+		if(all_nash.length > 0) {
+			best_nash = pick_nash(Q, all_nash);
+			out = distribution_from_nash(player_count, best_nash);
+
+			for(int player = 0; player < player_count; player++) {
+				for(int action : Q.state.choices_for(player)) {
+					if(out[player].get(action) != fictitious_play[player].get(action)) {
+						print = true;
+					}
+				}
+			}
+			if(print) {
+			Log.log(fictitious_play_name, "");
+				if(!converged) {
+					Log.log(fictitious_play_name, "Did not converge");
+				}
+				for(int player = 0; player < player_count; player++) {
+					Log.log(fictitious_play_name, "Player " + (player + 1) + "/" + player_count);
+					Log.log(fictitious_play_name, "Nash: " + out[player].toString());
+					Log.log(fictitious_play_name, "Fict: " + fictitious_play[player].toString());
+					for(int action : Q.state.choices_for(player)) {
+						//Log.log(fictitious_play_name, action + ":" + out[player].get(action) + " " + action + ":" + fictitious_play[player].get(action) + " ");
+						if(out[player].get(action) != fictitious_play[player].get(action)) {
+							Log.log(fictitious_play_name, "Action " + action + " for player " + (player + 1) + " did not match");
+						}
+					}
+				}
+			}
+		} 
+	}
+	private static final String fictitious_play_name = "fictitious_play";
+	private static SuccessLogger fictitious_play_convergence = new SuccessLogger(fictitious_play_name, "Convergence rate");
+	private static SuccessLogger fictitious_play_panic_convergence = new SuccessLogger(fictitious_play_name, "Panic success rate");
 
 }
 

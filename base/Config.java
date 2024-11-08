@@ -7,12 +7,13 @@ public class Config {
 	public static int Q_iterations = 64;
 
 	public static boolean fictitious_play_panic = true;
-	public static int fictitious_play_panic_iterations = 4096;
+	public static int fictitious_play_panic_iterations = 512;
 
 	public static final int placeholder_action = -1;
 
 	public static boolean use_pure_nash_optimization = false;
 	public static boolean pick_one_pure_nash = false;
+	public static boolean nash_take_highest_sum_of_Q = false;
 
 	// Base learning rate for gradient descent
 	public static double alpha = 0.4;
