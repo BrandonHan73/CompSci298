@@ -154,7 +154,7 @@ public class ActionDistribution {
 		StringBuilder sb = new StringBuilder();
 
 		for(int action : distribution.keySet()) {
-			sb.append(String.format("%d:%.4f ", action, get(action)));
+			sb.append(String.format("(%d)%.4f ", action, get(action)));
 		}
 
 		return sb.toString();

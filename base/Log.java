@@ -60,7 +60,7 @@ public class Log {
 	public static String focus;
 
 	static {
-		focus = "Q_training";
+		focus = "";
 		logs = new HashMap<>();
 		loggers = new ArrayList<>();
 

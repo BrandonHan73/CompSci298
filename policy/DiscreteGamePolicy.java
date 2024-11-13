@@ -49,6 +49,7 @@ public class DiscreteGamePolicy extends Policy {
 
 				StateQ state_update = new StateQ(state);
 				Utility.MaxRecord record_change = new Utility.MaxRecord();
+
 				Utility.forEachChoice(state.choices(), action -> {
 					ActionSet as = new ActionSet(action, state);
 
@@ -66,12 +67,24 @@ public class DiscreteGamePolicy extends Policy {
 							Math.abs(old_Q_value - new_Q_value), 
 							() -> {
 								ActionDistribution[] test_fictitious_play = NashSolver.evaluate_state(Q.get(new_state), true);
+								StringBuilder builder = new StringBuilder("\n\n");
+								builder.append(String.format("Change from %.4f to %.4f, ", old_Q_value, new_Q_value) + '\n');
+								builder.append(as.toString() +	" at " + state.toString() + '\n');
+								builder.append("Truck: " + test_fictitious_play[0] + '\n');
+								builder.append("Car: " + test_fictitious_play[1] + '\n');
+								builder.append("Reward (truck): ").append(rewards[0]).append('\n');
+								builder.append("New state value ").append(state_value[0]).append('\n');
 
-								return "\n" + 
-								String.format("Change from %.4f to %.4f, ", old_Q_value, new_Q_value) + '\n' + 
-								as.toString() +	" at " + state.toString() + '\n' +
-								"Truck: " + test_fictitious_play[0] + '\n' +
-								"Car: " + test_fictitious_play[1] + '\n';
+								Utility.forEachChoice(new_state.choices(), actions -> {
+									ActionSet aset = new ActionSet(actions, new_state);
+									builder.append(aset.toString()).append(" ");
+									Game simul = get_base_copy(new_state);
+									simul.update(aset);
+									State next = simul.get_state();
+									builder.append(Q.get(next).value()[0]).append('\n');
+								});
+
+								return builder.toString();
 							}
 						);
 

@@ -2,8 +2,8 @@ package base;
 
 public class Config {
 
-	public static int fictitious_play_iterations = 512;
-	public static int fast_fictitious_play_iterations = 256;
+	public static int fictitious_play_iterations = 256;
+	public static int fast_fictitious_play_iterations = 128;
 	public static int Q_iterations = 64;
 
 	public static boolean fictitious_play_panic = true;
@@ -19,7 +19,7 @@ public class Config {
 	public static double alpha = 0.4;
 
 	// Discount for Q learning
-	public static double Beta = 0.2;
+	public static double Beta = 0.9;
 
 	// Fictitious play base ratio
 	public static double gamma = 0.5;

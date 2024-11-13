@@ -29,12 +29,8 @@ public class StateQ {
 	}
 
 	public double[] get(ActionSet actions) {
-		return Q.get(actions);
-	}
-
-	public double get(ActionSet actions, int player) {
 		if(Q.keySet().contains(actions)) {
-			return Q.get(actions)[player];
+			return Q.get(actions);
 		} else {
 			StringBuilder sb = new StringBuilder();
 
@@ -54,6 +50,10 @@ public class StateQ {
 
 			throw new RuntimeException(sb.toString());
 		}
+	}
+
+	public double get(ActionSet actions, int player) {
+		return get(actions)[player];
 	}
 
 	public void set(double val, ActionSet actions, int player) {

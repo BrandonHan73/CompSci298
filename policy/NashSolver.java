@@ -314,11 +314,13 @@ public class NashSolver {
 
 			if(max_change.get() == 0) {
 				fictitious_play_convergence.success();
+				fictitious_play_panic_rate.fail();
 				compare_with_pure_nash(Q, action_counts, true);
 				return action_counts;
 			}
 		}
 
+		fictitious_play_panic_rate.success();
 		if(Config.fictitious_play_panic) {
 			for(int panic = 0; panic < Config.fictitious_play_panic_iterations; panic++) {
 				ActionDistribution[] old_distribution = action_counts;
@@ -389,6 +391,7 @@ public class NashSolver {
 	}
 	private static final String fictitious_play_name = "fictitious_play";
 	private static SuccessLogger fictitious_play_convergence = new SuccessLogger(fictitious_play_name, "Convergence rate");
+	private static SuccessLogger fictitious_play_panic_rate = new SuccessLogger(fictitious_play_name, "Panic rate");
 	private static SuccessLogger fictitious_play_panic_convergence = new SuccessLogger(fictitious_play_name, "Panic success rate");
 
 }
