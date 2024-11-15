@@ -1,7 +1,7 @@
 package base;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class State {
 
@@ -21,7 +21,7 @@ public class State {
 		this(0, new Set[p_actions.length]);
 
 		for(int player = 0; player < p_actions.length; player++) {
-			action_choices[player] = new HashSet<>();
+			action_choices[player] = new TreeSet<>();
 			for(int action : p_actions[player]) {
 				action_choices[player].add(action);
 			}
@@ -56,6 +56,13 @@ public class State {
 		if(action_choices == null) {
 			throw new RuntimeException("Player action choices not specified. ");
 		}
+	}
+
+	public double[] to_double_array() {
+		return new double[] { state_code };
+	}
+	public int parameter_count() {
+		return 1;
 	}
 
 	@Override

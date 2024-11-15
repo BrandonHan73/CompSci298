@@ -18,6 +18,11 @@ public abstract class Policy {
 		return base_game.get_copy(s);
 	}
 
+	public Game get_randomized() {
+		base_game.randomize();
+		return base_game;
+	}
+
 	public State[] get_possible_states() {
 		return base_game.get_possible_states();
 	}

@@ -1,6 +1,7 @@
 package environment;
 
 import base.Utility;
+import policy.ActionDistribution;
 import base.State;
 
 public class ActionSet {
@@ -12,6 +13,18 @@ public class ActionSet {
 	public ActionSet(int[] player_actions, State st) {
 		player_count = player_actions.length;
 		actions = Utility.copy(player_actions);
+		state = st;
+	}
+
+	public ActionSet(ActionDistribution[] choices, State st) {
+		int[] poll = new int[choices.length];
+
+		for(int i = 0; i < choices.length; i++) {
+			poll[i] = choices[i].poll();
+		}
+
+		player_count = choices.length;
+		actions = poll;
 		state = st;
 	}
 
