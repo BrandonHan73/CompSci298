@@ -13,7 +13,7 @@ import policy.DiscreteGamePolicy;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		CrashGameTest.zero_sum_base();
+		CrashGameTest.symmetric_base();
 		//test_games(args);
 	}
 

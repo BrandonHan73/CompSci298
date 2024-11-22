@@ -1,6 +1,6 @@
 
 base_objects = out/base/Config.class out/base/Position.class out/base/State.class out/base/Log.class out/base/Utility.class
-environment_objects = out/environment/CrashGame.class out/environment/CrashGameTest.class out/environment/CycleGame.class out/environment/CycleGameTest.class out/environment/Game.class out/environment/RockPaperScissors.class
+environment_objects = out/environment/CrashGame.class out/environment/CrashGameTest.class out/environment/Game.class out/environment/RockPaperScissors.class
 policy_objects = out/policy/DiscreteGamePolicy.class out/policy/LogisticRegression.class out/policy/NashSolver.class out/policy/Policy.class out/policy/RandomPolicy.class out/policy/StateQ.class
 
 objects = $(environment_objects) $(policy_objects) $(base_objects) 
@@ -47,14 +47,6 @@ out/environment/CrashGame.class: environment/CrashGame.java
 out/environment/CrashGameTest.class: environment/CrashGameTest.java
 	@echo Compiling environment/CrashGameTest.class
 	@javac -d out/ -cp $(class_path) environment/CrashGameTest.java
-
-out/environment/CycleGame.class: environment/CycleGame.java
-	@echo Compiling environment/CycleGame.class
-	@javac -d out/ -cp $(class_path) environment/CycleGame.java
-
-out/environment/CycleGameTest.class: environment/CycleGameTest.java
-	@echo Compiling environment/CycleGameTest.class
-	@javac -d out/ -cp $(class_path) environment/CycleGameTest.java
 
 out/environment/Game.class: environment/Game.java
 	@echo Compiling environment/Game.class

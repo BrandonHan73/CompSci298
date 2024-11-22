@@ -3,59 +3,33 @@ package base;
 import java.util.Set;
 import java.util.TreeSet;
 
+import environment.Game;
+
 public class State {
 
 	private final int state_code;
 
-	private final Set<Integer>[] action_choices;
+	private final Game base;
 
-	public State() {
-		this(0);
+	public State(Game base) {
+		this(0, base);
 	}
 
-	public State(int code) {
-		this(code, null);
-	}
-
-	public State(int[][] p_actions) {
-		this(0, new Set[p_actions.length]);
-
-		for(int player = 0; player < p_actions.length; player++) {
-			action_choices[player] = new TreeSet<>();
-			for(int action : p_actions[player]) {
-				action_choices[player].add(action);
-			}
-		}
-	}
-
-	public State(Set<Integer>[] p_actions) {
-		this(0, p_actions);
-	}
-
-	public State(int code, Set<Integer>[] p_actions) {
+	public State(int code, Game game) {
 		state_code = code;
-		action_choices = p_actions;
+		base = game;
 	}
 
 	public Set<Integer> choices_for(int player) {
-		ensure_action_choices_provided();
-		return action_choices[player];
+		return base.get_possible_actions()[player];
 	}
 
 	public Set<Integer>[] choices() {
-		ensure_action_choices_provided();
-		return action_choices;
+		return base.get_possible_actions();
 	}
 
 	public int player_count() {
-		ensure_action_choices_provided();
-		return action_choices.length;
-	}
-
-	public void ensure_action_choices_provided() {
-		if(action_choices == null) {
-			throw new RuntimeException("Player action choices not specified. ");
-		}
+		return base.player_count();
 	}
 
 	public double[] to_double_array() {

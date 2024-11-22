@@ -17,7 +17,6 @@ public class StateQ {
 	private boolean fast_value;
 
 	public StateQ(State s) {
-		s.ensure_action_choices_provided();
 		value = null;
 		fast_value = true;
 		state = s;

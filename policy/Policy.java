@@ -8,9 +8,12 @@ import policy.NashSolver;
 
 public abstract class Policy {
 
+	private State[] possible_states;
+
 	private final Game base_game;
 
 	public Policy(Game base) {
+		possible_states = null;
 		base_game = base;
 	}
 
@@ -23,8 +26,19 @@ public abstract class Policy {
 		return base_game;
 	}
 
+	public void load_possible_states(Game game) {
+		possible_states = game.get_possible_states();
+	}
+
+	public void load_possible_states() {
+		load_possible_states(base_game);
+	}
+
 	public State[] get_possible_states() {
-		return base_game.get_possible_states();
+		if(possible_states == null) {
+			load_possible_states();
+		}
+		return possible_states;
 	}
 
 	public void train() {

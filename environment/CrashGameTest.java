@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import base.Config;
 import base.Position;
 import base.Utility;
+import environment.SymmetricGame;
 import policy.ActionDistribution;
 import policy.DiscreteGamePolicy;
 import policy.Policy;
@@ -19,6 +20,16 @@ public class CrashGameTest {
 			{ 0, 1, 2, 1, 2, 1, 0 },
 			{ 0, 0, 1, 0, 1, 0, 0 }
 	};
+
+	public static void symmetric_base() throws InterruptedException {
+		// CrashGame game = new CrashGame(5, 7);
+		SymmetricGame game = new SymmetricGame(reward1);
+		DiscreteGamePolicy pol = new DiscreteGamePolicy(game);
+
+		pol.train();
+
+		idle(game, pol);
+	}
 
 	public static void zero_sum_base() throws InterruptedException {
 		// CrashGame game = new CrashGame(5, 7);
@@ -103,6 +114,45 @@ public class CrashGameTest {
 
 		game.print(System.out);
 
+	}
+
+	public static void idle(SymmetricGame game, Policy pol) throws InterruptedException {
+		ActionDistribution[] possibilities;
+		ActionSet actions;
+		double[] rewards;
+		char escCode = 0x1B;
+		for(int iteration = 1; true; iteration++) {
+
+			Utility.println(System.out);
+			Utility.println(System.out, "Iteration ", iteration);
+
+			// Config.debug = false;
+			possibilities = pol.get_action_options(game.get_state());
+			actions = NashSolver.evaluate_options(possibilities);
+			rewards = game.update(actions);
+
+			game.print(System.out);
+
+			Utility.clearln(System.out);
+			Utility.print(System.out, "Action pair: ");
+			print_action_list(actions);
+			Utility.println(System.out);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "Truck options: ", possibilities[0]);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Car options: ", possibilities[1]);
+
+			Utility.clearln(System.out);
+			Utility.println(System.out, "  Reward pair: ", rewards);
+
+			TimeUnit.SECONDS.sleep(1);
+
+			for(int i = 0; i < 20; i++) {
+				Utility.print(System.out, String.format("%c[A", escCode));
+			}
+		}
 	}
 
 	public static void idle(CrashGame game, Policy pol) throws InterruptedException {

@@ -1,6 +1,8 @@
 package environment;
 
 import java.io.PrintStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 import base.Utility;
 import base.Position;
@@ -20,15 +22,13 @@ public class CrashGame extends Game {
 	private Position truck, car;
 
 	private CrashGameState[] possible_states;
+	private Set<Integer>[] possible_actions;
 
 	private class CrashGameState extends State {
 		Position truck, car;
 
-		CrashGameState(Position t, Position c) {
-			super(new int[][] {
-				new int[] { 0, 1, 2, 3 },
-				new int[] { 0, 1, 2, 3 }
-			});
+		CrashGameState(CrashGame game, Position t, Position c) {
+			super(game);
 
 			truck = new Position(t);
 			car = new Position(c);
@@ -76,6 +76,10 @@ public class CrashGame extends Game {
 		car = new Position();
 		randomize();
 
+	}
+
+	@Override
+	public State[] get_possible_states() {
 		if(possible_states == null) {
 			possible_states = new CrashGameState[rows * cols * (rows * cols - 1)];
 			int state_ = 0;
@@ -85,6 +89,7 @@ public class CrashGame extends Game {
 						for(int cc = 0; cc < cols; cc++) {
 							if(!(tr == cr && tc == cc)) {
 								possible_states[state_++] = new CrashGameState(
+									this, 
 									new Position(tr, tc), 
 									new Position(cr, cc)
 								);
@@ -94,11 +99,17 @@ public class CrashGame extends Game {
 				}
 			}
 		}
+		return possible_states;
 	}
 
 	@Override
-	public State[] get_possible_states() {
-		return possible_states;
+	public Set<Integer>[] get_possible_actions() {
+		if(possible_actions == null) {
+			possible_actions = new Set[2];
+			possible_actions[0] = new TreeSet<>(Set.of(0, 1, 2, 3));
+			possible_actions[1] = new TreeSet<>(Set.of(0, 1, 2, 3));
+		}
+		return possible_actions;
 	}
 
 	public CrashGame(double[][] rewards_) {
@@ -154,7 +165,7 @@ public class CrashGame extends Game {
 
 	@Override
 	public State get_state() {
-		return new CrashGameState(truck, car);
+		return new CrashGameState(this, truck, car);
 	}
 
 	@Override
