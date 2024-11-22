@@ -13,7 +13,8 @@ public class SymmetricGame extends CrashGame {
 	@Override
 	public double[] update(int truck_action, int car_action) {
 		double[] rewards = super.update(truck_action, car_action);
-		rewards[0] = rewards[1];
+		rewards[0] += rewards[1];
+		rewards[1] = rewards[0];
 
 		return rewards;
 	}

@@ -2,10 +2,11 @@ package base;
 
 public class Config {
 
-	public static int fictitious_play_iterations = 256;
-	public static int fast_fictitious_play_iterations = 128;
+	public static int fictitious_play_iterations = 64;
+	public static int fast_fictitious_play_iterations = 32;
+
 	public static boolean fictitious_play_panic = true;
-	public static int fictitious_play_panic_iterations = 512;
+	public static int fictitious_play_panic_iterations = 16;
 
 	public static int Q_iterations = 64;
 
