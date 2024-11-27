@@ -1,4 +1,4 @@
-package environment;
+package example;
 
 public class ZeroSumCrashGame extends CrashGame {
 

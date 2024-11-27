@@ -3,9 +3,9 @@ package policy;
 import java.util.HashMap;
 import java.util.Map;
 
-import base.State;
-import base.Utility;
-import environment.ActionSet;
+import base.*;
+import util.*;
+import environment.*;
 
 public class StateQ {
 

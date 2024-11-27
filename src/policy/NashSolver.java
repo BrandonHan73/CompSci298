@@ -6,12 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import base.Config;
-import base.Log;
-import base.Utility;
-import base.Log.SuccessLogger;
-import environment.ActionSet;
-import policy.ActionDistribution;
+import base.*;
+import util.*;
+import environment.*;
 
 /**
  * Various library functions for Q learning. 
@@ -284,7 +281,7 @@ public class NashSolver {
 
 		ActionDistribution[] reaction;
 
-		Utility.MaxRecord max_change = null;
+		MaxRecord max_change = null;
 
 		for(int moves = 1; moves < iterations; moves++) {
 
@@ -295,7 +292,7 @@ public class NashSolver {
 				old_distribution[i] = new ActionDistribution(action_counts[i]);
 			}
 
-			max_change = new Utility.MaxRecord();
+			max_change = new MaxRecord();
 			final ActionDistribution[] reaction_ = reaction;
 			ActionDistribution[] action_counts_ = action_counts;
 			Utility.forEachChoice(Q.state.choices(), action -> {
@@ -327,7 +324,7 @@ public class NashSolver {
 
 				action_counts = react_to_actions(Q, action_counts);
 
-				max_change = new Utility.MaxRecord();
+				max_change = new MaxRecord();
 				for(int player = 0; player < Q.state.player_count(); player++) {
 					for(int action : Q.state.choices_for(player)) {
 						max_change.record(Math.abs(

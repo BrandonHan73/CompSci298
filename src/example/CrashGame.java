@@ -1,12 +1,11 @@
-package environment;
+package example;
 
 import java.io.PrintStream;
 import java.util.Set;
-import java.util.TreeSet;
 
-import base.Utility;
-import base.Position;
-import base.State;
+import util.*;
+import base.*;
+import environment.*;
 
 public class CrashGame extends Game {
 
@@ -19,12 +18,7 @@ public class CrashGame extends Game {
 	public final int rows, cols;
 	private final double[][] rewards;
 
-	private Position truck, car;
-
-	private CrashGameState[] possible_states;
-	private Set<Integer>[] possible_actions;
-
-	private class CrashGameState extends State {
+	public static class CrashGameState extends State {
 		Position truck, car;
 
 		CrashGameState(CrashGame game, Position t, Position c) {
@@ -48,10 +42,11 @@ public class CrashGame extends Game {
 
 		@Override
 		public int hashCode() {
+			CrashGame game = (CrashGame) base;
 			int state = truck.row;
-			state = state * cols + truck.col;
-			state = state * rows + car.row;
-			state = state * cols + car.col;
+			state = state * game.cols + truck.col;
+			state = state * game.rows + car.row;
+			state = state * game.cols + car.col;
 			return state;
 		}
 
@@ -62,6 +57,12 @@ public class CrashGame extends Game {
 	}
 
 	public CrashGame(int rows_, int cols_) {
+		super(2);
+		actions = new Set[] {
+			Utility.toTreeSet(0, 1, 2, 3),
+			Utility.toTreeSet(0, 1, 2, 3)
+		};
+
 		rows = rows_;
 		cols = cols_;
 
@@ -72,44 +73,8 @@ public class CrashGame extends Game {
 			}
 		}
 
-		truck = new Position();
-		car = new Position();
+		state = new CrashGameState(this, new Position(), new Position());
 		randomize();
-
-	}
-
-	@Override
-	public State[] get_possible_states() {
-		if(possible_states == null) {
-			possible_states = new CrashGameState[rows * cols * (rows * cols - 1)];
-			int state_ = 0;
-			for(int tr = 0; tr < rows; tr++) {
-				for(int tc = 0; tc < cols; tc++) {
-					for(int cr = 0; cr < rows; cr++) {
-						for(int cc = 0; cc < cols; cc++) {
-							if(!(tr == cr && tc == cc)) {
-								possible_states[state_++] = new CrashGameState(
-									this, 
-									new Position(tr, tc), 
-									new Position(cr, cc)
-								);
-							}
-						}
-					}
-				}
-			}
-		}
-		return possible_states;
-	}
-
-	@Override
-	public Set<Integer>[] get_possible_actions() {
-		if(possible_actions == null) {
-			possible_actions = new Set[2];
-			possible_actions[0] = new TreeSet<>(Set.of(0, 1, 2, 3));
-			possible_actions[1] = new TreeSet<>(Set.of(0, 1, 2, 3));
-		}
-		return possible_actions;
 	}
 
 	public CrashGame(double[][] rewards_) {
@@ -123,28 +88,21 @@ public class CrashGame extends Game {
 	}
 
 	public CrashGame(CrashGame o) {
-		rows = o.rows;
-		cols = o.cols;
-		rewards = o.rewards;
+		this(o.rewards);
 
-		truck = new Position(o.truck);
-		car = new Position(o.car);
-
-		possible_states = o.possible_states;
+		state = new CrashGameState(this, ((CrashGameState) o.state).truck, ((CrashGameState) o.state).car);
 	}
 
 	public CrashGame(CrashGame o, CrashGameState state) {
 		this(o);
 
-		truck = new Position(state.truck);
-		car = new Position(state.car);
+		state = new CrashGameState(this, ((CrashGameState) state).truck, ((CrashGameState) state).car);
 	}
 
 	public CrashGame(CrashGame o, Position t, Position c) {
 		this(o);
 
-		truck = new Position(t);
-		car = new Position(c);
+		state = new CrashGameState(this, t, c);
 	}
 
 	@Override
@@ -153,19 +111,23 @@ public class CrashGame extends Game {
 	}
 
 	public void randomize() {
+		Position truck = ((CrashGameState) state).truck;
+		Position car = ((CrashGameState) state).car;
 		truck.randomize(rows, cols);
 		do {
 			car.randomize(rows, cols);
 		} while(truck.equals(car));
 	}
 
-	public double get_reward(Position pos) {
-		return rewards[pos.row][pos.col];
+	@Override
+	public Game get_random_copy() {
+		CrashGame out = new CrashGame(this);
+		out.randomize();
+		return out;
 	}
 
-	@Override
-	public State get_state() {
-		return new CrashGameState(this, truck, car);
+	public double get_reward(Position pos) {
+		return rewards[pos.row][pos.col];
 	}
 
 	@Override
@@ -174,51 +136,52 @@ public class CrashGame extends Game {
 	}
 
 	public double[] update(int truck_action, int car_action) {
-		Position truck_old = new Position(truck);
-		Position car_old = new Position(car);
+		CrashGameState curr = (CrashGameState) state;
+		Position truck_old = new Position(curr.truck);
+		Position car_old = new Position(curr.car);
 
 		switch(truck_action % 4) {
 			case 0:
-			truck.up(rows);
+			curr.truck.up(rows);
 			break;
 			case 1:
-			truck.right(cols);
+			curr.truck.right(cols);
 			break;
 			case 2:
-			truck.down(rows);
+			curr.truck.down(rows);
 			break;
 			case 3:
-			truck.left(cols);
+			curr.truck.left(cols);
 			break;
 			default:
 		}
 
 		switch(car_action % 4) {
 			case 0:
-			car.up(rows);
+			curr.car.up(rows);
 			break;
 			case 1:
-			car.right(cols);
+			curr.car.right(cols);
 			break;
 			case 2:
-			car.down(rows);
+			curr.car.down(rows);
 			break;
 			case 3:
-			car.left(cols);
+			curr.car.left(cols);
 			break;
 			default:
 		}
 
-		double[] rewards = { get_reward(truck), get_reward(car) };
+		double[] rewards = { get_reward(curr.truck), get_reward(curr.car) };
 
-		if(truck_old.equals(car) && car_old.equals(truck)) {
-			truck = truck_old;
-			car = car_old;
+		if(truck_old.equals(curr.car) && car_old.equals(curr.truck)) {
+			curr.truck = truck_old;
+			curr.car = car_old;
 			rewards[0] += truck_crash_reward;
 			rewards[1] -= car_crash_cost;
 		}
-		if(truck.equals(car)) {
-			truck = truck_old;
+		if(curr.truck.equals(curr.car)) {
+			curr.truck = truck_old;
 			rewards[0] -= truck_cutoff_cost;
 			rewards[1] += car_cutoff_reward;
 		}
@@ -227,29 +190,31 @@ public class CrashGame extends Game {
 	}
 
 	public void print(PrintStream out) {
-		Utility.println(out, "Truck position: ", truck);
-		Utility.println(out, "Car position: ", car);
+		Position truck = ((CrashGameState) state).truck;
+		Position car = ((CrashGameState) state).car;
+		Print.println(out, "Truck position: ", truck);
+		Print.println(out, "Car position: ", car);
 
 		for(int col = 0; col < cols; col++) {
-			Utility.print(out, "---");
+			Print.print(out, "---");
 		}
-		Utility.println(out, "-");
+		Print.println(out, "-");
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
-				Utility.print(out, "|");
+				Print.print(out, "|");
 				if(truck.row == row && truck.col == col) {
-					Utility.print(out, "TT");
+					Print.print(out, "TT");
 				} else if(car.row == row && car.col == col) {
-					Utility.print(out, "cc");
+					Print.print(out, "cc");
 				} else {
-					Utility.print(out, "  ");
+					Print.print(out, "  ");
 				}
 			}
-			Utility.println(out, "|");
+			Print.println(out, "|");
 			for(int col = 0; col < cols; col++) {
-				Utility.print(out, "---");
+				Print.print(out, "---");
 			}
-			Utility.println(out, "-");
+			Print.println(out, "-");
 		}
 	}
 

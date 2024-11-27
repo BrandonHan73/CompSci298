@@ -1,16 +1,15 @@
-package environment;
+package example;
 
 import java.util.TreeSet;
 import java.util.Set;
 
-import base.State;
+import base.*;
+import environment.*;
 
 public class RockPaperScissors extends Game {
 
-	private State state;
-	private Set<Integer>[] actions;
-
 	public RockPaperScissors() {
+		super(2);
 		actions = new Set[2];
 		actions[0] = new TreeSet<>(Set.of(0, 1, 2));
 		actions[1] = new TreeSet<>(Set.of(0, 1, 2));
@@ -18,16 +17,9 @@ public class RockPaperScissors extends Game {
 	}
 
 	@Override
-	public State[] get_possible_states() {
-		return new State[] { state };
-	}
-
-	@Override
-	public Set<Integer>[] get_possible_actions() {
-		return actions;
-	}
-
 	public Game get_copy(State state) { return new RockPaperScissors(); }
+	@Override
+	public Game get_random_copy() { return new RockPaperScissors(); }
 
 	public double[] update(int p1_action, int p2_action) {
 
@@ -53,8 +45,6 @@ public class RockPaperScissors extends Game {
 	public double[] update(ActionSet as) {
 		return update(as.get(0), as.get(1));
 	}
-
-	public State get_state() { return state; }
 
 }
 

@@ -1,4 +1,4 @@
-package base;
+package util;
 
 import java.awt.List;
 import java.io.BufferedWriter;
@@ -14,48 +14,27 @@ import java.util.Map;
 
 public class Log {
 
-	public static class Logger {
-		private String topic, name;
-		public double value;
-		public Logger(String t, String n) {
-			topic = t;
-			name = n;
-			value = 0;
-			loggers.add(this);
-		}
-		public String getName() {
-			return name;
-		}
-		public String getTopic() {
-			return topic;
-		}
-		@Override
-		public String toString() {
-			return name + ": " + value;
-		}
+	private String topic, name;
+	public double value;
+	public Log(String t, String n) {
+		topic = t;
+		name = n;
+		value = 0;
+		loggers.add(this);
 	}
-
-	public static class SuccessLogger extends Logger {
-		private long trials, successes;
-		public SuccessLogger(String t, String n) {
-			super(t, n);
-		}
-		public void success() {
-			trials++;
-			successes++;
-		}
-		public void fail() {
-			trials++;
-		}
-		@Override
-		public String toString() {
-			double rate = trials == 0 ? 0 : ((double) successes / trials);
-			return getName() + ": " + rate;
-		}
+	public String getName() {
+		return name;
+	}
+	public String getTopic() {
+		return topic;
+	}
+	@Override
+	public String toString() {
+		return name + ": " + value;
 	}
 
 	private static Map<String, PrintWriter> logs;
-	private static ArrayList<Logger> loggers;
+	private static ArrayList<Log> loggers;
 
 	public static String focus;
 
@@ -69,8 +48,8 @@ public class Log {
 				PrintWriter out = logs.get(topic);
 				out.println("\n\n\n--------------------------------\n");
 			}
-			
-			for(Logger l : loggers) {
+
+			for(Log l : loggers) {
 				log(l.topic, l.toString());
 			}
 
@@ -94,7 +73,7 @@ public class Log {
 		out.println(txt);
 
 		if(focus.equals(topic)) {
-			Utility.println(System.out, txt);
+			Utility.println(txt);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package base;
+package util;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -6,85 +6,32 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.IntToDoubleFunction;
 
-import environment.ActionSet;
+import environment.*;
+import base.*;
 
 public class Utility {
 
-	private static void print_ob(PrintStream out, int[][] arr) {
-		for(int[] row : arr) {
-			for(int i = 0; i < row.length - 1; i++) {
-				out.print(row[i] + ", ");
-			}
-			out.print(row[row.length - 1]);
-		}
+	public static void clearln() {
+		Print.clearln(System.out);
 	}
 
-	private static void print_ob(PrintStream out, int[] arr) {
-		for(int i = 0; i < arr.length - 1; i++) {
-			out.print(arr[i] + ", ");
-		}
-		out.print(arr[arr.length - 1]);
+	public static void debugln(Object... args) {
+		Print.debugln(System.out, args);
 	}
 
-	private static void print_ob(PrintStream out, double[] arr) {
-		for(int i = 0; i < arr.length - 1; i++) {
-			print_ob(out, arr[i]);
-			out.print(", ");
-		}
-		print_ob(out, arr[arr.length - 1]);
+	public static void debug(Object... args) {
+		Print.debug(System.out, args);
 	}
 
-	private static void print_ob(PrintStream out, double d) {
-		out.print(String.format("%.8f", d));
+	public static void println(Object... args) {
+		Print.println(System.out, args);
 	}
 
-	private static void print_ob(PrintStream out, Position pos) {
-		out.print("(" + pos.row + ", " + pos.col + ")");
-	}
-
-	private static void print_ob(PrintStream out, Object o) {
-		if(o instanceof int[][]) {
-			print_ob(out, (int[][]) o);
-		} else if(o instanceof int[]) {
-			print_ob(out, (int[]) o);
-		} else if(o instanceof Double) {
-			print_ob(out, (double) o);
-		} else if(o instanceof double[]) {
-			print_ob(out, (double[]) o);
-		} else if(o instanceof Position) {
-			print_ob(out, (Position) o);
-		} else {
-			out.print(o);
-		}
-	}
-
-	public static void print(PrintStream out, Object... args) {
-		for(Object o : args) {
-			print_ob(out, o);
-		}
-	}
-
-	public static void println(PrintStream out, Object... args) {
-		print(out, args);
-		out.println();
-	}
-
-	public static void debug(PrintStream out, Object... args) {
-		if(Config.debug) {
-			print(out, args);
-		}
-	}
-
-	public static void debugln(PrintStream out, Object... args) {
-		if(Config.debug) {
-			println(out, args);
-		}
-	}
-
-	public static void clearln(PrintStream out) {
-		Utility.println(System.out, String.format("                                                                             %c[A", 0x1B));
+	public static void print(Object... args) {
+		Print.print(System.out, args);
 	}
 
 	public static int[] toArray(ArrayList<Integer> arr) {
@@ -117,6 +64,14 @@ public class Utility {
 		int[] out = new int[arr.length];
 		for(int i = 0; i < out.length; i++) {
 			out[i] = arr[i];
+		}
+		return out;
+	}
+
+	public static Set<Integer> toTreeSet(int... vals) {
+		Set<Integer> out = new TreeSet<>();
+		for(int v : vals) {
+			out.add(v);
 		}
 		return out;
 	}
@@ -318,44 +273,6 @@ public class Utility {
 			out[i] = val;
 		}
 		return out;
-	}
-
-	public static interface VoidString {
-		String run();
-	}
-
-	public static class MaxRecord {
-		private double value;
-		private VoidString log;
-		public MaxRecord() {
-			value = 0;
-			log = null;
-		}
-		public void record(double v, VoidString vs) {
-			if(v > value) {
-				value = v;
-				log = vs;
-			}
-		}
-		public void record(double v, String debug) {
-			record(v, () -> debug);
-		}
-		public void record(double v) {
-			record(v, "");
-		}
-		public void record(MaxRecord o) {
-			record(o.value, o.log);
-		}
-		public String log() {
-			return log.run();
-		}
-		public double get() {
-			return value;
-		}
-		@Override
-		public String toString() {
-			return value + " (" + log() + ")";
-		}
 	}
 
 }

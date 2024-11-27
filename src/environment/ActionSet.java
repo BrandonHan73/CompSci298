@@ -1,7 +1,7 @@
 package environment;
 
-import base.Utility;
-import policy.ActionDistribution;
+import util.Utility;
+import environment.ActionDistribution;
 import base.State;
 
 public class ActionSet {

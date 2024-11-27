@@ -1,6 +1,6 @@
 package policy;
 
-import policy.ActionDistribution;
+import environment.ActionDistribution;
 import policy.NashSolver;
 import policy.StateQ;
 

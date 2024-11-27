@@ -1,11 +1,11 @@
-package policy;
+package environment;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import base.Config;
-import base.Utility;
+import util.Utility;
 
 public class ActionDistribution {
 

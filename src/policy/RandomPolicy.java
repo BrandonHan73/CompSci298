@@ -1,8 +1,7 @@
 package policy;
 
-import environment.Game;
-import base.State;
-import base.Utility;
+import environment.*;
+import base.*;
 
 public class RandomPolicy extends Policy {
 
@@ -11,7 +10,7 @@ public class RandomPolicy extends Policy {
 	}
 
 	@Override
-	public ActionDistribution[] get_action_options(State state) {
+	public ActionDistribution[] evaluate(State state) {
 		ActionDistribution[] out = new ActionDistribution[state.player_count()];
 
 		for(int player = 0; player < state.player_count(); player++) {
@@ -22,7 +21,7 @@ public class RandomPolicy extends Policy {
 	}
 
 	@Override
-	public void train(int iterations) {}
+	public void train_step() {}
 
 }
 

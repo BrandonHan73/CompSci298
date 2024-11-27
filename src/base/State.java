@@ -1,7 +1,6 @@
 package base;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 import environment.Game;
 
@@ -9,7 +8,7 @@ public class State {
 
 	private final int state_code;
 
-	private final Game base;
+	protected final Game base;
 
 	public State(Game base) {
 		this(0, base);
