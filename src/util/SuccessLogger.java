@@ -15,7 +15,7 @@ public class SuccessLogger extends Log {
 	@Override
 	public String toString() {
 		double rate = trials == 0 ? 0 : ((double) successes / trials);
-		return getName() + ": " + rate;
+		return getName() + ": " + rate + " (" + successes + "/" + trials + ")";
 	}
 }
 

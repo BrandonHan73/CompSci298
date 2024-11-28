@@ -93,10 +93,10 @@ public class CrashGame extends Game {
 		state = new CrashGameState(this, ((CrashGameState) o.state).truck, ((CrashGameState) o.state).car);
 	}
 
-	public CrashGame(CrashGame o, CrashGameState state) {
+	public CrashGame(CrashGame o, CrashGameState st) {
 		this(o);
 
-		state = new CrashGameState(this, ((CrashGameState) state).truck, ((CrashGameState) state).car);
+		state = new CrashGameState(this, ((CrashGameState) st).truck, ((CrashGameState) st).car);
 	}
 
 	public CrashGame(CrashGame o, Position t, Position c) {
@@ -182,9 +182,12 @@ public class CrashGame extends Game {
 		}
 		if(curr.truck.equals(curr.car)) {
 			curr.truck = truck_old;
-			rewards[0] -= truck_cutoff_cost;
-			rewards[1] += car_cutoff_reward;
+			rewards[0] += truck_crash_reward;
+			rewards[1] -= car_crash_cost;
 		}
+
+		rewards[0] = Utility.logistic(rewards[0]);
+		rewards[1] = Utility.logistic(rewards[1]);
 
 		return rewards;
 	}

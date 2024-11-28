@@ -86,7 +86,7 @@ public class StateQ {
 	public double[] value(boolean fast) {
 		if(value == null || (fast_value && !fast)) {
 			fast_value = fast;
-			return value(NashSolver.evaluate_state(this, fast));
+			value = value(NashSolver.evaluate_state(this, fast));
 		}
 
 		return value;

@@ -1,4 +1,5 @@
 import example.*;
+import network.SoftMax;
 import environment.*;
 import util.*;
 import policy.*;
@@ -6,6 +7,7 @@ import policy.*;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
+		SoftMax sm = new SoftMax(5, 7, 3, 2);
 		CrashGameTest.base();
 		//test_games(args);
 	}

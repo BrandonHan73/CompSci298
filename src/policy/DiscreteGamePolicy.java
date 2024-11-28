@@ -67,29 +67,7 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 					double old_Q_value = get_Q(state).get(as, player);
 					double new_Q_value = rewards[player] + Config.Beta * state_value[player];
 
-					record_change.record(
-						Math.abs(old_Q_value - new_Q_value), () -> {
-							ActionDistribution[] test_fictitious_play = NashSolver.evaluate_state(get_Q(new_state), true);
-							StringBuilder builder = new StringBuilder("\n\n");
-							builder.append(String.format("Change from %.4f to %.4f, ", old_Q_value, new_Q_value) + '\n');
-							builder.append(as.toString() +	" at " + state.toString() + '\n');
-							builder.append("Truck: " + test_fictitious_play[0] + '\n');
-							builder.append("Car: " + test_fictitious_play[1] + '\n');
-							builder.append("Reward (truck): ").append(rewards[0]).append('\n');
-							builder.append("New state value ").append(state_value[0]).append('\n');
-
-							Utility.forEachChoice(new_state.choices(), actions -> {
-								ActionSet aset = new ActionSet(actions, new_state);
-								builder.append(aset.toString()).append(" ");
-								Game simul = get_base_copy(new_state);
-								simul.update(aset);
-								State next = simul.get_state();
-								builder.append(get_Q(next).value()[0]).append('\n');
-							});
-
-							return builder.toString();
-						}
-					);
+					record_change.record(Math.abs(old_Q_value - new_Q_value));
 
 					state_update.set(new_Q_value, as, player);
 				}

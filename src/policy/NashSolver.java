@@ -273,6 +273,19 @@ public class NashSolver {
 	 */
 	public static ActionDistribution[] fictitious_play(StateQ Q, int iterations) {
 
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n\n>>>>>>>>>>>>>>\nFictitious play\n");
+		sb.append(Q.state).append('\n');
+		for(int i = 0; i < 4; ++i) {
+			for(int j = 0; j < 4; ++j) {
+				ActionSet lol = new ActionSet(new int[] {i, j}, Q.state);
+				sb.append(Q.get(lol, 0)).append(" ");
+			}
+			sb.append('\n');
+		}
+		sb.append("<<<<<<<<<<<<\n");
+		Log.log(fictitious_play_name, sb.toString());
+
 		ActionDistribution[] action_counts = new ActionDistribution[Q.state.player_count()];
 		
 		for(int player = 0; player < Q.state.player_count(); player++) {
@@ -282,6 +295,7 @@ public class NashSolver {
 		ActionDistribution[] reaction;
 
 		MaxRecord max_change = null;
+		boolean converged = false;
 
 		for(int moves = 1; moves < iterations; moves++) {
 
@@ -312,13 +326,13 @@ public class NashSolver {
 			if(max_change.get() == 0) {
 				fictitious_play_convergence.success();
 				fictitious_play_panic_rate.fail();
-				compare_with_pure_nash(Q, action_counts, true);
-				return action_counts;
+				converged = true;
+				break;
 			}
 		}
 
 		fictitious_play_panic_rate.success();
-		if(Config.fictitious_play_panic) {
+		if(!converged && Config.fictitious_play_panic) {
 			for(int panic = 0; panic < Config.fictitious_play_panic_iterations; panic++) {
 				ActionDistribution[] old_distribution = action_counts;
 
@@ -336,56 +350,23 @@ public class NashSolver {
 				if(max_change.get() == 0) {
 					fictitious_play_convergence.success();
 					fictitious_play_panic_convergence.success();
-					compare_with_pure_nash(Q, action_counts, true);
-					return action_counts;
+					converged = true;
+					break;
 				}
 			}
 			fictitious_play_panic_convergence.fail();
 		}
 
-		fictitious_play_convergence.fail();
-		compare_with_pure_nash(Q, action_counts, false);
+		if(!converged) {
+			fictitious_play_convergence.fail();
+		}
+
+		Log.log(fictitious_play_name, "");
+		Log.log(fictitious_play_name, action_counts[0].toString());
+		Log.log(fictitious_play_name, action_counts[1].toString());
 		return action_counts;
 	}
 
-	private static void compare_with_pure_nash(StateQ Q, ActionDistribution[] fictitious_play, boolean converged) {
-		ActionSet[] all_nash = basic_nash(Q);
-		ActionSet[] best_nash;
-		int player_count = Q.state.player_count();
-		
-		ActionDistribution[] out = null;
-		boolean print = false;
-
-		if(all_nash.length > 0) {
-			best_nash = pick_nash(Q, all_nash);
-			out = distribution_from_nash(player_count, best_nash);
-
-			for(int player = 0; player < player_count; player++) {
-				for(int action : Q.state.choices_for(player)) {
-					if(out[player].get(action) != fictitious_play[player].get(action)) {
-						print = true;
-					}
-				}
-			}
-			if(print) {
-			Log.log(fictitious_play_name, "");
-				if(!converged) {
-					Log.log(fictitious_play_name, "Did not converge");
-				}
-				for(int player = 0; player < player_count; player++) {
-					Log.log(fictitious_play_name, "Player " + (player + 1) + "/" + player_count);
-					Log.log(fictitious_play_name, "Nash: " + out[player].toString());
-					Log.log(fictitious_play_name, "Fict: " + fictitious_play[player].toString());
-					for(int action : Q.state.choices_for(player)) {
-						//Log.log(fictitious_play_name, action + ":" + out[player].get(action) + " " + action + ":" + fictitious_play[player].get(action) + " ");
-						if(out[player].get(action) != fictitious_play[player].get(action)) {
-							Log.log(fictitious_play_name, "Action " + action + " for player " + (player + 1) + " did not match");
-						}
-					}
-				}
-			}
-		} 
-	}
 	private static final String fictitious_play_name = "fictitious_play";
 	private static SuccessLogger fictitious_play_convergence = new SuccessLogger(fictitious_play_name, "Convergence rate");
 	private static SuccessLogger fictitious_play_panic_rate = new SuccessLogger(fictitious_play_name, "Panic rate");

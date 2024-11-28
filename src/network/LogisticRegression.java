@@ -1,4 +1,4 @@
-package util;
+package network;
 
 import Jama.Matrix;
 
@@ -9,10 +9,10 @@ public class LogisticRegression {
 	public final int inputs, hiddens, outputs;
 	public final int hidden_layers;
 
-	private Matrix[] weights;
-	private Matrix[] biases;
+	protected Matrix[] weights;
+	protected Matrix[] biases;
 
-	private int training = 1;
+	protected int training = 1;
 
 	public LogisticRegression(int in, int hid, int hid_count, int out) {
 		inputs = in;
@@ -40,7 +40,7 @@ public class LogisticRegression {
 		}
 	}
 
-	private Matrix[] pass(Matrix in) {
+	protected Matrix[] pass(Matrix in) {
 		Matrix[] out = new Matrix[hidden_layers + 2];
 		out[0] = in;
 

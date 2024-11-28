@@ -38,8 +38,8 @@ public class CrashGameTest {
 	}
 
 	public static void base() throws InterruptedException {
-		// CrashGame game = new CrashGame(5, 7);
-		CrashGame game = new CrashGame(reward1);
+		CrashGame game = new CrashGame(5, 7);
+		// CrashGame game = new CrashGame(reward1);
 		DiscreteGamePolicy pol = new CrashGamePolicy(game);
 
 		pol.train();
