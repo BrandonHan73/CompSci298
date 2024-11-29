@@ -1,108 +1,36 @@
 package environment;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 
-import base.Config;
-import util.Utility;
+public class ActionDistribution <E extends Enum<E>> {
 
-public class ActionDistribution {
-
-	private Map<Integer, Double> distribution;
+	private Map<E, Double> distribution;
 	private double count;
 
-	public InitializationOption init_option;
-	private boolean used;
+	private Class<E> key_type;
+	private E[] options;
 
-	public enum InitializationOption {
-		EMPTY, RANDOM, EVEN, SPECIFIC
-	}
-
-	public ActionDistribution(InitializationOption init, Set<Integer> choices, int def) {
-		distribution = new HashMap<>();
+	public ActionDistribution(Class<E> keyType, E[] values) {
+		distribution = new EnumMap<>(keyType);
 		count = 0;
-		used = false;
 
-		double temp;
-		switch(init) {
-			case EMPTY: break;
-			case RANDOM: 
+		key_type = keyType;
+		options = values;
+	}
 
-			if(choices == null) {
-				throw new RuntimeException("Choices are required to make a random distribution");
-			}
+	public ActionDistribution<E> copy() {
+		ActionDistribution<E> out = new ActionDistribution<>(key_type, options);
 
-			for(int action : choices) {
-				temp = Math.random();
-				distribution.put(action, temp);
-				count += temp;
-			}
-
-			break;
-
-			case EVEN:
-
-			if(choices == null) {
-				throw new RuntimeException("Choices are required to make an even distribution");
-			}
-
-			for(int action : choices) {
-				distribution.put(action, 1.0);
-			}
-			count = choices.size();
-
-			break;
-
-			case SPECIFIC:
-
-			distribution.put(def, 1.0);
-			count = 1;
-
-			default:
-			throw new RuntimeException("Invalid initialization type has been provided");
+		for(E a : options) {
+			out.distribution.put( a, distribution.get(a) );
 		}
+		out.count = count;
+
+		return out;
 	}
 
-	public ActionDistribution() {
-		this(InitializationOption.EMPTY, null, Config.placeholder_action);
-	}
-
-	public ActionDistribution(Set<Integer> choices, boolean random) {
-		this(
-			random ? InitializationOption.RANDOM : InitializationOption.EVEN,
-			choices,
-			Config.placeholder_action
-		);
-	}
-
-	public ActionDistribution(Set<Integer> choices) {
-		this(choices, false);
-	}
-
-	public ActionDistribution(int action) {
-		this(InitializationOption.SPECIFIC, null, action);
-	}
-
-	public ActionDistribution(ActionDistribution o) {
-		this();
-
-		count = o.count;
-		for(int action : o.distribution.keySet()) {
-			distribution.put(action, o.distribution.get(action));
-		}
-	}
-
-	public ActionDistribution copy() {
-		return new ActionDistribution(this);
-	}
-
-	public void add(int action, double val) {
-		if(!used) {
-			used = true;
-			distribution = new HashMap<>();
-			count = 0;
-		}
+	public void add(E action, double val) {
 		count += val;
 		if(distribution.containsKey(action)) {
 			distribution.put(action, distribution.get(action) + val);
@@ -115,46 +43,44 @@ public class ActionDistribution {
 		return count;
 	}
 
-	public void add(int action) {
+	public void add(E action) {
 		add(action, 1);
 	}
 
-	public double get(int action) {
-		if(count == 0 || !distribution.containsKey(action)) {
+	public double get(E action) {
+		if(count == 0) {
+			return 1.0 / options.length;
+		}
+		if(!distribution.containsKey(action)) {
 			return 0;
 		}
 		return distribution.get(action) / count;
 	}
 
-	public int[] choices() {
-		int[] out = new int[distribution.size()];
-		int i = 0;
-		for(int action : distribution.keySet()) {
-			out[i++] = action;
+	public E poll() {
+		if(count == 0) {
+			return options[ (int) (options.length * Math.random()) ];
 		}
-		return out;
-	}
 
-	public int poll() {
 		double choice = count * Math.random();
 
-		for(int action : distribution.keySet()) {
-			choice -= distribution.get(action);
+		for(E action : options) {
+			choice -= get(action);
 
 			if(choice < 0) {
 				return action;
 			}
 		}
 
-		return -1;
+		throw new RuntimeException("Action distribution polling did not execute correctly");
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
-		for(int action : distribution.keySet()) {
-			sb.append(String.format("(%d)%.4f ", action, get(action)));
+		for(E action : options) {
+			sb.append(String.format("(" + action + ")%.4f ", get(action)));
 		}
 
 		return sb.toString();
