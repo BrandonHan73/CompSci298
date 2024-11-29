@@ -7,17 +7,17 @@ import base.State;
 public class ActionSet {
 
 	public final int player_count;
-	private int[] actions;
+	private Enum[] actions;
 	private final State state;
 
-	public ActionSet(int[] player_actions, State st) {
+	public ActionSet(Enum[] player_actions, State st) {
 		player_count = player_actions.length;
 		actions = Utility.copy(player_actions);
 		state = st;
 	}
 
 	public ActionSet(ActionDistribution[] choices, State st) {
-		int[] poll = new int[choices.length];
+		Enum[] poll = new Enum[choices.length];
 
 		for(int i = 0; i < choices.length; i++) {
 			poll[i] = choices[i].poll();
@@ -32,11 +32,11 @@ public class ActionSet {
 		this(o.actions, o.state);
 	}
 
-	public int get(int player) {
+	public Enum get(int player) {
 		return actions[player];
 	}
 
-	public void set(int player, int action) {
+	public void set(int player, Enum action) {
 		actions[player] = action;
 	}
 
@@ -61,11 +61,11 @@ public class ActionSet {
 
 	@Override
 	public int hashCode() {
-		int res = actions[0];
+		int res = actions[0].ordinal();
 
 		for(int i = 1; i < actions.length; ++i) {
-			res *= state.choices_for(i).size();
-			res += actions[i];
+			res *= state.choices_for(i).length;
+			res += actions[i].ordinal();
 		}
 
 		return res;

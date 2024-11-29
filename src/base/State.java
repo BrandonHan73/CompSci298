@@ -1,7 +1,5 @@
 package base;
 
-import java.util.Set;
-
 import environment.Game;
 
 public class State {
@@ -19,12 +17,8 @@ public class State {
 		base = game;
 	}
 
-	public Set<Integer> choices_for(int player) {
-		return base.get_possible_actions()[player];
-	}
-
-	public Set<Integer>[] choices() {
-		return base.get_possible_actions();
+	public Enum[] choices_for(int player) {
+		return base.get_possible_actions(player);
 	}
 
 	public int player_count() {

@@ -72,6 +72,15 @@ public class Utility {
 		return out;
 	}
 
+	public static <T extends Enum<T>> Enum<T>[] copy(Enum<T>[] arr) {
+		if(arr == null) return null;
+		Enum<T>[] out = new Enum[arr.length];
+		for(int i = 0; i < arr.length; i++) {
+			out[i] = arr[i];
+		}
+		return out;
+	}
+
 	public static Set<Integer> toTreeSet(int... vals) {
 		Set<Integer> out = new TreeSet<>();
 		for(int v : vals) {

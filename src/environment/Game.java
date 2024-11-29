@@ -1,17 +1,20 @@
 package environment;
 
-import java.util.Set;
-
 import base.State;
 
 public abstract class Game {
 
 	protected State state;
 	protected final int player_count;
-	protected Set<Integer>[] actions;
+	protected Enum[][] actions;
 
-	public Game(int players) {
+	public Game(int players, Enum[]... action_choices) {
 		player_count = players;
+
+		actions = new Enum[player_count][];
+		for(int player = 0; player < player_count; player++) {
+			actions[player] = action_choices[player];
+		}
 	}
 
 	public int player_count() {
@@ -22,8 +25,8 @@ public abstract class Game {
 		return get_copy(state);
 	}
 
-	public Set<Integer>[] get_possible_actions() {
-		return actions;
+	public Enum[] get_possible_actions(int player) {
+		return actions[player];
 	}
 
 	public State get_state() {
