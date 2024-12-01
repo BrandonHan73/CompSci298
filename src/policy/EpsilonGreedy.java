@@ -18,18 +18,17 @@ public abstract class EpsilonGreedy extends Policy {
 
 			ActionDistribution[] choices = evaluate(curr);
 			ActionSet action = new ActionSet(choices, curr);
+			double[] prob = new double[game.player_count()];
+
 			for(int player = 0; player < game.player_count(); player++) {
+				Enum[] possible_actions = game.get_possible_actions(player);
 				if(Math.random() < Config.epsilon) {
-					ActionDistribution greedy = new ActionDistribution(game.get_possible_actions()[player]);
+					ActionDistribution greedy = new ActionDistribution(possible_actions);
 					action.set(player, greedy.poll());
 				}
-			}
-
-			double[] prob = new double[game.player_count()];
-			for(int player = 0; player < game.player_count(); player++) {
 				prob[player] = 
 					(1 - Config.epsilon) * choices[player].get(action.get(player)) + 
-					(Config.epsilon * game.get_possible_actions()[player].size())
+					(Config.epsilon * possible_actions.length)
 				;
 			}
 

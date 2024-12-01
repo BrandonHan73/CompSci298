@@ -230,21 +230,7 @@ public class CrashGameTest {
 	}
 
 	public static void print_action_list(ActionSet as) {
-		Utility.println(
-			action_string(as.get(0)),
-			", ", 
-			action_string(as.get(1))
-		);
-	}
-
-	public static String action_string(int action) {
-		switch(action) {
-			case 0: return "Up";
-			case 1: return "Right";
-			case 2: return "Down";
-			case 3: return "Left";
-			default: return "Invalid";
-		}
+		Utility.println(as.get(0), ", ", as.get(1));
 	}
 
 }

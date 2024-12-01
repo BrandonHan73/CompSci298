@@ -12,7 +12,7 @@ public class ActionSet {
 
 	public ActionSet(Enum[] player_actions, State st) {
 		player_count = player_actions.length;
-		actions = Utility.copy(player_actions);
+		actions = Utility.copyEnum(player_actions);
 		state = st;
 	}
 

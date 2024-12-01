@@ -5,25 +5,26 @@ import java.util.Map;
 
 public class ActionDistribution <E extends Enum<E>> {
 
-	private Map<E, Double> distribution;
+	private double[] distribution;
 	private double count;
 
-	private Class<E> key_type;
 	private E[] options;
 
-	public ActionDistribution(Class<E> keyType, E[] values) {
-		distribution = new EnumMap<>(keyType);
+	public ActionDistribution(E[] values) {
+		if(values.length <= 0) {
+			throw new RuntimeException("Action distribution requires at least one possible action");
+		}
+		distribution = new double[values.length];
 		count = 0;
 
-		key_type = keyType;
 		options = values;
 	}
 
 	public ActionDistribution<E> copy() {
-		ActionDistribution<E> out = new ActionDistribution<>(key_type, options);
+		ActionDistribution<E> out = new ActionDistribution<>(options);
 
 		for(E a : options) {
-			out.distribution.put( a, distribution.get(a) );
+			out.distribution[a.ordinal()] = distribution[a.ordinal()];
 		}
 		out.count = count;
 
@@ -32,11 +33,7 @@ public class ActionDistribution <E extends Enum<E>> {
 
 	public void add(E action, double val) {
 		count += val;
-		if(distribution.containsKey(action)) {
-			distribution.put(action, distribution.get(action) + val);
-		} else {
-			distribution.put(action, val);
-		}
+		distribution[action.ordinal()] += val;
 	}
 
 	public double count() {
@@ -51,10 +48,7 @@ public class ActionDistribution <E extends Enum<E>> {
 		if(count == 0) {
 			return 1.0 / options.length;
 		}
-		if(!distribution.containsKey(action)) {
-			return 0;
-		}
-		return distribution.get(action) / count;
+		return distribution[action.ordinal()] / count;
 	}
 
 	public E poll() {
@@ -62,7 +56,7 @@ public class ActionDistribution <E extends Enum<E>> {
 			return options[ (int) (options.length * Math.random()) ];
 		}
 
-		double choice = count * Math.random();
+		double choice = Math.random();
 
 		for(E action : options) {
 			choice -= get(action);

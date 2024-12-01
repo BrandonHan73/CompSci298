@@ -13,6 +13,9 @@ public class StateQ {
 
 	public final State state;
 
+	private Enum[][] choices;
+	private int player_count;
+
 	private double value[];
 	private boolean fast_value;
 
@@ -21,9 +24,15 @@ public class StateQ {
 		fast_value = true;
 		state = s;
 
+		player_count = state.player_count();
+		choices = new Enum[player_count][];
+		for(int i = 0; i < player_count; i++) {
+			choices[i] = state.choices_for(i);
+		}
+
 		Q = new HashMap<>();
-		Utility.forEachChoice(state.choices(), pick -> {
-			Q.put(new ActionSet(pick, state), Utility.createDoubleArray(state.choices().length, 1));
+		Utility.forEachChoice(choices, pick -> {
+			Q.put(new ActionSet(pick, state), Utility.createDoubleArray(player_count, 1));
 		});
 	}
 
@@ -66,9 +75,9 @@ public class StateQ {
 
 	public double[] value(ActionDistribution[] distributions) {
 
-		double[] eval = new double[state.choices().length];
+		double[] eval = new double[state.player_count()];
 
-		Utility.forEachChoice(state.choices(), pick -> {
+		Utility.forEachChoice(choices, pick -> {
 			double prob = 1;
 			for(int player = 0; player < pick.length; player++) {
 				prob *= distributions[player].get(pick[player]);

@@ -18,6 +18,10 @@ public class CrashGame extends Game {
 	public final int rows, cols;
 	private final double[][] rewards;
 
+	public static enum CrashGameAction {
+		UP, RIGHT, DOWN, LEFT
+	}
+
 	public static class CrashGameState extends State {
 		Position truck, car;
 
@@ -57,11 +61,10 @@ public class CrashGame extends Game {
 	}
 
 	public CrashGame(int rows_, int cols_) {
-		super(2);
-		actions = new Set[] {
-			Utility.toTreeSet(0, 1, 2, 3),
-			Utility.toTreeSet(0, 1, 2, 3)
-		};
+		super(2,
+			CrashGameAction.values(),
+			CrashGameAction.values()
+		);
 
 		rows = rows_;
 		cols = cols_;
@@ -132,41 +135,41 @@ public class CrashGame extends Game {
 
 	@Override
 	public double[] update(ActionSet as) {
-		return update(as.get(0), as.get(1));
+		return update((CrashGameAction) as.get(0), (CrashGameAction) as.get(1));
 	}
 
-	public double[] update(int truck_action, int car_action) {
+	public double[] update(CrashGameAction truck_action, CrashGameAction car_action) {
 		CrashGameState curr = (CrashGameState) state;
 		Position truck_old = new Position(curr.truck);
 		Position car_old = new Position(curr.car);
 
-		switch(truck_action % 4) {
-			case 0:
+		switch(truck_action) {
+			case UP:
 			curr.truck.up(rows);
 			break;
-			case 1:
+			case RIGHT:
 			curr.truck.right(cols);
 			break;
-			case 2:
+			case DOWN:
 			curr.truck.down(rows);
 			break;
-			case 3:
+			case LEFT:
 			curr.truck.left(cols);
 			break;
 			default:
 		}
 
-		switch(car_action % 4) {
-			case 0:
+		switch(car_action) {
+			case UP:
 			curr.car.up(rows);
 			break;
-			case 1:
+			case RIGHT:
 			curr.car.right(cols);
 			break;
-			case 2:
+			case DOWN:
 			curr.car.down(rows);
 			break;
-			case 3:
+			case LEFT:
 			curr.car.left(cols);
 			break;
 			default:

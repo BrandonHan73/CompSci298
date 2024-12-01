@@ -9,6 +9,7 @@ import environment.*;
 public abstract class DiscreteGamePolicy extends Q_Policy {
 
 	protected State[] possible_states;
+	private Enum[][] action_choices;
 
 	private Map<State, StateQ> Q;
 
@@ -22,6 +23,11 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 		super(game);
 
 		Q = new HashMap<>();
+
+		action_choices = new Enum[game.player_count()][];
+		for(int player = 0; player < game.player_count(); player++) {
+			action_choices[player] = game.get_possible_actions(player);
+		}
 
 		for(State s : get_possible_states()) {
 			Q.put(s, new StateQ(s));
@@ -54,7 +60,7 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 			StateQ state_update = new StateQ(state);
 			MaxRecord record_change = new MaxRecord();
 
-			Utility.forEachChoice(state.choices(), action -> {
+			Utility.forEachChoice(action_choices, action -> {
 				ActionSet as = new ActionSet(action, state);
 
 				Game sim = get_base_copy(state);
