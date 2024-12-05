@@ -1,12 +1,19 @@
 package environment;
 
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+
+import base.Config;
 
 public class ActionDistribution <E extends Enum<E>> {
 
 	private double[] distribution;
 	private double count;
+
+	private Queue<Double> added_values;
+	private Queue<Enum> added_actions;
 
 	private E[] options;
 
@@ -16,6 +23,9 @@ public class ActionDistribution <E extends Enum<E>> {
 		}
 		distribution = new double[values.length];
 		count = 0;
+
+		added_values = new LinkedList<>();
+		added_actions = new LinkedList<>();
 
 		options = values;
 	}
@@ -34,6 +44,16 @@ public class ActionDistribution <E extends Enum<E>> {
 	public void add(E action, double val) {
 		count += val;
 		distribution[action.ordinal()] += val;
+
+		added_actions.add(action);
+		added_values.add(val);
+
+		while(count > Config.action_distribution_max_count) {
+			double remove = added_values.poll();
+
+			distribution[ added_actions.poll().ordinal() ] -= remove;
+			count -= remove;
+		}
 	}
 
 	public double count() {

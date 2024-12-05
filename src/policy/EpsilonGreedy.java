@@ -2,6 +2,7 @@ package policy;
 
 import base.Config;
 import base.State;
+import util.Utility;
 import environment.*;
 
 public abstract class EpsilonGreedy extends Policy {
@@ -14,7 +15,7 @@ public abstract class EpsilonGreedy extends Policy {
 	public void train_step() {
 		Game game = base_game.get_random_copy();
 		for(int time = 0; time < Config.DQN_simulation_time; time++) {
-			State curr = game.get_state();
+			State curr = game.get_state().get_copy();
 
 			ActionDistribution[] choices = evaluate(curr);
 			ActionSet action = new ActionSet(choices, curr);
@@ -28,11 +29,16 @@ public abstract class EpsilonGreedy extends Policy {
 				}
 				prob[player] = 
 					(1 - Config.epsilon) * choices[player].get(action.get(player)) + 
-					(Config.epsilon * possible_actions.length)
+					(Config.epsilon / possible_actions.length)
 				;
 			}
 
 			double[] reward = game.update(action);
+			// Clamping reward
+			for(int player = 0; player < game.player_count(); player++) {
+				reward[player] = Utility.logistic(reward[player]) * (1 - Config.Beta);
+			}
+
 			State next = game.get_state();
 
 			step(curr, action, next, reward, prob);

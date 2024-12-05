@@ -7,6 +7,10 @@ public class MaxRecord {
 		value = 0;
 		log = null;
 	}
+	public void reset() {
+		value = 0;
+		log = null;
+	}
 	public void record(double v, VoidString vs) {
 		if(v > value) {
 			value = v;

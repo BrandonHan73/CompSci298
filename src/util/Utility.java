@@ -69,6 +69,17 @@ public class Utility {
 		return (T[]) out;
 	}
 
+	public static double[] copyDoubleArr(double[] arr) {
+		if(arr == null) return null;
+		double[] out = new double[arr.length];
+
+		for(int i = 0; i < arr.length; i++) {
+			out[i] = arr[i];
+		}
+
+		return out;
+	}
+
 	public static int[] copyIntArr(int[] arr) {
 		if(arr == null) return null;
 		int[] out = new int[arr.length];
@@ -184,7 +195,7 @@ public class Utility {
 			for(int actor = 0; actor < actor_count; actor++) {
 				arr[actor] = choices[actor][ indices[actor] ];
 			}
-			action.run(arr);
+			action.run(copyEnum(arr));
 
 			indices[0]++;
 			for(int actor = 0; actor < actor_count - 1; actor++) {

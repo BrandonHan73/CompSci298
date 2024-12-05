@@ -2,15 +2,17 @@ package base;
 
 public class Config {
 
-	public static int fictitious_play_iterations = 128;
-	public static int fast_fictitious_play_iterations = 64;
+	public static int fictitious_play_iterations = 1 << 12;
+	public static int fast_fictitious_play_iterations = 1 << 12;
 
-	public static boolean fictitious_play_panic = true;
+	public static int action_distribution_max_count = 1 << 5;
+
+	public static boolean fictitious_play_panic = false;
 	public static int fictitious_play_panic_iterations = 16;
 
-	public static int Q_iterations = 128;
+	public static int Q_iterations = 1 << 6;
 
-	public static int DQN_iterations = 512;
+	public static int DQN_iterations = 2048;
 	public static int DQN_simulation_time = 64;
 	// Probability of taking a random action for epsilon-greedy
 	public static double epsilon = 0.01;

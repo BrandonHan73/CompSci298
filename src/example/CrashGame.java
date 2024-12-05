@@ -58,6 +58,12 @@ public class CrashGame extends Game {
 		public String toString() {
 			return truck.toString() + " vs. " + car.toString();
 		}
+
+		@Override
+		public State get_copy() {
+			CrashGameState out = new CrashGameState((CrashGame)base, truck, car);
+			return out;
+		}
 	}
 
 	public CrashGame(int rows_, int cols_) {

@@ -233,137 +233,112 @@ public class NashSolver {
 		return fictitious_play(Q, Config.fast_fictitious_play_iterations);
 	}
 
-	public static ActionDistribution[] react_to_actions(StateQ Q, ActionDistribution[] action_counts) {
-		Map<ActionSet, ActionDistribution>[] response = best_responses(Q);
-		int player_count = Q.state.player_count();
-
-		Enum[][] action_options = new Enum[player_count][];
-		for(int player = 0; player < player_count; player++) {
-			action_options[player] = Q.state.choices_for(player);
-		}
-
-		ActionDistribution[] reaction = new ActionDistribution[Q.state.player_count()];
-		Enum[] current_player_choices;
-
-		for(int player = 0; player < Q.state.player_count(); player++) {
-			reaction[player] = new ActionDistribution(action_options[player]);
-
-			current_player_choices = action_options[player];
-
-			final int player_ = player;
-			final Map<ActionSet, ActionDistribution> current_best_response = response[player];
-			final Enum[] current_player_choices_ = current_player_choices;
-			final ActionDistribution current_reaction = reaction[player];
-			Utility.forEachChoice(action_options, action -> {
-				ActionSet as = new ActionSet(action, Q.state);
-				double probability = 1;
-
-				for(int opponent = 0; opponent < Q.state.player_count(); opponent++) {
-					if(player_ == opponent) continue;
-
-					probability *= action_counts[opponent].get(as.get(opponent));
-				}
-
-				for(Enum curr : current_player_choices_) {
-					current_reaction.add(curr, probability * current_best_response.get(as).get(curr));
-				}
-			}, player);
-		}
-
-		return reaction;
-	}
-
 	/**
 	 * Runs the fictitious play algorithm for the current state. 
 	 *
 	 * @param Q The Q function for the current state.
-	 * @param action_count The number of possible actions for each player. 
+	 * @param iterations Total iteration count
 	 */
 	public static ActionDistribution[] fictitious_play(StateQ Q, int iterations) {
-
-		ActionDistribution[] action_counts = new ActionDistribution[Q.state.player_count()];
-		int player_count = Q.state.player_count();
-		Enum[][] action_options = new Enum[player_count][];
+		// Required constant values
+		final int player_count = Q.state.player_count();
+		final Enum[][] player_choices = new Enum[player_count][];
 		for(int player = 0; player < player_count; player++) {
-			action_options[player] = Q.state.choices_for(player);
-		}
-		
-		for(int player = 0; player < Q.state.player_count(); player++) {
-			action_counts[player] = new ActionDistribution(Q.state.choices_for(player));
+			player_choices[player] = Q.state.choices_for(player);
 		}
 
-		ActionDistribution[] reaction;
+		// Set up return value
+		ActionDistribution[] action_counts = new ActionDistribution[player_count];
+		for(int player = 0; player < player_count; player++) {
+			// Action distributions are uniform upon generation
+			action_counts[player] = new ActionDistribution<>(player_choices[player]);
+		}
 
-		MaxRecord max_change = null;
-		boolean converged = false;
+		// Store reactions to past actions
+		Enum[][] reactions = new Enum[player_count][];
 
-		for(int moves = 1; moves < iterations; moves++) {
+		// Keep track of largest change
+		MaxRecord max_change = new MaxRecord();
 
-			reaction = react_to_actions(Q, action_counts);
+		// Do the specified number of iterations
+		for(int iteration = 0; iteration < Config.fictitious_play_iterations; iteration++) {
+			max_change.reset();
 
-			ActionDistribution[] old_distribution = new ActionDistribution[Q.state.player_count()];
-			for(int i = 0; i < Q.state.player_count(); i++) {
-				old_distribution[i] = action_counts[i].copy();
+			// Calculate reaction for each player
+			for(int player = 0; player < player_count; player++) {
+				// Final variable for lambda expression
+				final int player_ = player;
+
+				reactions[player] = Utility.toArray(
+					// Pick the action(s) that lead to the highest expected Q
+					Utility.argmax(player_choices[player], c -> {
+						// Store expectation for Q
+						DoubleAccumulator expected_reward = new DoubleAccumulator();
+
+						// Go through all opponent actions
+						Utility.forEachChoice(player_choices, choice -> {
+							// Set choice for current player and create action set
+							choice[player_] = (Enum) c;
+							ActionSet action_set = new ActionSet(choice, Q.state);
+
+							// Determine probability of current action set
+							double probability = 1;
+							for(int opponent = 0; opponent < player_count; opponent++) {
+								if(player_ == opponent) continue;
+								probability *= action_counts[opponent].get(choice[opponent]);
+							}
+
+							// Weighted sum for expectation
+							expected_reward.add(probability * Q.get(action_set, player_));
+						}, player_);
+
+						// Return expectation
+						return expected_reward.get();
+					}), 
+					player_choices[player][0].getDeclaringClass()
+				);
 			}
 
-			max_change = new MaxRecord();
-			final ActionDistribution[] reaction_ = reaction;
-			ActionDistribution[] action_counts_ = action_counts;
-			Utility.forEachChoice(action_options, action -> {
-				for(int player = 0; player < Q.state.player_count(); player++) {
-					action_counts_[player].add(action[player], reaction_[player].get(action[player]));
+			// Add reaction to distribution
+			for(int player = 0; player < player_count; player++) {
+				for(Enum action : reactions[player]) {
+					max_change.record(
+						Math.abs(action_counts[player].get(action) - 1.0 / reactions[player].length)
+					);
 				}
-			});
-
-			for(int player = 0; player < Q.state.player_count(); player++) {
-				for(Enum action : Q.state.choices_for(player)) {
-					max_change.record(Math.abs(
-						old_distribution[player].get(action) - action_counts[player].get(action)
-					));
+				for(Enum action : reactions[player]) {
+					action_counts[player].add(action, 1.0 / reactions[player].length);
 				}
 			}
 
 			if(max_change.get() == 0) {
-				fictitious_play_convergence.success();
-				fictitious_play_panic_rate.fail();
-				converged = true;
 				break;
 			}
 		}
 
-		fictitious_play_panic_rate.success();
-		if(!converged && Config.fictitious_play_panic) {
-			for(int panic = 0; panic < Config.fictitious_play_panic_iterations; panic++) {
-				ActionDistribution[] old_distribution = action_counts;
-
-				action_counts = react_to_actions(Q, action_counts);
-
-				max_change = new MaxRecord();
-				for(int player = 0; player < Q.state.player_count(); player++) {
-					for(Enum action : Q.state.choices_for(player)) {
-						max_change.record(Math.abs(
-							old_distribution[player].get(action) - action_counts[player].get(action)
-						));
-					}
-				}
-
-				if(max_change.get() == 0) {
-					fictitious_play_convergence.success();
-					fictitious_play_panic_convergence.success();
-					converged = true;
-					break;
-				}
+		// Logging
+		StringBuilder log = new StringBuilder();
+		log.append("Last reactions\n");
+		for(int player = 0; player < player_count; player++) {
+			log.append("Player ").append(player).append(": ");
+			for(Enum e : reactions[player]) {
+				log.append(e).append(" ");
 			}
-			fictitious_play_panic_convergence.fail();
+			log.append("\n");
 		}
-
-		if(!converged) {
+		log.append("Output\n");
+		for(int player = 0; player < player_count; player++) {
+			log.append(action_counts[player]).append("\n");
+		}
+		if(max_change.get() == 0) {
+			fictitious_play_convergence.success();
+			log.append("Convergence successful\n");
+		} else {
 			fictitious_play_convergence.fail();
+			Log.log(fictitious_play_name, log.toString());
 		}
 
-		Log.log(fictitious_play_name, "");
-		Log.log(fictitious_play_name, action_counts[0].toString());
-		Log.log(fictitious_play_name, action_counts[1].toString());
+		// Return value
 		return action_counts;
 	}
 

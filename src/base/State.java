@@ -17,6 +17,11 @@ public class State {
 		base = game;
 	}
 
+	public State get_copy() {
+		State out = new State(state_code, base);
+		return out;
+	}
+
 	public Enum[] choices_for(int player) {
 		return base.get_possible_actions(player);
 	}

@@ -30,7 +30,7 @@ public abstract class Game {
 	}
 
 	public State get_state() {
-		return state;
+		return state.get_copy();
 	}
 
 	public abstract Game get_copy(State state);

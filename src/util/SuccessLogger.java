@@ -5,12 +5,20 @@ public class SuccessLogger extends Log {
 	public SuccessLogger(String t, String n) {
 		super(t, n);
 	}
+	public void reset() {
+		trials = 0;
+		successes = 0;
+	}
 	public void success() {
 		trials++;
 		successes++;
 	}
 	public void fail() {
 		trials++;
+	}
+	public double get() {
+		if(trials == 0) return 0;
+		return (double) successes / trials;
 	}
 	@Override
 	public String toString() {

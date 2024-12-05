@@ -9,7 +9,19 @@ import environment.*;
 
 public class StateQ {
 
-	private Map<ActionSet, double[]> Q;
+	private static class Information {
+		double[] Q = null;
+		StateQ next = null;
+		double[] rewards = null;
+		int players;
+
+		Information(int player_count) {
+			players = player_count;
+			Q = new double[players];
+		}
+	}
+
+	private Map<ActionSet, Information> Q;
 
 	public final State state;
 
@@ -22,7 +34,7 @@ public class StateQ {
 	public StateQ(State s) {
 		value = null;
 		fast_value = true;
-		state = s;
+		state = s.get_copy();
 
 		player_count = state.player_count();
 		choices = new Enum[player_count][];
@@ -32,13 +44,13 @@ public class StateQ {
 
 		Q = new HashMap<>();
 		Utility.forEachChoice(choices, pick -> {
-			Q.put(new ActionSet(pick, state), Utility.createDoubleArray(player_count, 1));
+			Q.put(new ActionSet(pick, state), new Information(player_count));
 		});
 	}
 
 	public double[] get(ActionSet actions) {
 		if(Q.keySet().contains(actions)) {
-			return Q.get(actions);
+			return Q.get(actions).Q;
 		} else {
 			StringBuilder sb = new StringBuilder();
 
@@ -64,8 +76,20 @@ public class StateQ {
 		return get(actions)[player];
 	}
 
+	public void update(ActionSet actions, double[] rewards, StateQ next) {
+		Information info = Q.get(actions);
+
+		info.rewards = Utility.copyDoubleArr(rewards);
+		info.next = next;
+		update(actions);
+	}
+
+	public void update(ActionSet actions) {
+
+	}
+
 	public void set(double val, ActionSet actions, int player) {
-		double[] vector = Q.get(actions);
+		double[] vector = Q.get(actions).Q;
 		if(vector[player] != val) {
 			vector[player] = val;
 			fast_value = true;

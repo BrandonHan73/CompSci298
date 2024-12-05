@@ -25,7 +25,7 @@ public class ActionSet {
 
 		player_count = choices.length;
 		actions = poll;
-		state = st;
+		state = st.get_copy();
 	}
 
 	public ActionSet(ActionSet o) {
