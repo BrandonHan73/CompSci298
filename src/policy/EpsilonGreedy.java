@@ -39,7 +39,7 @@ public abstract class EpsilonGreedy extends Policy {
 				reward[player] = Utility.logistic(reward[player]) * (1 - Config.Beta);
 			}
 
-			State next = game.get_state();
+			State next = game.get_state().get_copy();
 
 			step(curr, action, next, reward, prob);
 		}

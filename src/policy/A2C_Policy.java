@@ -26,6 +26,11 @@ public class A2C_Policy extends EpsilonGreedy {
 		}
 	}
 
+	@Override
+	public void train() {
+		train(Config.A2C_iterations);
+	}
+
 	public void step(State curr, ActionSet action, State next, double[] reward, double[] prob) {
 		int player_count = base_game.player_count();
 		Log.log(A2C_log_name, curr.toString() + " to " + next.toString() + " using " + action.toString());
@@ -45,10 +50,12 @@ public class A2C_Policy extends EpsilonGreedy {
 			advantage[player] = critic_target[player] - curr_value[player];
 		}
 		Log.log(A2C_log_name, "Advantage: " + advantage[0] + " " + advantage[1]);
+		Log.log(A2C_log_name, "Current value: " + curr_value[0] + " " + curr_value[1]);
+		Log.log(A2C_log_name, "   Next value: " + next_value[0] + " " + next_value[1]);
 
 		double[] critic_loss_gradient = new double[player_count];
 		for(int player = 0; player < player_count; player++) {
-			critic_loss_gradient[player] = critic_target[player] - curr_value[player];
+			critic_loss_gradient[player] = curr_value[player] - critic_target[player];
 		}
 		Log.log(A2C_log_name, "Critic gradient: " + critic_loss_gradient[0] + " " + critic_loss_gradient[1]);
 		value_network.backpropogate(curr_param, critic_loss_gradient);

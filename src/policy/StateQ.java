@@ -76,17 +76,37 @@ public class StateQ {
 		return get(actions)[player];
 	}
 
-	public void update(ActionSet actions, double[] rewards, StateQ next) {
+	public double update(ActionSet actions, double[] rewards, StateQ next) {
 		Information info = Q.get(actions);
 
 		info.rewards = Utility.copyDoubleArr(rewards);
 		info.next = next;
-		update(actions);
+		return update(actions);
 	}
 
-	public void update(ActionSet actions) {
+	public double update(ActionSet actions) {
+		Information info = Q.get(actions);
+		MaxRecord max_change = new MaxRecord();
 
+		double[] value = info.next.value(true);
+		for(int player = 0; player < info.players; player++) {
+			double old_Q = info.Q[player];
+			double new_Q = info.rewards[player] + Config.Beta * value[player];
+
+			if(old_Q == new_Q) {
+				discrete_Q_train_convergence.success();
+			} else {
+				discrete_Q_train_convergence.fail();
+			}
+			max_change.record(Math.abs(new_Q - old_Q));
+
+			set(new_Q, actions, player);
+		}
+
+		return max_change.get();
 	}
+	private static final String discrete_Q_train_name = "Q_training";
+	private static SuccessLogger discrete_Q_train_convergence = new SuccessLogger(discrete_Q_train_name, "Convergence rate");
 
 	public void set(double val, ActionSet actions, int player) {
 		double[] vector = Q.get(actions).Q;

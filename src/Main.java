@@ -7,9 +7,8 @@ import policy.*;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		SoftMax sm = new SoftMax(5, 7, 3, 2);
-		CrashGameTest.base();
-		//test_games(args);
+		// CrashGameTest.base();
+		test_games(args);
 	}
 
 	public static void test_games(String[] args) {
@@ -78,6 +77,11 @@ public class Main {
 		Utility.println("Using discrete policy");
 
 		Main.test(game, new CrashGamePolicy(game), games, cycles);
+
+		Utility.println();
+		Utility.println("Using A2C");
+
+		Main.test(game, new A2C_Policy(game), games, cycles);
 
 	}
 

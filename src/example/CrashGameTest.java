@@ -41,7 +41,7 @@ public class CrashGameTest {
 		CrashGame game = new CrashGame(5, 7);
 		// CrashGame game = new CrashGame(reward1);
 		// DiscreteGamePolicy pol = new CrashGamePolicy(game);
-		Policy pol = new CrashGamePolicy(game);
+		Policy pol = new A2C_Policy(game);
 
 		pol.train();
 

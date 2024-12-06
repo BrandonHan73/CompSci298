@@ -32,6 +32,17 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 		for(State s : get_possible_states()) {
 			Q.put(s, new StateQ(s));
 		}
+
+		for(State curr : possible_states) {
+			Utility.forEachChoice(action_choices, choice -> {
+				Game sim = get_base_copy(curr.get_copy());
+				ActionSet action = new ActionSet(choice, curr.get_copy());
+				double[] rewards = sim.update(action);
+				State next = sim.get_state().get_copy();
+
+				Q.get(curr).update(action, rewards, Q.get(next));
+			});
+		}
 	}
 
 	public abstract void load_possible_states();
@@ -51,66 +62,28 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 
 	@Override
 	public void train_step() {
-		discrete_Q_decreased_value.reset();
-		Map<State, StateQ> Q_update = new HashMap<>();
+		int[] indices = new int[possible_states.length];
+		for(int i = 0; i < indices.length; i++) {
+			indices[i] = i;
+		}
+		for(int i = indices.length - 1; i > 0; i--) {
+			int swap = (int) (i * Math.random());
+			int temp = indices[swap];
+			indices[swap] = indices[i];
+			indices[i] = temp;
+		}
 
 		MaxRecord max_change = new MaxRecord();
-
-		for(State state_ : get_possible_states()) {
-			State state = state_.get_copy();
-
-			StateQ state_update = new StateQ(state);
-			MaxRecord record_change = new MaxRecord();
-
-			Utility.forEachChoice(action_choices, action -> {
-				ActionSet as = new ActionSet(action, state);
-
-				Game sim = get_base_copy(state);
-				double[] rewards = sim.update(as);
-
-				State new_state = sim.get_state();
-				double[] state_value = get_Q(new_state).value(true);
-
-				for(int player = 0; player < state.player_count(); player++) {
-					double old_Q_value = get_Q(state).get(as, player);
-					double new_Q_value = rewards[player] + Config.Beta * state_value[player];
-					double diff = new_Q_value - old_Q_value;
-
-					record_change.record(Math.abs(diff));
-					Log.log(discrete_Q_train_name, new_Q_value + " - " + old_Q_value + " = " + Math.abs(diff));
-					if(diff < 0) {
-						discrete_Q_train_convergence.fail();
-						discrete_Q_decreased_value.success();
-					} else if(diff == 0) {
-						discrete_Q_train_convergence.success();
-					} else if (diff > 0) {
-						discrete_Q_train_convergence.fail();
-						discrete_Q_decreased_value.fail();
-					}
-
-					state_update.set(new_Q_value, as, player);
-				}
-
+		for(int index : indices) {
+			State state = possible_states[index];
+			StateQ state_Q = Q.get(state);
+			Utility.forEachChoice(action_choices, choice -> {
+				ActionSet actions = new ActionSet(choice, state);
+				max_change.record(state_Q.update(actions));
 			});
-
-			max_change.record(record_change);
-
-			Q_update.put(state, state_update);
 		}
-
-		Log.log(discrete_Q_train_name, "Q update " + max_change.toString());
-		if(discrete_Q_decreased_value.get() >= 0.5) {
-			discrete_Q_mostly_decrease.success();
-		} else {
-			discrete_Q_mostly_decrease.fail();
-		}
-
-		Q = Q_update;
+		Log.log("Q_training", "Changed by " + max_change.get());
 	}
-	private static final String discrete_Q_train_name = "Q_training";
-	private static SuccessLogger discrete_Q_train_convergence = new SuccessLogger(discrete_Q_train_name, "Convergence rate");
-	private static SuccessLogger discrete_Q_decreased_value = new SuccessLogger(discrete_Q_train_name, "Decrease");
-	private static SuccessLogger discrete_Q_mostly_decrease = new SuccessLogger(discrete_Q_train_name, "Overall decreased");
 
 }
 

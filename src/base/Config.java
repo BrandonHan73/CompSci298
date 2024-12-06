@@ -2,15 +2,16 @@ package base;
 
 public class Config {
 
-	public static int fictitious_play_iterations = 1 << 12;
-	public static int fast_fictitious_play_iterations = 1 << 12;
+	public static int fictitious_play_iterations = 1 << 10;
+	public static int fast_fictitious_play_iterations = 1 << 8;
 
 	public static int action_distribution_max_count = 1 << 5;
 
 	public static boolean fictitious_play_panic = false;
 	public static int fictitious_play_panic_iterations = 16;
 
-	public static int Q_iterations = 1 << 6;
+	public static int Q_iterations = 1 << 7;
+	public static int A2C_iterations = 1 << 18;
 
 	public static int DQN_iterations = 2048;
 	public static int DQN_simulation_time = 64;
