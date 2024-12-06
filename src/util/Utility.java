@@ -8,7 +8,18 @@ import java.util.function.ToDoubleFunction;
 public class Utility {
 
 	public static double logistic(double x) {
-		return 1 / (1 + Math.exp(-x));
+		double exp = Math.exp(-x);
+
+		if(Double.isNaN(exp)) {
+			return 0;
+		}
+
+		double out = 1 / (1 + exp);
+		if(0 <= out && out <= 1) {
+			return out;
+		}
+
+		throw new RuntimeException("Logistic function produced inaccurate result");
 	}
 
 	public static void clearln() {

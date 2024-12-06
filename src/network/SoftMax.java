@@ -25,18 +25,39 @@ public class SoftMax extends LogisticRegression {
 		Matrix out = in.times(weights).plus(biases);
 
 		double sum = 0;
+		int nan_produced = 0;
+		int[] nan_coordinates = null;
 
 		for(int row = 0; row < out.getRowDimension(); row++) {
 			for(int col = 0; col < out.getColumnDimension(); col++) {
 				double curr = Math.exp(out.get(row, col));
+
+				if(Double.isNaN(curr)) {
+					nan_produced++;
+					nan_coordinates = new int[] {row, col};
+				}
+
 				sum += curr;
+				if(sum < 0) {
+					throw new RuntimeException("Overflow occurred in softmax layer");
+				}
 				out.set(row, col, curr);
 			}
 		}
 
+		if(nan_produced > 1) {
+			throw new RuntimeException("Softmax produced " + nan_produced + " NaN values");
+		}
+
 		for(int row = 0; row < out.getRowDimension(); row++) {
 			for(int col = 0; col < out.getColumnDimension(); col++) {
-				out.set(row, col, out.get(row, col) / sum);
+				out.set(
+					row, col, 
+
+					nan_produced == 0 ? 
+					(out.get(row, col) / sum) :
+					( (row == nan_coordinates[0] && col == nan_coordinates[1]) ? 1 : 0 )
+				);
 			}
 		}
 

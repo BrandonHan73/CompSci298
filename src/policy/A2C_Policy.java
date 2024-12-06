@@ -18,11 +18,11 @@ public class A2C_Policy extends EpsilonGreedy {
 		int player_count = game.player_count();
 		int param_count = game.get_state().parameter_count();
 
-		value_network = new LogisticRegression(param_count, 5, 3, player_count);
+		value_network = new LogisticRegression(param_count, 20, 5, player_count);
 
 		policy_network = new SoftMax[player_count];
 		for(int player = 0; player < player_count; player++) {
-			policy_network[player] = new SoftMax(param_count, 5, 3, game.get_possible_actions(player).length);
+			policy_network[player] = new SoftMax(param_count, 10, 3, game.get_possible_actions(player).length);
 		}
 	}
 
@@ -32,13 +32,20 @@ public class A2C_Policy extends EpsilonGreedy {
 	}
 
 	public void step(State curr, ActionSet action, State next, double[] reward, double[] prob) {
+		for(double p : prob) {
+			if(p == 0) {
+				throw new RuntimeException("Action with zero probability provided");
+			}
+		}
 		int player_count = base_game.player_count();
-		Log.log(A2C_log_name, curr.toString() + " to " + next.toString() + " using " + action.toString());
-		Log.log(A2C_log_name, "Rewards: " + reward[0] + " " + reward[1]);
-		Log.log(A2C_log_name, "Action probabilities: "+ prob[0] + " " + prob[1]);
-
 		double[] curr_param = curr.to_double_array();
 		double[] next_param = next.to_double_array();
+
+		Log.log(A2C_log_name, curr_param[0] + " " + curr_param[1] + " " + curr_param[2] + " " + curr_param[3]);
+		Log.log(A2C_log_name, next_param[0] + " " + next_param[1] + " " + next_param[2] + " " + next_param[3]);
+		Log.log(A2C_log_name, action.get(0) + " " + action.get(1));
+		Log.log(A2C_log_name, "Rewards: " + reward[0] + " " + reward[1]);
+		Log.log(A2C_log_name, "Action probabilities: "+ (int) (100 * prob[0]) + "% " + (int) (100 * prob[1]) + "%");
 
 		double[] curr_value = value_network.pass(curr_param);
 		double[] next_value = value_network.pass(next_param);

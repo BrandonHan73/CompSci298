@@ -11,10 +11,11 @@ public class Config {
 	public static int fictitious_play_panic_iterations = 16;
 
 	public static int Q_iterations = 1 << 7;
-	public static int A2C_iterations = 1 << 18;
+
+	public static int A2C_iterations = 1 << 25;
 
 	public static int DQN_iterations = 2048;
-	public static int DQN_simulation_time = 64;
+	public static int DQN_simulation_time = 1 << 10;
 	// Probability of taking a random action for epsilon-greedy
 	public static double epsilon = 0.01;
 
@@ -32,6 +33,8 @@ public class Config {
 
 	// Fictitious play base ratio
 	public static double gamma = 0.5;
+
+	public static double probability_distribution_tolerance = 0.00000001;
 
 	public static boolean debug = true;
 

@@ -18,25 +18,18 @@ public abstract class EpsilonGreedy extends Policy {
 			State curr = game.get_state().get_copy();
 
 			ActionDistribution[] choices = evaluate(curr);
+			for(int player = 0; player < game.player_count(); player++) {
+				choices[player].set_epsilon(Config.epsilon);
+			}
+
 			ActionSet action = new ActionSet(choices, curr);
 			double[] prob = new double[game.player_count()];
 
-			for(int player = 0; player < game.player_count(); player++) {
-				Enum[] possible_actions = game.get_possible_actions(player);
-				if(Math.random() < Config.epsilon) {
-					ActionDistribution greedy = new ActionDistribution(possible_actions);
-					action.set(player, greedy.poll());
-				}
-				prob[player] = 
-					(1 - Config.epsilon) * choices[player].get(action.get(player)) + 
-					(Config.epsilon / possible_actions.length)
-				;
-			}
-
 			double[] reward = game.update(action);
-			// Clamping reward
+			// Clamping reward and setting probability
 			for(int player = 0; player < game.player_count(); player++) {
 				reward[player] = Utility.logistic(reward[player]) * (1 - Config.Beta);
+				prob[player] = choices[player].get(action.get(player));
 			}
 
 			State next = game.get_state().get_copy();

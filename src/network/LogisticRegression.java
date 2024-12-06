@@ -3,6 +3,7 @@ package network;
 import Jama.Matrix;
 
 import base.Config;
+import util.Utility;
 
 public class LogisticRegression {
 
@@ -32,9 +33,9 @@ public class LogisticRegression {
 			biases[i] = new Matrix(1, to, -1);
 
 			for(int t = 0; t < to; t++) {
-				biases[i].set(0, t, 2 * Math.random() - 1);
+				biases[i].set(0, t, 0);
 				for(int f = 0; f < from; f++) {
-					weights[i].set(f, t, 2 * Math.random() - 1);
+					weights[i].set(f, t, 0);
 				}
 			}
 		}
@@ -64,7 +65,7 @@ public class LogisticRegression {
 
 		for(int row = 0; row < out.getRowDimension(); row++) {
 			for(int col = 0; col < out.getColumnDimension(); col++) {
-				out.set(row, col, logistic(out.get(row, col)));
+				out.set(row, col, Utility.logistic(out.get(row, col)));
 			}
 		}
 
@@ -119,10 +120,6 @@ public class LogisticRegression {
 		biases.minusEquals(dCdz.times(alpha));
 
 		return dCdx;
-	}
-
-	public static double logistic(double x) {
-		return 1 / (1 + Math.exp(-x));
 	}
 
 }

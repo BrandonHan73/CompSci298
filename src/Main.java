@@ -7,8 +7,8 @@ import policy.*;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		// CrashGameTest.base();
-		test_games(args);
+		CrashGameTest.base();
+		// test_games(args);
 	}
 
 	public static void test_games(String[] args) {
@@ -74,14 +74,14 @@ public class Main {
 		Main.test(game, new RandomPolicy(game), games, cycles);
 
 		Utility.println();
-		Utility.println("Using discrete policy");
-
-		Main.test(game, new CrashGamePolicy(game), games, cycles);
-
-		Utility.println();
 		Utility.println("Using A2C");
 
 		Main.test(game, new A2C_Policy(game), games, cycles);
+
+		Utility.println();
+		Utility.println("Using discrete policy");
+
+		Main.test(game, new CrashGamePolicy(game), games, cycles);
 
 	}
 

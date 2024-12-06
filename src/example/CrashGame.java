@@ -64,6 +64,13 @@ public class CrashGame extends Game {
 			CrashGameState out = new CrashGameState((CrashGame)base, truck, car);
 			return out;
 		}
+
+		public double[] to_double_array() {
+			return new double[] { truck.row, truck.col, car.row, car.col };
+		}
+		public int parameter_count() {
+			return 4;
+		}
 	}
 
 	public CrashGame(int rows_, int cols_) {
@@ -194,9 +201,6 @@ public class CrashGame extends Game {
 			rewards[0] += truck_crash_reward;
 			rewards[1] -= car_crash_cost;
 		}
-
-		rewards[0] = Utility.logistic(rewards[0]);
-		rewards[1] = Utility.logistic(rewards[1]);
 
 		return rewards;
 	}
