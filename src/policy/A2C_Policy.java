@@ -18,11 +18,11 @@ public class A2C_Policy extends EpsilonGreedy {
 		int player_count = game.player_count();
 		int param_count = game.get_state().parameter_count();
 
-		value_network = new LogisticRegression(param_count, 20, 5, player_count);
+		value_network = new LogisticRegression(param_count, 50, 1, player_count);
 
 		policy_network = new SoftMax[player_count];
 		for(int player = 0; player < player_count; player++) {
-			policy_network[player] = new SoftMax(param_count, 10, 3, game.get_possible_actions(player).length);
+			policy_network[player] = new SoftMax(param_count, 25, 1, game.get_possible_actions(player).length);
 		}
 	}
 
@@ -57,6 +57,7 @@ public class A2C_Policy extends EpsilonGreedy {
 			advantage[player] = critic_target[player] - curr_value[player];
 		}
 		Log.log(A2C_log_name, "Advantage: " + advantage[0] + " " + advantage[1]);
+		Log.log(A2C_log_name, "   Target: " + critic_target[0] + " " + critic_target[1]);
 		Log.log(A2C_log_name, "Current value: " + curr_value[0] + " " + curr_value[1]);
 		Log.log(A2C_log_name, "   Next value: " + next_value[0] + " " + next_value[1]);
 
@@ -71,6 +72,7 @@ public class A2C_Policy extends EpsilonGreedy {
 			Enum[] choices = base_game.get_possible_actions(player);
 			double[] gradient = new double[choices.length];
 			gradient[ action.get(player).ordinal() ] = -advantage[player] / prob[player];
+			Log.log(A2C_log_name, "Player " + player + " actor gradient: " + gradient[0] + " " + gradient[1] + " " + gradient[2] + " " + gradient[3]);
 			policy_network[player].backpropogate(curr_param, gradient);
 		}
 

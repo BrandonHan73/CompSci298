@@ -61,9 +61,10 @@ public class ActionDistribution <E extends Enum<E>> {
 
 			while(count > Config.action_distribution_max_count) {
 				double remove = added_values.poll();
+				int index = added_actions.poll().ordinal();
 
-				distribution[ added_actions.poll().ordinal() ] -= remove;
-				count -= remove;
+				distribution[index] = Math.max(0, distribution[index] - remove);
+				count = Math.max(0, count - remove);
 			}
 		} else {
 			throw new RuntimeException("Invalid number provided (" + val + ")");
@@ -121,7 +122,7 @@ public class ActionDistribution <E extends Enum<E>> {
 		StringBuilder sb = new StringBuilder();
 
 		for(E action : options) {
-			sb.append(String.format("(" + action + ")%.4f ", get(action)));
+			sb.append(String.format("(" + action + ")%d ", (int) (100 * get(action))));
 		}
 
 		return sb.toString();

@@ -10,11 +10,11 @@ import environment.*;
 public class CrashGameTest {
 
 	public static final double[][] reward1 = new double[][] {
-			{ 0, 0, 1, 0, 1, 0, 0 },
-			{ 0, 1, 2, 1, 2, 1, 0 },
-			{ 0, 2, 4, 3, 2, 2, 1 },
-			{ 0, 1, 2, 1, 2, 1, 0 },
-			{ 0, 0, 1, 0, 1, 0, 0 }
+			{ -5, -5, 0, -5, 0, -5, -5 },
+			{ -5, 0, 1, 0, 1, 0, -5 },
+			{ -5, 1, 4, 3, 1, 1, 0 },
+			{ -5, 0, 1, 0, 1, 0, -5 },
+			{ -5, -5, 0, -5, 0, -5, -5 }
 	};
 
 	public static void symmetric_base() throws InterruptedException {
@@ -38,8 +38,8 @@ public class CrashGameTest {
 	}
 
 	public static void base() throws InterruptedException {
-		CrashGame game = new CrashGame(5, 7);
-		// CrashGame game = new CrashGame(reward1);
+		// CrashGame game = new CrashGame(5, 7);
+		CrashGame game = new CrashGame(reward1);
 		// DiscreteGamePolicy pol = new CrashGamePolicy(game);
 		Policy pol = new A2C_Policy(game);
 

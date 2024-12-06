@@ -12,14 +12,12 @@ public class Config {
 
 	public static int Q_iterations = 1 << 7;
 
-	public static int A2C_iterations = 1 << 25;
+	public static int A2C_iterations = 1 << 5;
 
 	public static int DQN_iterations = 2048;
-	public static int DQN_simulation_time = 1 << 10;
+	public static int DQN_simulation_time = 1 << 15;
 	// Probability of taking a random action for epsilon-greedy
 	public static double epsilon = 0.01;
-
-	public static final int placeholder_action = -1;
 
 	public static boolean use_pure_nash_optimization = false;
 	public static boolean pick_one_pure_nash = false;
@@ -29,10 +27,7 @@ public class Config {
 	public static double alpha = 0.4;
 
 	// Discount for Q learning
-	public static double Beta = 0.9;
-
-	// Fictitious play base ratio
-	public static double gamma = 0.5;
+	public static double Beta = 0.4;
 
 	public static double probability_distribution_tolerance = 0.00000001;
 

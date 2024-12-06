@@ -99,7 +99,7 @@ public class LogisticRegression {
 		backpropogate(out, dCdy);
 	}
 
-	private void backpropogate(Matrix[] out, Matrix dCdy) {
+	protected void backpropogate(Matrix[] out, Matrix dCdy) {
 		double rate = Config.alpha / (Math.log(training++) + 1);
 
 		for(int i = hidden_layers; i >= 0; i--) {

@@ -1,5 +1,7 @@
 package network;
 
+import base.Config;
+
 import Jama.Matrix;
 
 public class SoftMax extends LogisticRegression {
@@ -21,14 +23,52 @@ public class SoftMax extends LogisticRegression {
 		return out;
 	}
 
+	public static Matrix softmax_backpropogate(Matrix weights, Matrix biases, Matrix in, Matrix out, Matrix dCdy, double alpha) {
+		int outputs = weights.getColumnDimension();
+
+		Matrix expected_deriv_mat = dCdy.times(out.transpose());
+		if(expected_deriv_mat.getRowDimension() != 1 || expected_deriv_mat.getColumnDimension() != 1) {
+			throw new RuntimeException("Did not perform dot product correctly");
+		}
+		double expected_deriv = expected_deriv_mat.get(0, 0);
+		expected_deriv_mat = new Matrix(
+			dCdy.getRowDimension(),
+			dCdy.getColumnDimension(),
+			expected_deriv
+		);
+		Matrix dCdz = out.arrayTimes(dCdy.minus(expected_deriv_mat));
+		Matrix dCdw = in.transpose().times(dCdz);
+
+		Matrix dCdx = dCdz.times(weights.transpose());
+
+		weights.minusEquals(dCdw.times(alpha));
+		biases.minusEquals(dCdz.times(alpha));
+
+		return dCdx;
+	}
+
+	@Override
+	protected void backpropogate(Matrix[] out, Matrix dCdy) {
+		double rate = Config.alpha / (Math.log(training++) + 1);
+
+		dCdy = softmax_backpropogate(weights[hidden_layers], biases[hidden_layers], out[hidden_layers], out[hidden_layers + 1], dCdy, rate);
+		for(int i = hidden_layers - 1; i >= 0; i--) {
+			dCdy = backpropogate(weights[i], biases[i], out[i], out[i + 1], dCdy, rate);
+		}
+	}
+
 	public static Matrix softmax_pass(Matrix weights, Matrix biases, Matrix in) {
 		Matrix out = in.times(weights).plus(biases);
 
-		double sum = 0;
-		int nan_produced = 0;
-		int[] nan_coordinates = null;
+		if(out.getRowDimension() != 1) {
+			throw new RuntimeException("Expected matrix multiplication output to have one row");
+		}
 
 		for(int row = 0; row < out.getRowDimension(); row++) {
+			double sum = 0;
+			int nan_produced = 0;
+			int[] nan_coordinates = null;
+
 			for(int col = 0; col < out.getColumnDimension(); col++) {
 				double curr = Math.exp(out.get(row, col));
 
@@ -43,13 +83,11 @@ public class SoftMax extends LogisticRegression {
 				}
 				out.set(row, col, curr);
 			}
-		}
 
-		if(nan_produced > 1) {
-			throw new RuntimeException("Softmax produced " + nan_produced + " NaN values");
-		}
+			if(nan_produced > 1) {
+				throw new RuntimeException("Softmax produced " + nan_produced + " NaN values");
+			}
 
-		for(int row = 0; row < out.getRowDimension(); row++) {
 			for(int col = 0; col < out.getColumnDimension(); col++) {
 				out.set(
 					row, col, 
