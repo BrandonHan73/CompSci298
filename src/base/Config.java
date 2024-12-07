@@ -12,10 +12,10 @@ public class Config {
 
 	public static int Q_iterations = 1 << 7;
 
-	public static int A2C_iterations = 1 << 5;
+	public static int A2C_iterations = 1 << 6;
 
 	public static int DQN_iterations = 2048;
-	public static int DQN_simulation_time = 1 << 15;
+	public static int DQN_simulation_time = 1 << 18;
 	// Probability of taking a random action for epsilon-greedy
 	public static double epsilon = 0.01;
 

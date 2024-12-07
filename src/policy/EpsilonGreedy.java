@@ -23,22 +23,14 @@ public abstract class EpsilonGreedy extends Policy {
 			}
 
 			ActionSet action = new ActionSet(choices, curr);
-			double[] prob = new double[game.player_count()];
-
 			double[] reward = game.update(action);
-			// Clamping reward and setting probability
-			for(int player = 0; player < game.player_count(); player++) {
-				reward[player] = Utility.logistic(reward[player]) * (1 - Config.Beta);
-				prob[player] = choices[player].get(action.get(player));
-			}
-
 			State next = game.get_state().get_copy();
 
-			step(curr, action, next, reward, prob);
+			step(curr, action, next, reward, choices);
 		}
 	}
 
-	public abstract void step(State curr, ActionSet action, State next, double[] reward, double[] prob);
+	public abstract void step(State curr, ActionSet action, State next, double[] reward, ActionDistribution[] prob);
 
 }
 

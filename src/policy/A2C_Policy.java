@@ -5,6 +5,7 @@ import environment.*;
 import base.*;
 import util.*;
 import network.LogisticRegression;
+import network.LogRegFullRange;
 import network.SoftMax;
 
 public class A2C_Policy extends EpsilonGreedy {
@@ -18,11 +19,11 @@ public class A2C_Policy extends EpsilonGreedy {
 		int player_count = game.player_count();
 		int param_count = game.get_state().parameter_count();
 
-		value_network = new LogisticRegression(param_count, 50, 1, player_count);
+		value_network = new LogRegFullRange(param_count, 50, 2, player_count);
 
 		policy_network = new SoftMax[player_count];
 		for(int player = 0; player < player_count; player++) {
-			policy_network[player] = new SoftMax(param_count, 25, 1, game.get_possible_actions(player).length);
+			policy_network[player] = new SoftMax(param_count, 15, 2, game.get_possible_actions(player).length);
 		}
 	}
 
@@ -31,13 +32,19 @@ public class A2C_Policy extends EpsilonGreedy {
 		train(Config.A2C_iterations);
 	}
 
-	public void step(State curr, ActionSet action, State next, double[] reward, double[] prob) {
+	public void step(State curr, ActionSet action, State next, double[] reward, ActionDistribution[] probabilities) {
+		int player_count = base_game.player_count();
+
+		double[] prob = new double[player_count];
+		for(int player = 0; player < player_count; player++) {
+			prob[player] = probabilities[player].get(action.get(player));
+		}
 		for(double p : prob) {
 			if(p == 0) {
 				throw new RuntimeException("Action with zero probability provided");
 			}
 		}
-		int player_count = base_game.player_count();
+
 		double[] curr_param = curr.to_double_array();
 		double[] next_param = next.to_double_array();
 
@@ -70,8 +77,13 @@ public class A2C_Policy extends EpsilonGreedy {
 
 		for(int player = 0; player < player_count; player++) {
 			Enum[] choices = base_game.get_possible_actions(player);
+
 			double[] gradient = new double[choices.length];
-			gradient[ action.get(player).ordinal() ] = -advantage[player] / prob[player];
+			for(Enum a : curr.choices_for(player)) {
+				gradient[a.ordinal()] = 1 + Math.log(probabilities[player].get(a));
+			}
+			gradient[ action.get(player).ordinal() ] -= advantage[player] / prob[player];
+
 			Log.log(A2C_log_name, "Player " + player + " actor gradient: " + gradient[0] + " " + gradient[1] + " " + gradient[2] + " " + gradient[3]);
 			policy_network[player].backpropogate(curr_param, gradient);
 		}

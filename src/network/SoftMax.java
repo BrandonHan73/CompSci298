@@ -23,19 +23,23 @@ public class SoftMax extends LogisticRegression {
 		return out;
 	}
 
+	@Override
+	protected void backpropogate(Matrix[] out, Matrix dCdy) {
+		double rate = Config.alpha / (Math.log(training++) + 1);
+
+		dCdy = softmax_backpropogate(weights[hidden_layers], biases[hidden_layers], out[hidden_layers], out[hidden_layers + 1], dCdy, rate);
+		for(int i = hidden_layers - 1; i >= 0; i--) {
+			dCdy = backpropogate(weights[i], biases[i], out[i], out[i + 1], dCdy, rate);
+		}
+	}
+
 	public static Matrix softmax_backpropogate(Matrix weights, Matrix biases, Matrix in, Matrix out, Matrix dCdy, double alpha) {
 		int outputs = weights.getColumnDimension();
 
 		Matrix expected_deriv_mat = dCdy.times(out.transpose());
-		if(expected_deriv_mat.getRowDimension() != 1 || expected_deriv_mat.getColumnDimension() != 1) {
-			throw new RuntimeException("Did not perform dot product correctly");
-		}
 		double expected_deriv = expected_deriv_mat.get(0, 0);
-		expected_deriv_mat = new Matrix(
-			dCdy.getRowDimension(),
-			dCdy.getColumnDimension(),
-			expected_deriv
-		);
+		expected_deriv_mat = new Matrix(dCdy.getRowDimension(), dCdy.getColumnDimension(), expected_deriv);
+
 		Matrix dCdz = out.arrayTimes(dCdy.minus(expected_deriv_mat));
 		Matrix dCdw = in.transpose().times(dCdz);
 
@@ -45,16 +49,6 @@ public class SoftMax extends LogisticRegression {
 		biases.minusEquals(dCdz.times(alpha));
 
 		return dCdx;
-	}
-
-	@Override
-	protected void backpropogate(Matrix[] out, Matrix dCdy) {
-		double rate = Config.alpha / (Math.log(training++) + 1);
-
-		dCdy = softmax_backpropogate(weights[hidden_layers], biases[hidden_layers], out[hidden_layers], out[hidden_layers + 1], dCdy, rate);
-		for(int i = hidden_layers - 1; i >= 0; i--) {
-			dCdy = backpropogate(weights[i], biases[i], out[i], out[i + 1], dCdy, rate);
-		}
 	}
 
 	public static Matrix softmax_pass(Matrix weights, Matrix biases, Matrix in) {
