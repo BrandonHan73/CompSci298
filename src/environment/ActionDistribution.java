@@ -89,18 +89,20 @@ public class ActionDistribution <E extends Enum<E>> {
 			out = (epsilon * even) + ( (1 - epsilon) * standard );
 		}
 
-		if(0 <= out && out <= 1) {
-			return out;
+		if(-Config.probability_distribution_tolerance <= out && out <= 1 + Config.probability_distribution_tolerance) {
+			return Math.max(0, Math.min(out, 1));
 		}
 
 		throw new RuntimeException("Action distribution provided improper probability (" + out + ", " + count + ")");
 	}
 
 	public E poll() {
-		double choice = 0;
+		double choice = 0, sum = 0;
 		for(E action : options) {
 			choice += get(action);
+			sum += distribution[action.ordinal()];
 		}
+		count = sum;
 		if(Math.abs(choice - 1.0) > Config.probability_distribution_tolerance) {
 			throw new RuntimeException("Probability distribution is not valid (" + choice + ")");
 		}

@@ -4,14 +4,12 @@ import environment.*;
 
 import base.*;
 import util.*;
-import network.LogisticRegression;
-import network.LogRegFullRange;
-import network.SoftMax;
+import network.*;
 
 public class A2C_Policy extends EpsilonGreedy {
 
-	LogisticRegression value_network;
-	SoftMax[] policy_network;
+	NeuralNetwork value_network;
+	NeuralNetwork[] policy_network;
 
 	public A2C_Policy(Game game) {
 		super(game);
@@ -19,11 +17,11 @@ public class A2C_Policy extends EpsilonGreedy {
 		int player_count = game.player_count();
 		int param_count = game.get_state().parameter_count();
 
-		value_network = new LogRegFullRange(param_count, 50, 2, player_count);
+		value_network = new FullRangeNetwork(param_count, 5, 5, 5, 5, player_count);
 
 		policy_network = new SoftMax[player_count];
 		for(int player = 0; player < player_count; player++) {
-			policy_network[player] = new SoftMax(param_count, 15, 2, game.get_possible_actions(player).length);
+			policy_network[player] = new SoftMax(param_count, 5, 5, 5, game.get_possible_actions(player).length);
 		}
 	}
 

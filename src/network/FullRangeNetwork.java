@@ -1,8 +1,8 @@
 package network;
 
-public class SoftMax extends NeuralNetwork {
+public class FullRangeNetwork extends NeuralNetwork {
 
-	public SoftMax(int... layer_sizes) {
+	public FullRangeNetwork(int... layer_sizes) {
 		super(layer_sizes);
 	}
 
@@ -10,9 +10,9 @@ public class SoftMax extends NeuralNetwork {
 		Class[] out = new Class[layer_count];
 
 		for(int i = 0; i < layer_count - 1; i++) {
-			out[i] = LogisticLayer.class;
+			out[i] = TanhLayer.class;
 		}
-		out[layer_count - 1] = SoftMaxLayer.class;
+		out[layer_count - 1] = CleanLayer.class;
 
 		return out;
 	}
