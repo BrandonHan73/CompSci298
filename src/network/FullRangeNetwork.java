@@ -10,7 +10,7 @@ public class FullRangeNetwork extends NeuralNetwork {
 		Class[] out = new Class[layer_count];
 
 		for(int i = 0; i < layer_count - 1; i++) {
-			out[i] = TanhLayer.class;
+			out[i] = SoftplusLayer.class;
 		}
 		out[layer_count - 1] = CleanLayer.class;
 
