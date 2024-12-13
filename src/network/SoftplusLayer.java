@@ -14,7 +14,7 @@ public class SoftplusLayer extends NetworkLayer {
 		double exp;
 		for(int i = 0; i < out.length; i++) {
 			exp = Math.exp(val[i]);
-			if(Double.isNaN(exp)) {
+			if(Double.isNaN(exp) || Double.isInfinite(exp)) {
 				out[i] = val[i];
 			} else {
 				out[i] = Math.log(exp + 1);
