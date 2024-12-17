@@ -8,14 +8,19 @@ import network.*;
 
 public class A2C_Policy extends EpsilonGreedy {
 
-	NeuralNetwork value_network;
-	NeuralNetwork[] policy_network;
+	private NeuralNetwork value_network;
+	private NeuralNetwork[] policy_network;
+
+	private boolean needs_pretraining;
+	AllStatesDefinedPolicy target_critic;
 
 	public A2C_Policy(Game game) {
 		super(game);
 
 		int player_count = game.player_count();
 		int param_count = game.get_state().parameter_count();
+		needs_pretraining = false;
+		target_critic = null;
 
 		value_network = new FullRangeNetwork(param_count, 5, 5, 5, 5, player_count);
 
@@ -25,8 +30,19 @@ public class A2C_Policy extends EpsilonGreedy {
 		}
 	}
 
+	public A2C_Policy(Game game, AllStatesDefinedPolicy value_target) {
+		this(game);
+		needs_pretraining = true;
+		target_critic = value_target;
+	}
+
 	@Override
 	public void train() {
+		if(needs_pretraining) {
+			PretrainCriticNetwork trainer = new PretrainCriticNetwork(base_game, target_critic);
+			trainer.train(Config.a2c_critic_pretrain_iterations);
+			value_network = trainer.get_trained();
+		}
 		train(Config.A2C_iterations);
 	}
 
@@ -71,7 +87,9 @@ public class A2C_Policy extends EpsilonGreedy {
 			critic_loss_gradient[player] = curr_value[player] - critic_target[player];
 		}
 		Log.log(A2C_log_name, "Critic gradient: " + critic_loss_gradient[0] + " " + critic_loss_gradient[1]);
-		value_network.backpropogate(curr_param, critic_loss_gradient);
+		if(!needs_pretraining) {
+			value_network.backpropogate(curr_param, critic_loss_gradient);
+		}
 
 		for(int player = 0; player < player_count; player++) {
 			Enum[] choices = base_game.get_possible_actions(player);

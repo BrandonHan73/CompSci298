@@ -59,7 +59,7 @@ public class ActionDistribution <E extends Enum<E>> {
 			added_actions.add(action);
 			added_values.add(val);
 
-			while(count > Config.action_distribution_max_count) {
+			while(Config.action_distribution_max_count > 0 && count > Config.action_distribution_max_count) {
 				double remove = added_values.poll();
 				int index = added_actions.poll().ordinal();
 

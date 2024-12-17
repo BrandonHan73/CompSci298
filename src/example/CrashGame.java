@@ -15,8 +15,10 @@ public class CrashGame extends Game {
 	private final double car_cutoff_reward = 8.0;
 	private final double truck_cutoff_cost = 7.0;
 
+	public static final double epsilon = 0.01;
+
 	public final int rows, cols;
-	private final double[][] rewards;
+	private final FinalMatrix rewards;
 
 	public static enum CrashGameAction {
 		UP, RIGHT, DOWN, LEFT
@@ -82,25 +84,38 @@ public class CrashGame extends Game {
 		rows = rows_;
 		cols = cols_;
 
-		rewards = new double[rows][cols];
+		double[][] vals = new double[rows][cols];
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
-				rewards[row][col] = Math.exp( -(Math.pow(rows / 2 - row, 2) + Math.pow(cols / 2 - col, 2)) / 2 );
+				vals[row][col] = Math.exp( -(Math.pow(rows / 2 - row, 2) + Math.pow(cols / 2 - col, 2)) / 2 );
 			}
 		}
+		rewards = new FinalMatrix(vals, epsilon);
 
 		state = new CrashGameState(this, new Position(), new Position());
 		randomize();
 	}
 
 	public CrashGame(double[][] rewards_) {
-		this(rewards_.length, rewards_[0].length);
+		super(2, CrashGameAction.values(), CrashGameAction.values());
+		rows = rewards_.length;
+		cols = rewards_[0].length;
 
-		for(int r = 0; r < rows; r++) {
-			for(int c = 0; c < cols; c++) {
-				rewards[r][c] = rewards_[r][c];
-			}
-		}
+		rewards = new FinalMatrix(rewards_);
+
+		state = new CrashGameState(this, new Position(), new Position());
+		randomize();
+	}
+
+	public CrashGame(FinalMatrix rewards_) {
+		super(2, CrashGameAction.values(), CrashGameAction.values());
+		rows = rewards_.rows;
+		cols = rewards_.cols;
+
+		rewards = rewards_;
+
+		state = new CrashGameState(this, new Position(), new Position());
+		randomize();
 	}
 
 	public CrashGame(CrashGame o) {
@@ -143,7 +158,7 @@ public class CrashGame extends Game {
 	}
 
 	public double get_reward(Position pos) {
-		return rewards[pos.row][pos.col];
+		return rewards.get(pos.row, pos.col);
 	}
 
 	@Override

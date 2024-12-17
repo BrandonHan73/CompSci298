@@ -6,9 +6,8 @@ import util.*;
 import base.*;
 import environment.*;
 
-public abstract class DiscreteGamePolicy extends Q_Policy {
+public abstract class DiscreteGamePolicy extends AllStatesDefinedPolicy {
 
-	protected State[] possible_states;
 	private Enum[][] action_choices;
 
 	private Map<State, StateQ> Q;
@@ -45,15 +44,6 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 		}
 	}
 
-	public abstract void load_possible_states();
-
-	public State[] get_possible_states() {
-		if(possible_states == null) {
-			load_possible_states();
-		}
-		return possible_states;
-	}
-
 	@Override
 	public StateQ get_Q(State state) {
 		if(state == null) throw new RuntimeException("State must not be null");
@@ -61,28 +51,14 @@ public abstract class DiscreteGamePolicy extends Q_Policy {
 	}
 
 	@Override
-	public void train_step() {
-		int[] indices = new int[possible_states.length];
-		for(int i = 0; i < indices.length; i++) {
-			indices[i] = i;
-		}
-		for(int i = indices.length - 1; i > 0; i--) {
-			int swap = (int) (i * Math.random());
-			int temp = indices[swap];
-			indices[swap] = indices[i];
-			indices[i] = temp;
-		}
-
+	public void train_with_state(State state) {
 		MaxRecord max_change = new MaxRecord();
-		for(int index : indices) {
-			State state = possible_states[index];
-			StateQ state_Q = Q.get(state);
-			Utility.forEachChoice(action_choices, choice -> {
-				ActionSet actions = new ActionSet(choice, state);
-				max_change.record(state_Q.update(actions));
-			});
-		}
-		Log.log("Q_training", "Changed by " + max_change.get());
+		StateQ state_Q = Q.get(state);
+		Utility.forEachChoice(action_choices, choice -> {
+			ActionSet actions = new ActionSet(choice, state);
+			max_change.record(state_Q.update(actions));
+		});
+		Log.log("Q_training", "Changed by " + max_change.get() + " (" + state.toString() + ")");
 	}
 
 }

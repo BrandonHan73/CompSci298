@@ -20,21 +20,21 @@ public class Main {
 
 		Utility.println();
 		Utility.println("----------------------------------");
-		Utility.println("| Crash Game                     |");
-		Utility.println("----------------------------------");
-		evaluate(new CrashGame(5, 7));
-
-		Utility.println();
-		Utility.println("----------------------------------");
 		Utility.println("| Crash Game with custom rewards |");
 		Utility.println("----------------------------------");
 		evaluate(new CrashGame(CrashGameTest.reward1));
 
 		Utility.println();
 		Utility.println("----------------------------------");
+		Utility.println("| Crash Game                     |");
+		Utility.println("----------------------------------");
+		// evaluate(new CrashGame(5, 7));
+
+		Utility.println();
+		Utility.println("----------------------------------");
 		Utility.println("| Zero Sum Crash Game            |");
 		Utility.println("----------------------------------");
-		evaluate(new ZeroSumCrashGame(CrashGameTest.reward1));
+		// evaluate(new ZeroSumCrashGame(CrashGameTest.reward1));
 	}
 
 	public static void test(Game game, Policy pol, int games, int cycles) {
@@ -69,18 +69,23 @@ public class Main {
 
 		Utility.println();
 		Utility.println("Using random actions");
-
-		Main.test(game, new RandomPolicy(game), games, cycles);
+		RandomPolicy random_policy = new RandomPolicy(game);
+		Main.test(game, random_policy, games, cycles);
 
 		Utility.println();
 		Utility.println("Using A2C");
-
-		Main.test(game, new A2C_Policy(game), games, cycles);
+		A2C_Policy a2c_policy = new A2C_Policy(game);
+		// Main.test(game, a2c_policy, games, cycles);
 
 		Utility.println();
 		Utility.println("Using discrete policy");
+		DiscreteGamePolicy discrete_policy = new CrashGamePolicy(game);
+		Main.test(game, discrete_policy, games, cycles);
 
-		Main.test(game, new CrashGamePolicy(game), games, cycles);
+		Utility.println();
+		Utility.println("Using pretrained policy");
+		A2C_Policy pretrained_a2c = new A2C_Policy(game, discrete_policy);
+		Main.test(game, pretrained_a2c, games, cycles);
 
 	}
 

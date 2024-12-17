@@ -260,6 +260,8 @@ public class NashSolver {
 		// Keep track of largest change
 		MaxRecord max_change = new MaxRecord();
 
+		fictitious_play_csv.clear();
+
 		// Do the specified number of iterations
 		for(int iteration = 0; iteration < Config.fictitious_play_iterations; iteration++) {
 			max_change.reset();
@@ -311,10 +313,24 @@ public class NashSolver {
 				}
 			}
 
+			fictitious_play_csv.add(new Object[] {
+				iteration,
+				action_counts[0].get(player_choices[0][0]),
+				action_counts[0].get(player_choices[0][1]),
+				action_counts[0].get(player_choices[0][2]),
+				action_counts[0].get(player_choices[0][3]),
+				action_counts[1].get(player_choices[1][0]),
+				action_counts[1].get(player_choices[1][1]),
+				action_counts[1].get(player_choices[1][2]),
+				action_counts[1].get(player_choices[1][3])
+			});
+
 			if(max_change.get() == 0) {
 				break;
 			}
 		}
+
+		fictitious_play_csv.complete();
 
 		// Logging
 		StringBuilder log = new StringBuilder();
@@ -344,8 +360,11 @@ public class NashSolver {
 
 	private static final String fictitious_play_name = "fictitious_play";
 	private static SuccessLogger fictitious_play_convergence = new SuccessLogger(fictitious_play_name, "Convergence rate");
-	private static SuccessLogger fictitious_play_panic_rate = new SuccessLogger(fictitious_play_name, "Panic rate");
-	private static SuccessLogger fictitious_play_panic_convergence = new SuccessLogger(fictitious_play_name, "Panic success rate");
+	private static CSV_Log fictitious_play_csv = new CSV_Log(fictitious_play_name + "_csv", "csv", 
+		"time", 
+		"P(UP)", "P(RIGHT)", "P(DOWN)", "P(LEFT)",
+		"P(UP)", "P(RIGHT)", "P(DOWN)", "P(LEFT)"
+	);
 
 }
 

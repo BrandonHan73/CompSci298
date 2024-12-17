@@ -17,6 +17,14 @@ public class CrashGameTest {
 			{ -5, -5, 0, -5, 0, -5, -5 }
 	};
 
+	static {
+		for(int r = 0; r < reward1.length; r++) {
+			for(int c = 0; c < reward1[r].length; c++) {
+				reward1[r][c] += CrashGame.epsilon * (2 * Math.random() - 1);
+			}
+		}
+	}
+
 	public static void symmetric_base() throws InterruptedException {
 		// CrashGame game = new CrashGame(5, 7);
 		SymmetricGame game = new SymmetricGame(reward1);

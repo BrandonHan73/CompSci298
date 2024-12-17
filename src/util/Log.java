@@ -62,7 +62,8 @@ public class Log {
 	public static void log(String topic, String txt) {
 		if(!logs.containsKey(topic)) {
 			try {
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("logs/" + topic + ".log")));
+				String filename = "logs/" + topic + ".log";
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 				logs.put(topic, out);
 			} catch(IOException e) {
 				throw new RuntimeException("Failed to create new log topic");
