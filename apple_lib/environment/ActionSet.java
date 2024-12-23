@@ -8,7 +8,7 @@ public class ActionSet implements Cloneable {
 	////////////////////////////////// FIELDS //////////////////////////////////
 
 	/* Game that this action set object is used in */
-	protected final Game base_game;
+	protected Game base_game;
 
 	/* Action choices */
 	private Enum[] action_choices;

@@ -7,4 +7,5 @@ third-party/
 
 *.out
 *.class
+*.jar
 

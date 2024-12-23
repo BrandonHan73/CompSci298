@@ -15,7 +15,7 @@ public class State implements Cloneable {
 	////////////////////////////////// FIELDS //////////////////////////////////
 
 	/* Game that this state object is used in */
-	protected final Game base_game;
+	protected Game base_game;
 
 	/////////////////////////////// CONSTRUCTORS ///////////////////////////////
 

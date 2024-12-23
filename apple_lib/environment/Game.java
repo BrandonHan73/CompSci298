@@ -21,7 +21,7 @@ public abstract class Game implements Cloneable {
 	protected State state;
 
 	/* Number of players participating in this game */
-	public final int player_count;
+	protected int player_count;
 
 	/////////////////////////////// CONSTRUCTORS ///////////////////////////////
 
@@ -51,7 +51,11 @@ public abstract class Game implements Cloneable {
 	 * Returns a copy of the current state
 	 */
 	public State get_state() {
-		return (State) state.clone();
+		try {
+			return (State) state.clone();
+		} catch(CloneNotSupportedException cnse) {
+			throw new RuntimeException("Could not clone state object");
+		}
 	}
 
 	/**
@@ -71,6 +75,13 @@ public abstract class Game implements Cloneable {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Provides the player count for this game
+	 */
+	public int player_count() {
+		return player_count;
 	}
 
 	//////////////////////////////// OVERRIDING ////////////////////////////////

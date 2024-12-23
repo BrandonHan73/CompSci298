@@ -8,9 +8,9 @@ util_obj = out/util/*.class
 
 objects = $(base_obj) $(environment_obj) $(example_obj) $(network_obj) $(policy_obj) $(util_obj)
 
-libraries = lib/Jama-1.0.3.jar
+libraries = lib/Jama-1.0.3.jar apple_lib/apple_lib.jar
 
-class_path = src/:$(libraries)
+class_path = src/:lib/Jama-1.0.3.jar:apple_lib/apple_lib.jar
 
 all: $(libraries) $(objects)
 	@echo Compiling Main.java
@@ -22,6 +22,9 @@ all: $(libraries) $(objects)
 
 lib/Jama-1.0.3.jar:
 	@wget -P lib https://math.nist.gov/javanumerics/jama/Jama-1.0.3.jar
+
+apple_lib/apple_lib.jar:
+	@$(MAKE) -C apple_lib
 
 out/%.class: src/%.java
 	@echo Compiling $@
