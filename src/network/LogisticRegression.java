@@ -1,5 +1,7 @@
 package network;
 
+import apple_lib.network.*;
+
 public class LogisticRegression extends NeuralNetwork {
 
 	public LogisticRegression(int... layer_sizes) {

@@ -45,6 +45,11 @@ public abstract class Game implements Cloneable {
 	 */
 	public abstract double[] update(ActionSet actions);
 
+	/**
+	 * Resets the environment to the initial state
+	 */
+	public abstract void initialize();
+
 	////////////////////////////////// METHODS /////////////////////////////////
 
 	/**

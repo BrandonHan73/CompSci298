@@ -1,5 +1,7 @@
 package network;
 
+import apple_lib.network.*;
+
 public class SoftMax extends NeuralNetwork {
 
 	public SoftMax(int... layer_sizes) {
@@ -12,7 +14,7 @@ public class SoftMax extends NeuralNetwork {
 		for(int i = 0; i < layer_count - 1; i++) {
 			out[i] = LogisticLayer.class;
 		}
-		out[layer_count - 1] = SoftMaxLayer.class;
+		out[layer_count - 1] = SoftmaxLayer.class;
 
 		return out;
 	}

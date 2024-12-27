@@ -22,11 +22,15 @@ public class A2C_Policy extends EpsilonGreedy {
 		needs_pretraining = false;
 		target_critic = null;
 
-		value_network = new FullRangeNetwork(param_count, 5, 5, 5, 5, player_count);
+		double learning_rate = Math.PI / 1000;
+
+		value_network = new FullRangeNetwork(param_count, 32, player_count);
+		value_network.set_learning_rate(learning_rate);
 
 		policy_network = new SoftMax[player_count];
 		for(int player = 0; player < player_count; player++) {
-			policy_network[player] = new SoftMax(param_count, 5, 5, 5, game.get_possible_actions(player).length);
+			policy_network[player] = new SoftMax(param_count, 32, game.get_possible_actions(player).length);
+			policy_network[player].set_learning_rate(learning_rate);
 		}
 	}
 

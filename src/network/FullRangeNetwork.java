@@ -1,5 +1,7 @@
 package network;
 
+import apple_lib.network.*;
+
 public class FullRangeNetwork extends NeuralNetwork {
 
 	public FullRangeNetwork(int... layer_sizes) {
@@ -10,9 +12,9 @@ public class FullRangeNetwork extends NeuralNetwork {
 		Class[] out = new Class[layer_count];
 
 		for(int i = 0; i < layer_count - 1; i++) {
-			out[i] = LogisticLayer.class;
+			out[i] = SoftplusLayer.class;
 		}
-		out[layer_count - 1] = CleanLayer.class;
+		out[layer_count - 1] = LinearLayer.class;
 
 		return out;
 	}

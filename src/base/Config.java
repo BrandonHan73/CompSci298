@@ -2,8 +2,8 @@ package base;
 
 public class Config {
 
-	public static int fictitious_play_iterations = 1 << 11;
-	public static int fast_fictitious_play_iterations = 1 << 9;
+	public static int fictitious_play_iterations = 1 << 9;
+	public static int fast_fictitious_play_iterations = 1 << 7;
 
 	public static int action_distribution_max_count = -1;
 
@@ -13,7 +13,7 @@ public class Config {
 	public static int Q_iterations = 1 << 3;
 
 	public static int A2C_iterations = 1 << 4;
-	public static int a2c_critic_pretrain_iterations = 1 << 14;
+	public static int a2c_critic_pretrain_iterations = 1 << 9;
 
 	public static int DQN_iterations = 2048;
 	public static int DQN_simulation_time = 1 << 17;
@@ -28,7 +28,7 @@ public class Config {
 	public static double alpha = 0.1;
 
 	// Discount for Q learning
-	public static double Beta = 0.6;
+	public static double Beta = 0.99;
 
 	public static double probability_distribution_tolerance = 0.00000001;
 

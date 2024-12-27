@@ -18,7 +18,7 @@ all: $(libraries) $(objects)
 	@echo
 	@echo Executing Main
 	@echo
-	@java -cp out:lib/Jama-1.0.3.jar Main
+	@java -cp out/:$(class_path) Main
 
 lib/Jama-1.0.3.jar:
 	@wget -P lib https://math.nist.gov/javanumerics/jama/Jama-1.0.3.jar

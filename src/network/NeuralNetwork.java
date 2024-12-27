@@ -2,6 +2,8 @@ package network;
 
 import util.Log;
 
+import apple_lib.network.ANN_Layer;
+
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class NeuralNetwork {
@@ -9,7 +11,7 @@ public abstract class NeuralNetwork {
 	private final int[] sizes;
 	protected final int layer_count, input_count, output_count;
 
-	private final NetworkLayer[] layers;
+	private final ANN_Layer[] layers;
 
 	private static final String log_name = "neural_network";
 
@@ -19,11 +21,11 @@ public abstract class NeuralNetwork {
 		input_count = sizes[0];
 		output_count = sizes[layer_count];
 
-		layers = new NetworkLayer[layer_count];
+		layers = new ANN_Layer[layer_count];
 		Class[] layer_types = get_layer_types();
 		for(int i = 0; i < layer_count; i++) {
 			try {
-				layers[i] = (NetworkLayer) layer_types[i].getDeclaredConstructors()[0].newInstance(sizes[i], sizes[i + 1]);
+				layers[i] = (ANN_Layer) layer_types[i].getDeclaredConstructors()[0].newInstance(sizes[i], sizes[i + 1]);
 			} catch(InvocationTargetException ite) {
 				throw new RuntimeException(ite.getTargetException().getMessage());
 			} catch(IllegalAccessException iae) {
@@ -31,6 +33,12 @@ public abstract class NeuralNetwork {
 			} catch(InstantiationException ie) {
 				throw new RuntimeException("InstantiationException generated");
 			}
+		}
+	}
+
+	public void set_learning_rate(double v) {
+		for(ANN_Layer layer : layers) {
+			layer.set_learning_rate(v);
 		}
 	}
 
@@ -42,7 +50,7 @@ public abstract class NeuralNetwork {
 		for(double d : out) log.append(d).append(" ");
 		log.append("Input end\n");
 
-		for(NetworkLayer layer : layers) {
+		for(ANN_Layer layer : layers) {
 			out = layer.pass(out);
 
 			for(double d : out) log.append(d).append(" ");

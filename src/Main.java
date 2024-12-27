@@ -75,7 +75,7 @@ public class Main {
 		Utility.println();
 		Utility.println("Using A2C");
 		A2C_Policy a2c_policy = new A2C_Policy(game);
-		// Main.test(game, a2c_policy, games, cycles);
+		Main.test(game, a2c_policy, games, cycles);
 
 		Utility.println();
 		Utility.println("Using discrete policy");

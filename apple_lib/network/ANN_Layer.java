@@ -10,7 +10,7 @@ public abstract class ANN_Layer {
 	private static final Random rng = new Random();
 
 	/* Default learning rate */
-	public static double default_learning_rate = 0.4;
+	public static double default_learning_rate = 0.01;
 
 	////////////////////////////////// FIELDS //////////////////////////////////
 
@@ -44,7 +44,7 @@ public abstract class ANN_Layer {
 
 		for(int out = 0; out < outputs; out++) {
 			for(int in = 0; in < inputs; in++) {
-				weights[out][in] = rng.nextGaussian();
+				weights[in][out] = rng.nextGaussian();
 			}
 			biases[out] = rng.nextGaussian();
 		}
@@ -135,7 +135,7 @@ public abstract class ANN_Layer {
 
 		double[][] dydz = activation_derivative(last_z, last_y);
 		double[] dCdz = new double[output_count];
-		for(int z = 0; z < input_count; z++) {
+		for(int z = 0; z < output_count; z++) {
 			dCdz[z] = 0;
 			for(int y = 0; y < output_count; y++) {
 				dCdz[z] += dCdy[y] * dydz[y][z];
