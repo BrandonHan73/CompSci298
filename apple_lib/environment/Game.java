@@ -36,7 +36,8 @@ public abstract class Game implements Cloneable {
 	///////////////////////////////// ABSTRACT /////////////////////////////////
 
 	/**
-	 * Provide all possible actions for a given player
+	 * Provide all possible actions for a given player. Return value should be
+	 * consistent across all calls, regardless of game state. 
 	 */
 	public abstract Enum[] options_for(int player);
 

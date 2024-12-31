@@ -9,6 +9,7 @@ package apple_lib.environment;
  *
  * Usage
  *  - Override hash and equals methods
+ *  - Add necessary fields to clone method
  */
 public class State implements Cloneable {
 
