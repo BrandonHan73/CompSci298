@@ -10,7 +10,7 @@ public abstract class ANN_Layer {
 	private static final Random rng = new Random();
 
 	/* Default learning rate */
-	public static double default_learning_rate = 0.01;
+	public static double default_learning_rate = 0.0001;
 
 	////////////////////////////////// FIELDS //////////////////////////////////
 
@@ -97,7 +97,7 @@ public abstract class ANN_Layer {
 				z[o] += weights[i][o] * in[i];
 			}
 			if(Double.isFinite(z[o]) == false) {
-				throw new RuntimeException(String.format("Intermediate %d is %s and not finite", o, Double.toString(z[o])));
+				throw new RuntimeException(String.format("Intermediate %d in layer %s is %s and not finite", o, getClass().getName(), Double.toString(z[o])));
 			}
 			last_z[o] = z[o];
 		}
@@ -139,6 +139,14 @@ public abstract class ANN_Layer {
 			dCdz[z] = 0;
 			for(int y = 0; y < output_count; y++) {
 				dCdz[z] += dCdy[y] * dydz[y][z];
+
+				if(!Double.isFinite(dydz[y][z])) {
+					throw new RuntimeException(String.format("%s derivative function gave non-finite value %s", getClass().getName(), Double.toString(dydz[y][z])));
+				}
+			}
+
+			if(!Double.isFinite(dCdz[z])) {
+				throw new RuntimeException("dCdz is not finite");
 			}
 		}
 
@@ -148,14 +156,24 @@ public abstract class ANN_Layer {
 			for(int o = 0; o < output_count; o++) {
 				dCdx[i] += dCdz[o] * weights[i][o];
 			}
+
+			if(!Double.isFinite(dCdx[i])) {
+				throw new RuntimeException("dCdx is not finite");
+			}
 		}
 
 		double learning_rate = get_learning_rate();
 		for(int o = 0; o < output_count; o++) {
 			for(int i = 0; i < input_count; i++) {
 				weights[i][o] -= learning_rate * dCdz[o] * last_x[i];
+				if(!Double.isFinite(weights[i][o])) {
+					throw new RuntimeException(String.format("%s diverged", getClass().getName()));
+				}
 			}
 			biases[o] -= learning_rate * dCdz[o];
+			if(!Double.isFinite(biases[o])) {
+				throw new RuntimeException(String.format("%s diverged", getClass().getName()));
+			}
 		}
 
 		last_x = null;
@@ -181,6 +199,20 @@ public abstract class ANN_Layer {
 	 */
 	public double get_learning_rate() {
 		return alpha / (Math.log(training_time + 1) + 1);
+	}
+
+	////////////////////////////////// STATIC //////////////////////////////////
+
+	/**
+	 * Sets all weights and biases to a specified value
+	 */
+	public static void set_weights_and_biases(ANN_Layer layer, double value) {
+		for(int o = 0; o < layer.output_count; o++) {
+			for(int i = 0; i < layer.input_count; i++) {
+				layer.weights[i][o] = value;
+			}
+			layer.biases[o] = value;
+		}
 	}
 
 }

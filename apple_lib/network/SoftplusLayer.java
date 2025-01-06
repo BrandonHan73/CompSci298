@@ -30,6 +30,10 @@ public class SoftplusLayer extends ANN_Layer {
 			} else {
 				out[i] = z[i];
 			}
+
+			if(!Double.isFinite(out[i])) {
+				throw new RuntimeException(String.format("Softplus activation for input %f produced non-finite result", z[i]));
+			}
 		}
 		return out;
 	}

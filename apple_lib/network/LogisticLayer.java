@@ -30,6 +30,10 @@ public class LogisticLayer extends ANN_Layer {
 			} else {
 				out[i] = 0;
 			}
+
+			if(!Double.isFinite(out[i])) {
+				throw new RuntimeException(String.format("Logistic activation for input %f produced non-finite result", z[i]));
+			}
 		}
 		return out;
 	}
