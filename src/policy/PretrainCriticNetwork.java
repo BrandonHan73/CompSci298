@@ -19,6 +19,7 @@ public class PretrainCriticNetwork extends AllStatesDefinedPolicy {
 
 		target_policy = target;
 		value_network = new FullRangeNetwork(param_count, 128, player_count);
+		value_network.set_learning_rate(0.05);
 	}
 
 	public NeuralNetwork get_trained() {

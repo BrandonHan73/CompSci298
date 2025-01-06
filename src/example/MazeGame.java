@@ -1,6 +1,9 @@
 package example;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 import apple_lib.environment.*;
 
@@ -18,10 +21,32 @@ public class MazeGame extends Game {
 	private int start_dr, start_dc; 
 	private int start_or, start_oc;
 
+	/* Stores string representation of the current game state */
+	private String[] lines;
+
 	/////////////////////////////// CONSTRUCTORS ///////////////////////////////
 
+	/**
+	 * Basic constructor. Reads maze from a file. 
+	 */
 	public MazeGame(File input) {
 		super(5);
+
+		BufferedReader read = new BufferedReader(new FileReader(input));
+		String in = read.readLine();
+
+		ArrayList<String> stack = new ArrayList<>();
+		stack.add(in);
+
+		row_count = 0;
+		col_count = in.length() / 4;
+
+		while( (in = read.readLine()) != null ) {
+
+			row_count++;
+			stack.add(in);
+			stack.add(read.readLine());
+		}
 	}
 
 	//////////////////////////////// OVERRIDING ////////////////////////////////

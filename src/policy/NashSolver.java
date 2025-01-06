@@ -6,9 +6,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import apple_lib.network.ANN_Layer;
+import apple_lib.network.SoftmaxLayer;
 import base.*;
 import util.*;
 import environment.*;
+import network.SoftMax;
 
 /**
  * Various library functions for Q learning. 
@@ -42,7 +45,11 @@ public class NashSolver {
 			best_nash = pick_nash(Q, all_nash);
 			out = distribution_from_nash(Q, best_nash);
 		} else {
-			out = fast ? fast_fictitious_play(Q) : fictitious_play(Q);
+			if(Config.use_gradient_decent_solver) {
+				out = fast ? fast_fictitious_play(Q) : fictitious_play(Q);
+			} else {
+				out = gradient_descent(Q, Config.gradient_descent_solver_iterations);
+			}
 		}
 
 		return out;
@@ -239,6 +246,93 @@ public class NashSolver {
 	 * @param Q The Q function for the current state.
 	 * @param iterations Total iteration count
 	 */
+	public static ActionDistribution[] gradient_descent(StateQ Q, int iterations) {
+		// Required constant values
+		final int player_count = Q.state.player_count();
+		final Enum[][] player_choices = new Enum[player_count][];
+		for(int player = 0; player < player_count; player++) {
+			player_choices[player] = Q.state.choices_for(player);
+		}
+
+		// Create pass variable for networks
+		double[] network_in = new double[] {};
+
+		// Store network and standard representation for each player's action distribution
+		ActionDistribution[] action_counts = new ActionDistribution[player_count];
+		SoftmaxLayer[] player_networks = new SoftmaxLayer[player_count];
+		for(int player = 0; player < player_count; player++) {
+			player_networks[player] = new SoftmaxLayer(0, player_choices[player].length);
+			player_networks[player].set_learning_rate(Config.gradient_descent_solver_learning_rate);
+			ANN_Layer.set_weights_and_biases(player_networks[player], 1);
+			
+			action_counts[player] = new ActionDistribution<>(player_choices[player]);
+		}
+
+		// Keep track of largest change
+		MaxRecord max_change = new MaxRecord();
+
+		// Do the specified number of iterations
+		for(int iteration = 0; iteration < Config.fictitious_play_iterations; iteration++) {
+
+			// Iterate through each player
+			for(int player = 0; player < player_count; player++) {
+				// Store current player's choices
+				Enum[] curr_choices = player_choices[player];
+
+				// Construct a gradient
+				double[] gradient = new double[curr_choices.length];
+				for(int grad = 0; grad < curr_choices.length; grad++) {
+					gradient[grad] = 0;
+				}
+
+				// Iterate through all possible actions
+				int player_ = player;
+				Utility.forEachChoice(player_choices, choice -> {
+					ActionSet actions = new ActionSet(choice, Q.state);
+
+					// Calculate term related to current set of actions
+					// Negate Q because algorithm descends
+					double contribution = -Q.get(actions, player_);
+					for(int opponent = 0; opponent < player_count; opponent++) {
+						if(player_ == opponent) continue;
+
+						contribution *= action_counts[opponent].get(actions.get(opponent));
+					}
+
+					// Add to gradient
+					gradient[actions.get(player_).ordinal()] += contribution;
+				});
+
+				// Backpropogate
+				player_networks[player].pass(network_in);
+				player_networks[player].backpropogate(gradient);
+
+			}
+
+			// Update standard representation
+			for(int player = 0; player < player_count; player++) {
+				action_counts[player] = new ActionDistribution<>(player_choices[player]);
+				double[] network_out = player_networks[player].pass(network_in);
+				for(Enum action : player_choices[player]) {
+					action_counts[player].add(action, network_out[action.ordinal()]);
+				}
+			}
+
+		}
+
+		// Logging
+		StringBuilder log = new StringBuilder();
+
+		// Return value
+		return action_counts;
+	}
+
+	/**
+	 * Runs the fictitious play algorithm for the current state. 
+	 *
+	 * @param Q The Q function for the current state.
+	 * @param iterations Total iteration count
+	 */
 	public static ActionDistribution[] fictitious_play(StateQ Q, int iterations) {
 		// Required constant values
 		final int player_count = Q.state.player_count();
@@ -263,7 +357,7 @@ public class NashSolver {
 		fictitious_play_csv.clear();
 
 		// Do the specified number of iterations
-		for(int iteration = 0; iteration < Config.fictitious_play_iterations; iteration++) {
+		for(int iteration = 0; iteration < iterations; iteration++) {
 			max_change.reset();
 
 			// Calculate reaction for each player

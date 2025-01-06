@@ -14,7 +14,7 @@ public abstract class EpsilonGreedy extends Policy {
 	@Override
 	public void train_step() {
 		Game game = base_game.get_random_copy();
-		for(int time = 0; time < Config.DQN_simulation_time; time++) {
+		for(int time = 0; time < Config.epsilon_greedy_simulation_time; time++) {
 			State curr = game.get_state().get_copy();
 
 			ActionDistribution[] choices = evaluate(curr);

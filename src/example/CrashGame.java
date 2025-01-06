@@ -9,8 +9,8 @@ import environment.*;
 
 public class CrashGame extends Game {
 
-	private final double truck_crash_reward = 5.0;
-	private final double car_crash_cost = 10.0;
+	private final double truck_crash_reward = 1.0;
+	private final double car_crash_cost = 0.0;
 
 	private final double car_cutoff_reward = 8.0;
 	private final double truck_cutoff_cost = 7.0;
@@ -88,6 +88,7 @@ public class CrashGame extends Game {
 		for(int row = 0; row < rows; row++) {
 			for(int col = 0; col < cols; col++) {
 				vals[row][col] = Math.exp( -(Math.pow(rows / 2 - row, 2) + Math.pow(cols / 2 - col, 2)) / 2 );
+				// vals[row][col] = Math.random();
 			}
 		}
 		rewards = new FinalMatrix(vals, epsilon);
@@ -208,13 +209,13 @@ public class CrashGame extends Game {
 		if(truck_old.equals(curr.car) && car_old.equals(curr.truck)) {
 			curr.truck = truck_old;
 			curr.car = car_old;
-			rewards[0] += truck_crash_reward;
-			rewards[1] -= car_crash_cost;
+			rewards[0] = truck_crash_reward;
+			rewards[1] = car_crash_cost;
 		}
 		if(curr.truck.equals(curr.car)) {
 			curr.truck = truck_old;
-			rewards[0] += truck_crash_reward;
-			rewards[1] -= car_crash_cost;
+			rewards[0] = truck_crash_reward;
+			rewards[1] = car_crash_cost;
 		}
 
 		return rewards;
