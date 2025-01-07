@@ -110,7 +110,12 @@ public class ActionSet implements Cloneable {
 	 * Takes an index instead of the enum representation. 
 	 */
 	public ActionSet modify(int player, int action) {
-		ActionSet out = (ActionSet) this.clone();
+		ActionSet out;
+		try {
+			out = (ActionSet) this.clone();
+		} catch(CloneNotSupportedException cnse) {
+			throw new RuntimeException("Failed to clone action set");
+		}
 		out.action_choices[player] = action;
 		return out;
 	}
@@ -119,7 +124,12 @@ public class ActionSet implements Cloneable {
 	 * Creates a copy of this action set but changes a specified action choice
 	 */
 	public ActionSet modify(int player, Enum action) {
-		ActionSet out = (ActionSet) this.clone();
+		ActionSet out;
+		try {
+			out = (ActionSet) this.clone();
+		} catch(CloneNotSupportedException cnse) {
+			throw new RuntimeException("Failed to clone action set");
+		}
 		out.action_choices[player] = base_game.check_action(player, action);
 		return out;
 	}

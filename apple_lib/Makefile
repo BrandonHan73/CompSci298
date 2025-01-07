@@ -1,9 +1,9 @@
 
-base_obj = out/apple_lib/*.class
+util_obj = out/apple_lib/utility/*.class
 env_obj = out/apple_lib/environment/*.class
 network_obj = out/apple_lib/network/*.class
 
-objects = $(base_obj) $(env_obj) $(network_obj) 
+objects = $(util_obj) $(env_obj) $(network_obj) 
 
 class_path = ..
 

@@ -1,5 +1,7 @@
 package apple_lib.environment;
 
+import apple_lib.utility.Parameterizable;
+
 /**
  * Superclass for defining a game state
  *
@@ -11,7 +13,7 @@ package apple_lib.environment;
  *  - Override parameterize method for use with policy training
  *  - Add necessary fields to clone method
  */
-public class State implements Cloneable {
+public class State implements Cloneable, Parameterizable {
 
 	////////////////////////////////// FIELDS //////////////////////////////////
 
@@ -43,21 +45,17 @@ public class State implements Cloneable {
 		return base_game.options_for(player);
 	}
 
-	/**
-	 * Encodes this state object into a double array
-	 */
+	//////////////////////////////// OVERRIDING ////////////////////////////////
+
+	@Override
 	public double[] parameterize() {
 		return new double[] {};
 	}
 
-	/**
-	 * Returns the length of the parameter representation of this state
-	 */
+	@Override
 	public int parameter_count() {
 		return parameterize().length;
 	}
-
-	//////////////////////////////// OVERRIDING ////////////////////////////////
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {

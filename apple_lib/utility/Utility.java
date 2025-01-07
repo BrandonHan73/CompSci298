@@ -1,4 +1,4 @@
-package apple_lib;
+package apple_lib.utility;
 
 /**
  * Provides basic static utility functions
