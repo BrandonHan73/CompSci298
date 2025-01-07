@@ -8,7 +8,7 @@ package apple_lib.environment;
  *  - Can be used with hash tables
  *
  * Usage
- *  - Override hash and equals methods
+ *  - Override parameterize method for use with policy training
  *  - Add necessary fields to clone method
  */
 public class State implements Cloneable {
@@ -58,21 +58,6 @@ public class State implements Cloneable {
 	}
 
 	//////////////////////////////// OVERRIDING ////////////////////////////////
-
-	@Override
-	public boolean equals(Object other) {
-		if(other instanceof State) {
-			State state = (State) other;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		return 0;
-	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {

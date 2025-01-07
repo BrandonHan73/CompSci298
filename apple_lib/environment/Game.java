@@ -72,15 +72,18 @@ public abstract class Game implements Cloneable {
 	}
 
 	/**
-	 * Checks whether the specified player can perform the given action
+	 * Checks whether the specified player can perform the given action. Returns
+	 * -1 if the action cannot be performed. Otherwise, returns the index in
+	 *  the options_for list. 
 	 */
-	public boolean check_action(int player, Enum action) {
-		for(Enum a : options_for(player)) {
-			if(a == action) {
-				return true;
+	public int check_action(int player, Enum action) {
+		Enum[] choices = options_for(player);
+		for(int i = 0; i < choices.length; i++) {
+			if(choices[i] == action) {
+				return i;
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	/**
